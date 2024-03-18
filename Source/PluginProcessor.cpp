@@ -34,7 +34,7 @@ UtilitycloneAudioProcessor::UtilitycloneAudioProcessor()
         })
 {
     gain = parameters.getRawParameterValue("gain");
-    phase = parameters.getRawParameterValue("invertPhase");
+    invertPhase = parameters.getRawParameterValue("invertPhase");
 }
 
 UtilitycloneAudioProcessor::~UtilitycloneAudioProcessor()
@@ -146,7 +146,10 @@ bool UtilitycloneAudioProcessor::isBusesLayoutSupported (const BusesLayout& layo
 
 void UtilitycloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-    auto currentGain = gain->load(); // load() ?
+    DBG(juce::String(std::to_string( *invertPhase )));
+    auto phase = *invertPhase ? -1.0f : 1.0f;  // [6]
+    auto currentGain = *gain * phase; // [7]
+    // var->load or *var
 
     if (juce::approximatelyEqual(currentGain, previousGain))
     {

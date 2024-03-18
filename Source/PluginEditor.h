@@ -30,11 +30,14 @@ private:
     UtilitycloneAudioProcessor& audioProcessor;
 
 
-    typedef juce::AudioProcessorValueTreeState::SliderAttachment SliderAttachment; // ’Ç‰Á
+    typedef juce::AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
+    typedef juce::AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
     
-    juce::AudioProcessorValueTreeState& valueTreeState; // ’Ç‰Á
-    juce::Slider gainSlider; // ’Ç‰Á
-    std::unique_ptr<SliderAttachment> gainSliderAttachment; // ’Ç‰Á
+    juce::AudioProcessorValueTreeState& valueTreeState;
+    juce::Slider gainSlider;
+    std::unique_ptr<SliderAttachment> gainSliderAttachment;
+    juce::TextButton pheseInvertToggleButton;
+    std::unique_ptr<ButtonAttachment> pheseInvertToggleButtonAttachment;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UtilitycloneAudioProcessorEditor)
 };
