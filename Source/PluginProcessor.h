@@ -10,12 +10,15 @@
 
 #include <JuceHeader.h>
 
+const juce::StringArray stereoModeList = juce::StringArray("Width", "Mid/Side");
+
 //==============================================================================
 /**
 */
 class UtilitycloneAudioProcessor  : public juce::AudioProcessor
 {
 public:
+
     //==============================================================================
     UtilitycloneAudioProcessor();
     ~UtilitycloneAudioProcessor() override;
@@ -64,6 +67,13 @@ private:
     std::atomic<float>* isInvertPhase = nullptr;
     std::atomic<float>* isMono = nullptr;
     std::atomic<float>* pan = nullptr;
+    std::atomic<float>* stereoMode = nullptr; // Width or Mid/Side
+    std::atomic<float>* stereoWidth = nullptr;
+    std::atomic<float>* stereoMidSide = nullptr;
+
+    std::atomic<float>* isBassMono = nullptr;
+    std::atomic<float>* bassMonoFrequency = nullptr;
+
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UtilitycloneAudioProcessor)

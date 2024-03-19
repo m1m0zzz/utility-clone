@@ -9,8 +9,6 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
-#define M_PI 3.141592653589793238L
-
 //==============================================================================
 UtilitycloneAudioProcessor::UtilitycloneAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -29,12 +27,18 @@ UtilitycloneAudioProcessor::UtilitycloneAudioProcessor()
             std::make_unique<juce::AudioParameterBool>("invertPhase", "Invert Phase", false),
             std::make_unique<juce::AudioParameterBool>("mono", "Mono", false),
             std::make_unique<juce::AudioParameterFloat>("pan", "Pan", -50.0f, 50.0f, 0.0f),
+            std::make_unique<juce::AudioParameterChoice>("stereoMode", "Stereo Mode", stereoModeList, 0),
+            std::make_unique<juce::AudioParameterFloat>("stereoWidth", "Width", 0.0f, 400.0f, 100.0f),
+            std::make_unique<juce::AudioParameterFloat>("stereoMidSide", "Mid/Side", -100.0f, 100.0f, 0.0f),
         })
 {
-    gain = parameters.getRawParameterValue("gain");
+    gain          = parameters.getRawParameterValue("gain");
     isInvertPhase = parameters.getRawParameterValue("invertPhase");
-    isMono = parameters.getRawParameterValue("mono");
-    pan = parameters.getRawParameterValue("pan");
+    isMono        = parameters.getRawParameterValue("mono");
+    pan           = parameters.getRawParameterValue("pan");
+    stereoMode    = parameters.getRawParameterValue("stereoMode");
+    stereoWidth   = parameters.getRawParameterValue("stereoWidth");
+    stereoMidSide = parameters.getRawParameterValue("stereoMidSide");
 }
 
 UtilitycloneAudioProcessor::~UtilitycloneAudioProcessor()
@@ -166,6 +170,25 @@ void UtilitycloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     // phase
     auto phase = *isInvertPhase ? -1.0f : 1.0f;
     buffer.applyGain(phase);
+
+    // stereo
+    DBG("width = " << *stereoWidth);
+    DBG("MS = " << *stereoMidSide);
+    if (totalNumInputChannels == 2)
+    {
+        auto* leftChannel = buffer.getWritePointer(0);
+        auto* rightChannel = buffer.getWritePointer(1);
+
+        for (int i = 0; i < buffer.getNumSamples(); ++i)
+        {
+            auto midSignal = (leftChannel[i] + rightChannel[i]);
+            auto sideSignal = (leftChannel[i] - rightChannel[i]);
+            
+            leftChannel[i] = (midSignal + sideSignal);
+            rightChannel[i] = (midSignal - sideSignal);
+        }
+    }
+
     
     juce::dsp::AudioBlock<float> audioBlock(buffer);
     juce::dsp::ProcessContextReplacing<float> context(audioBlock);

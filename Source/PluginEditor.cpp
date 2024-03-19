@@ -23,6 +23,7 @@ UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor (
     : AudioProcessorEditor (&p), audioProcessor (p), valueTreeState(vts)
 {
     gainSliderAttachment.reset(new SliderAttachment(valueTreeState, "gain", gainSlider));
+    gainSlider.setTextValueSuffix(" dB");
     addAndMakeVisible(gainSlider);
 
     invertPhaseToggleButtonAttachment.reset(new ButtonAttachment(valueTreeState, "invertPhase", invertPhaseToggleButton));
@@ -42,7 +43,18 @@ UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor (
     addAndMakeVisible(monoToggleButton);
 
     panSliderAttachment.reset(new SliderAttachment(valueTreeState, "pan", panSlider));
+    // TODO: prefix (pan < 0 ? L : R) abs(pan)
     addAndMakeVisible(panSlider);
+
+    stereoModeComboBox.addItemList(stereoModeList, 1);
+    stereoModeComboBoxAttachment.reset(new ComboBoxAttachment(valueTreeState, "stereoMode", stereoModeComboBox));
+    addAndMakeVisible(stereoModeComboBox);
+
+    stereoWidthSliderAttachment.reset(new SliderAttachment(valueTreeState, "stereoWidth", stereoWidthSlider));
+    addAndMakeVisible(stereoWidthSlider);
+
+    stereoMidSideSliderAttachment.reset(new SliderAttachment(valueTreeState, "stereoMidSide", stereoMidSideSlider));
+    addAndMakeVisible(stereoMidSideSlider);
 
     setSize (200, 400);
 }
@@ -55,11 +67,7 @@ UtilitycloneAudioProcessorEditor::~UtilitycloneAudioProcessorEditor()
 void UtilitycloneAudioProcessorEditor::paint (juce::Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
-
-    g.setColour (juce::Colours::white);
-    g.setFont (15.0f);
-    g.drawFittedText ("Hello World!", getLocalBounds(), juce::Justification::centred, 1);
+    g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
 }
 
 void UtilitycloneAudioProcessorEditor::resized()
@@ -68,4 +76,7 @@ void UtilitycloneAudioProcessorEditor::resized()
     monoToggleButton.setBounds(10, 50, 180, 30);
     gainSlider.setBounds(10, 90, 180, 30);
     panSlider.setBounds(10, 130, 180, 30);
+    stereoModeComboBox.setBounds(10, 170, 180, 30);
+    stereoWidthSlider.setBounds(10, 210, 180, 30);
+    stereoMidSideSlider.setBounds(10, 250, 180, 30);
 }

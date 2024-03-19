@@ -36,23 +36,26 @@ private:
     // access the processor object that created it.
     UtilitycloneAudioProcessor& audioProcessor;
 
-
     typedef juce::AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
+    typedef juce::AudioProcessorValueTreeState::ComboBoxAttachment ComboBoxAttachment;
     typedef juce::AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
     
     juce::AudioProcessorValueTreeState& valueTreeState;
     
     juce::Slider gainSlider;
-    std::unique_ptr<SliderAttachment> gainSliderAttachment;
-
     juce::TextButton invertPhaseToggleButton;
-    std::unique_ptr<ButtonAttachment> invertPhaseToggleButtonAttachment;
-
     juce::TextButton monoToggleButton;
-    std::unique_ptr<ButtonAttachment> monoToggleButtonAttachment;
-
     juce::Slider panSlider;
+    juce::ComboBox stereoModeComboBox;
+    juce::Slider stereoWidthSlider;
+    juce::Slider stereoMidSideSlider;
+    std::unique_ptr<SliderAttachment> gainSliderAttachment;
+    std::unique_ptr<ButtonAttachment> invertPhaseToggleButtonAttachment;
+    std::unique_ptr<ButtonAttachment> monoToggleButtonAttachment;
     std::unique_ptr<SliderAttachment> panSliderAttachment;
+    std::unique_ptr<ComboBoxAttachment> stereoModeComboBoxAttachment;
+    std::unique_ptr<SliderAttachment> stereoWidthSliderAttachment;
+    std::unique_ptr<SliderAttachment> stereoMidSideSliderAttachment;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UtilitycloneAudioProcessorEditor)
 };
