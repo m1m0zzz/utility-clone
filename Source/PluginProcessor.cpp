@@ -25,10 +25,10 @@ UtilitycloneAudioProcessor::UtilitycloneAudioProcessor()
 #endif
     , parameters(*this, nullptr, juce::Identifier("Utility-clone"),
         {
-            std::make_unique<juce::AudioParameterFloat>("gain", "Gain", 0.0f, 2.0f, 1.0f),
+            std::make_unique<juce::AudioParameterFloat>("gain", "Gain", -100.0f, 35.0f, 0.0f),
             std::make_unique<juce::AudioParameterBool>("invertPhase", "Invert Phase", false),
             std::make_unique<juce::AudioParameterBool>("mono", "Mono", false),
-            std::make_unique<juce::AudioParameterFloat>("pan", "Pan", -1.0f, 1.0f, 0.0f),
+            std::make_unique<juce::AudioParameterFloat>("pan", "Pan", -50.0f, 50.0f, 0.0f),
         })
 {
     gain = parameters.getRawParameterValue("gain");
@@ -106,10 +106,15 @@ void UtilitycloneAudioProcessor::changeProgramName (int index, const juce::Strin
 //==============================================================================
 void UtilitycloneAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
+    spec.maximumBlockSize = samplesPerBlock;
+    spec.numChannels = 2;
+    spec.sampleRate = sampleRate;
 
-    previousGain = *gain;
+    gainDSP.prepare(spec);
+    gainDSP.setRampDurationSeconds(0.005); // should consider arguments or using SmoothValue
+
+    pannerDSP.prepare(spec);
+    pannerDSP.setRule(juce::dsp::PannerRule::sin3dB);
 }
 
 void UtilitycloneAudioProcessor::releaseResources()
@@ -146,8 +151,9 @@ bool UtilitycloneAudioProcessor::isBusesLayoutSupported (const BusesLayout& layo
 
 void UtilitycloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-    auto phase = *isInvertPhase ? -1.0f : 1.0f;
-    auto currentGain = *gain * phase;
+    juce::ScopedNoDenormals noDenormals;
+    auto totalNumInputChannels = getTotalNumInputChannels();
+    auto totalNumOutputChannels = getTotalNumOutputChannels();
 
     // mono
     if (*isMono) {
@@ -157,26 +163,20 @@ void UtilitycloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         buffer.applyGain(0.5f);
     }
 
-    // gain
-    if (juce::approximatelyEqual(currentGain, previousGain)) {
-        buffer.applyGain(currentGain);
-    } else {
-        buffer.applyGainRamp(0, buffer.getNumSamples(), previousGain, currentGain);
-        previousGain = currentGain;
-    }
+    // phase
+    auto phase = *isInvertPhase ? -1.0f : 1.0f;
+    buffer.applyGain(phase);
+    
+    juce::dsp::AudioBlock<float> audioBlock(buffer);
+    juce::dsp::ProcessContextReplacing<float> context(audioBlock);
 
-    // pan
-    /*if (getTotalNumInputChannels() != 2) {
-        return;
-    }*/
+    buffer.clear();
 
-    // sin 3 dB
-    float normalisedPan = 0.5f * (*pan + 1.0f);
-    float leftValue  = std::sin(0.5 * M_PI * (1.0 - normalisedPan));
-    float rightValue = std::sin(0.5 * M_PI * normalisedPan);
+    gainDSP.setGainDecibels(*gain);
+    pannerDSP.setPan(*pan / 50.0f);
 
-    buffer.applyGain(0, 0, buffer.getNumSamples(), leftValue * boostValue);
-    buffer.applyGain(1, 0, buffer.getNumSamples(), rightValue * boostValue);
+    gainDSP.process(context);
+    pannerDSP.process(context);
 }
 
 //==============================================================================

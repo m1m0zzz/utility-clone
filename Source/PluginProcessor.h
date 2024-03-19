@@ -55,8 +55,10 @@ public:
 
 private:
     juce::AudioProcessorValueTreeState parameters;
-    float previousGain;
-    float boostValue = std::sqrt(2.0f); // pan
+
+    juce::dsp::ProcessSpec spec;
+    juce::dsp::Gain<float> gainDSP;
+    juce::dsp::Panner<float> pannerDSP;
 
     std::atomic<float>* gain = nullptr;
     std::atomic<float>* isInvertPhase = nullptr;
