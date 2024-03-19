@@ -12,8 +12,8 @@
 **Processing**
 - [x] gain
 - [x] phase invert
-- [ ] pan
-- [ ] mono
+- [x] pan
+- [x] mono
 - [ ] bass mono
 - [ ] stereo width
 
