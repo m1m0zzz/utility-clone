@@ -11,6 +11,13 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 
+//class ToggleTextButton : public juce::TextButton
+//{
+//public:
+//    using juce::TextButton::TextButton;
+//    ToggleTextButton() {}
+//};
+
 //==============================================================================
 /**
 */
@@ -34,10 +41,15 @@ private:
     typedef juce::AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
     
     juce::AudioProcessorValueTreeState& valueTreeState;
+    
     juce::Slider gainSlider;
     std::unique_ptr<SliderAttachment> gainSliderAttachment;
+
     juce::TextButton invertPhaseToggleButton;
     std::unique_ptr<ButtonAttachment> invertPhaseToggleButtonAttachment;
+
+    juce::TextButton monoToggleButton;
+    std::unique_ptr<ButtonAttachment> monoToggleButtonAttachment;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UtilitycloneAudioProcessorEditor)
 };

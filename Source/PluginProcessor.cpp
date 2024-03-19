@@ -24,11 +24,13 @@ UtilitycloneAudioProcessor::UtilitycloneAudioProcessor()
     , parameters(*this, nullptr, juce::Identifier("Utility-clone"),
         {
             std::make_unique<juce::AudioParameterFloat>("gain", "Gain", 0.0f, 2.0f, 1.0f),
-            std::make_unique<juce::AudioParameterBool>("invertPhase", "Invert Phase", false)
+            std::make_unique<juce::AudioParameterBool>("invertPhase", "Invert Phase", false),
+            std::make_unique<juce::AudioParameterBool>("mono", "Mono", false),
         })
 {
     gain = parameters.getRawParameterValue("gain");
     isInvertPhase = parameters.getRawParameterValue("invertPhase");
+    isMono = parameters.getRawParameterValue("mono");
 }
 
 UtilitycloneAudioProcessor::~UtilitycloneAudioProcessor()
@@ -142,7 +144,16 @@ void UtilitycloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
 {
     auto phase = *isInvertPhase ? -1.0f : 1.0f;
     auto currentGain = *gain * phase;
+    //DBG("mono = " << std::to_string(*isMono));
+    // mono
+    if (*isMono) {
+        // cf. https://forum.juce.com/t/how-do-i-sum-stereo-to-mono/37579/8
+        buffer.addFrom(0, 0, buffer, 1, 0, buffer.getNumSamples());
+        buffer.copyFrom(1, 0, buffer, 0, 0, buffer.getNumSamples());
+        buffer.applyGain(0.5f);
+    }
 
+    // gain
     if (juce::approximatelyEqual(currentGain, previousGain))
     {
         buffer.applyGain(currentGain);

@@ -9,6 +9,14 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+//ToggleTextButton::ToggleTextButton() {
+//    setClickingTogglesState(true);
+//    setButtonText("Invert Phase");
+//    setColour(juce::TextButton::buttonOnColourId, juce::Colour::fromRGB(255, 183, 53));
+//    setColour(juce::TextButton::buttonColourId, juce::Colour::fromRGB(50, 50, 50));
+//    setColour(juce::TextButton::textColourOnId, juce::Colours::black);
+//}
+
 //==============================================================================
 UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor (
     UtilitycloneAudioProcessor& p, juce::AudioProcessorValueTreeState& vts)
@@ -24,6 +32,14 @@ UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor (
     invertPhaseToggleButton.setColour(juce::TextButton::buttonColourId, juce::Colour::fromRGB(50, 50, 50));
     invertPhaseToggleButton.setColour(juce::TextButton::textColourOnId, juce::Colours::black);
     addAndMakeVisible(invertPhaseToggleButton);
+
+    monoToggleButtonAttachment.reset(new ButtonAttachment(valueTreeState, "mono", monoToggleButton));
+    monoToggleButton.setClickingTogglesState(true);
+    monoToggleButton.setButtonText("Mono");
+    monoToggleButton.setColour(juce::TextButton::buttonOnColourId, juce::Colour::fromRGB(255, 183, 53));
+    monoToggleButton.setColour(juce::TextButton::buttonColourId, juce::Colour::fromRGB(50, 50, 50));
+    monoToggleButton.setColour(juce::TextButton::textColourOnId, juce::Colours::black);
+    addAndMakeVisible(monoToggleButton);
 
     setSize (200, 400);
 }
@@ -47,4 +63,5 @@ void UtilitycloneAudioProcessorEditor::resized()
 {
     gainSlider.setBounds(10, 10, 180, 30);
     invertPhaseToggleButton.setBounds(10, 50, 180, 30);
+    monoToggleButton.setBounds(10, 90, 180, 30);
 }

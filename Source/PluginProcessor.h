@@ -59,6 +59,7 @@ private:
 
     std::atomic<float>* gain = nullptr;
     std::atomic<float>* isInvertPhase = nullptr;
+    std::atomic<float>* isMono = nullptr;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UtilitycloneAudioProcessor)
