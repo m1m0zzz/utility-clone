@@ -9,6 +9,8 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+#define M_PI 3.141592653589793238L
+
 //==============================================================================
 UtilitycloneAudioProcessor::UtilitycloneAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -26,11 +28,13 @@ UtilitycloneAudioProcessor::UtilitycloneAudioProcessor()
             std::make_unique<juce::AudioParameterFloat>("gain", "Gain", 0.0f, 2.0f, 1.0f),
             std::make_unique<juce::AudioParameterBool>("invertPhase", "Invert Phase", false),
             std::make_unique<juce::AudioParameterBool>("mono", "Mono", false),
+            std::make_unique<juce::AudioParameterFloat>("pan", "Pan", -1.0f, 1.0f, 0.0f),
         })
 {
     gain = parameters.getRawParameterValue("gain");
     isInvertPhase = parameters.getRawParameterValue("invertPhase");
     isMono = parameters.getRawParameterValue("mono");
+    pan = parameters.getRawParameterValue("pan");
 }
 
 UtilitycloneAudioProcessor::~UtilitycloneAudioProcessor()
@@ -106,6 +110,11 @@ void UtilitycloneAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     // initialisation that you need..
 
     previousGain = *gain;
+    float normalisedPan = 0.5f * (*pan + 1.0f);
+    float leftValue = std::sin(0.5 * M_PI * (1.0 - normalisedPan));
+    float rightValue = std::sin(0.5 * M_PI * normalisedPan);
+    previousPanLeftValue  = leftValue;
+    previousPanRightValue = rightValue;
 }
 
 void UtilitycloneAudioProcessor::releaseResources()
@@ -144,7 +153,7 @@ void UtilitycloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
 {
     auto phase = *isInvertPhase ? -1.0f : 1.0f;
     auto currentGain = *gain * phase;
-    //DBG("mono = " << std::to_string(*isMono));
+
     // mono
     if (*isMono) {
         // cf. https://forum.juce.com/t/how-do-i-sum-stereo-to-mono/37579/8
@@ -154,14 +163,43 @@ void UtilitycloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     }
 
     // gain
-    if (juce::approximatelyEqual(currentGain, previousGain))
-    {
+    if (juce::approximatelyEqual(currentGain, previousGain)) {
         buffer.applyGain(currentGain);
-    }
-    else
-    {
+    } else {
         buffer.applyGainRamp(0, buffer.getNumSamples(), previousGain, currentGain);
         previousGain = currentGain;
+    }
+
+    // pan
+    /*if (getTotalNumInputChannels() != 2) {
+        return;
+    }*/
+
+    // sin 3 dB
+    float normalisedPan = 0.5f * (*pan + 1.0f);
+    float leftValue  = std::sin(0.5 * M_PI * (1.0 - normalisedPan));
+    float rightValue = std::sin(0.5 * M_PI * normalisedPan);
+
+    // pan: L channel
+    if (juce::approximatelyEqual(leftValue, previousPanLeftValue)) {
+        DBG("L: nomal");
+        buffer.applyGain(0, 0, buffer.getNumSamples(), leftValue * boostValue);
+    }
+    else {
+        DBG("L: ramp");
+        buffer.applyGainRamp(0, 0, buffer.getNumSamples(), previousPanLeftValue, leftValue * boostValue);
+        previousPanLeftValue = leftValue;
+    }
+
+    // pan: R channel
+    if (juce::approximatelyEqual(rightValue, previousPanRightValue)) {
+        DBG("R: nomal");
+        buffer.applyGain(1, 0, buffer.getNumSamples(), rightValue * boostValue);
+    }
+    else {
+        DBG("R: ramp");
+        buffer.applyGainRamp(1, 0, buffer.getNumSamples(), rightValue * boostValue);
+        previousPanRightValue = rightValue;
     }
 }
 

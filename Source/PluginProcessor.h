@@ -55,11 +55,13 @@ public:
 
 private:
     juce::AudioProcessorValueTreeState parameters;
-    float previousGain;
+    float previousGain, previousPanLeftValue, previousPanRightValue;
+    float boostValue = std::sqrt(2.0f); // pan
 
     std::atomic<float>* gain = nullptr;
     std::atomic<float>* isInvertPhase = nullptr;
     std::atomic<float>* isMono = nullptr;
+    std::atomic<float>* pan = nullptr;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UtilitycloneAudioProcessor)

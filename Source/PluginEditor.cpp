@@ -41,6 +41,9 @@ UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor (
     monoToggleButton.setColour(juce::TextButton::textColourOnId, juce::Colours::black);
     addAndMakeVisible(monoToggleButton);
 
+    panSliderAttachment.reset(new SliderAttachment(valueTreeState, "pan", panSlider));
+    addAndMakeVisible(panSlider);
+
     setSize (200, 400);
 }
 
@@ -61,7 +64,8 @@ void UtilitycloneAudioProcessorEditor::paint (juce::Graphics& g)
 
 void UtilitycloneAudioProcessorEditor::resized()
 {
-    gainSlider.setBounds(10, 10, 180, 30);
-    invertPhaseToggleButton.setBounds(10, 50, 180, 30);
-    monoToggleButton.setBounds(10, 90, 180, 30);
+    invertPhaseToggleButton.setBounds(10, 10, 180, 30);
+    monoToggleButton.setBounds(10, 50, 180, 30);
+    gainSlider.setBounds(10, 90, 180, 30);
+    panSlider.setBounds(10, 130, 180, 30);
 }

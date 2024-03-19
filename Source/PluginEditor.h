@@ -51,5 +51,8 @@ private:
     juce::TextButton monoToggleButton;
     std::unique_ptr<ButtonAttachment> monoToggleButtonAttachment;
 
+    juce::Slider panSlider;
+    std::unique_ptr<SliderAttachment> panSliderAttachment;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UtilitycloneAudioProcessorEditor)
 };
