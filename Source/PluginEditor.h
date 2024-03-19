@@ -36,8 +36,8 @@ private:
     juce::AudioProcessorValueTreeState& valueTreeState;
     juce::Slider gainSlider;
     std::unique_ptr<SliderAttachment> gainSliderAttachment;
-    juce::TextButton pheseInvertToggleButton;
-    std::unique_ptr<ButtonAttachment> pheseInvertToggleButtonAttachment;
+    juce::TextButton invertPhaseToggleButton;
+    std::unique_ptr<ButtonAttachment> invertPhaseToggleButtonAttachment;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UtilitycloneAudioProcessorEditor)
 };

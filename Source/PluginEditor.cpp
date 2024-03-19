@@ -17,13 +17,13 @@ UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor (
     gainSliderAttachment.reset(new SliderAttachment(valueTreeState, "gain", gainSlider));
     addAndMakeVisible(gainSlider);
 
-    pheseInvertToggleButtonAttachment.reset(new ButtonAttachment(valueTreeState, "invertPhase", pheseInvertToggleButton));
-    pheseInvertToggleButton.setClickingTogglesState(true);
-    pheseInvertToggleButton.setButtonText("Invert Phase");
-    pheseInvertToggleButton.setColour(juce::TextButton::buttonOnColourId, juce::Colour::fromRGB(255, 183, 53));
-    pheseInvertToggleButton.setColour(juce::TextButton::buttonColourId, juce::Colour::fromRGB(50, 50, 50));
-    pheseInvertToggleButton.setColour(juce::TextButton::textColourOnId, juce::Colours::black);
-    addAndMakeVisible(pheseInvertToggleButton);
+    invertPhaseToggleButtonAttachment.reset(new ButtonAttachment(valueTreeState, "invertPhase", invertPhaseToggleButton));
+    invertPhaseToggleButton.setClickingTogglesState(true);
+    invertPhaseToggleButton.setButtonText("Invert Phase");
+    invertPhaseToggleButton.setColour(juce::TextButton::buttonOnColourId, juce::Colour::fromRGB(255, 183, 53));
+    invertPhaseToggleButton.setColour(juce::TextButton::buttonColourId, juce::Colour::fromRGB(50, 50, 50));
+    invertPhaseToggleButton.setColour(juce::TextButton::textColourOnId, juce::Colours::black);
+    addAndMakeVisible(invertPhaseToggleButton);
 
     setSize (200, 400);
 }
@@ -46,5 +46,5 @@ void UtilitycloneAudioProcessorEditor::paint (juce::Graphics& g)
 void UtilitycloneAudioProcessorEditor::resized()
 {
     gainSlider.setBounds(10, 10, 180, 30);
-    pheseInvertToggleButton.setBounds(10, 50, 180, 30);
+    invertPhaseToggleButton.setBounds(10, 50, 180, 30);
 }

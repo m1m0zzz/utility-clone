@@ -23,18 +23,12 @@ UtilitycloneAudioProcessor::UtilitycloneAudioProcessor()
 #endif
     , parameters(*this, nullptr, juce::Identifier("Utility-clone"),
         {
-            std::make_unique<juce::AudioParameterFloat>("gain",            // parameterID
-                                                         "Gain",            // parameter name
-                                                         0.0f,              // minimum value
-                                                         2.0f,              // maximum value
-                                                         1.0f),             // default value
-            std::make_unique<juce::AudioParameterBool>("invertPhase",      // parameterID
-                                                        "Invert Phase",     // parameter name
-                                                        false)              // default value
+            std::make_unique<juce::AudioParameterFloat>("gain", "Gain", 0.0f, 2.0f, 1.0f),
+            std::make_unique<juce::AudioParameterBool>("invertPhase", "Invert Phase", false)
         })
 {
     gain = parameters.getRawParameterValue("gain");
-    invertPhase = parameters.getRawParameterValue("invertPhase");
+    isInvertPhase = parameters.getRawParameterValue("invertPhase");
 }
 
 UtilitycloneAudioProcessor::~UtilitycloneAudioProcessor()
@@ -146,10 +140,8 @@ bool UtilitycloneAudioProcessor::isBusesLayoutSupported (const BusesLayout& layo
 
 void UtilitycloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-    DBG(juce::String(std::to_string( *invertPhase )));
-    auto phase = *invertPhase ? -1.0f : 1.0f;  // [6]
-    auto currentGain = *gain * phase; // [7]
-    // var->load or *var
+    auto phase = *isInvertPhase ? -1.0f : 1.0f;
+    auto currentGain = *gain * phase;
 
     if (juce::approximatelyEqual(currentGain, previousGain))
     {
