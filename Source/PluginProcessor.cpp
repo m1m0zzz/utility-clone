@@ -110,11 +110,6 @@ void UtilitycloneAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     // initialisation that you need..
 
     previousGain = *gain;
-    float normalisedPan = 0.5f * (*pan + 1.0f);
-    float leftValue = std::sin(0.5 * M_PI * (1.0 - normalisedPan));
-    float rightValue = std::sin(0.5 * M_PI * normalisedPan);
-    previousPanLeftValue  = leftValue;
-    previousPanRightValue = rightValue;
 }
 
 void UtilitycloneAudioProcessor::releaseResources()
@@ -180,27 +175,8 @@ void UtilitycloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     float leftValue  = std::sin(0.5 * M_PI * (1.0 - normalisedPan));
     float rightValue = std::sin(0.5 * M_PI * normalisedPan);
 
-    // pan: L channel
-    if (juce::approximatelyEqual(leftValue, previousPanLeftValue)) {
-        DBG("L: nomal");
-        buffer.applyGain(0, 0, buffer.getNumSamples(), leftValue * boostValue);
-    }
-    else {
-        DBG("L: ramp");
-        buffer.applyGainRamp(0, 0, buffer.getNumSamples(), previousPanLeftValue, leftValue * boostValue);
-        previousPanLeftValue = leftValue;
-    }
-
-    // pan: R channel
-    if (juce::approximatelyEqual(rightValue, previousPanRightValue)) {
-        DBG("R: nomal");
-        buffer.applyGain(1, 0, buffer.getNumSamples(), rightValue * boostValue);
-    }
-    else {
-        DBG("R: ramp");
-        buffer.applyGainRamp(1, 0, buffer.getNumSamples(), rightValue * boostValue);
-        previousPanRightValue = rightValue;
-    }
+    buffer.applyGain(0, 0, buffer.getNumSamples(), leftValue * boostValue);
+    buffer.applyGain(1, 0, buffer.getNumSamples(), rightValue * boostValue);
 }
 
 //==============================================================================

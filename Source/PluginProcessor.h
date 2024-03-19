@@ -55,7 +55,7 @@ public:
 
 private:
     juce::AudioProcessorValueTreeState parameters;
-    float previousGain, previousPanLeftValue, previousPanRightValue;
+    float previousGain;
     float boostValue = std::sqrt(2.0f); // pan
 
     std::atomic<float>* gain = nullptr;
