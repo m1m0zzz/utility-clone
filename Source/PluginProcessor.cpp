@@ -172,8 +172,6 @@ void UtilitycloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     buffer.applyGain(phase);
 
     // stereo
-    DBG("width = " << *stereoWidth);
-    DBG("MS = " << *stereoMidSide);
     if (totalNumInputChannels == 2)
     {
         auto* leftChannel = buffer.getWritePointer(0);
@@ -181,11 +179,22 @@ void UtilitycloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
 
         for (int i = 0; i < buffer.getNumSamples(); ++i)
         {
-            auto midSignal = (leftChannel[i] + rightChannel[i]);
-            auto sideSignal = (leftChannel[i] - rightChannel[i]);
-            
-            leftChannel[i] = (midSignal + sideSignal);
-            rightChannel[i] = (midSignal - sideSignal);
+            auto mid = (leftChannel[i] + rightChannel[i]);
+            auto side = (rightChannel[i] - leftChannel[i]);
+
+            if (*stereoMode == 0) { // Width (0 to 400)
+                mid  *= 0.5f; // no change
+                side *= 0.5f * *stereoWidth / 100;
+            }
+            else { // Mid/Side (-100 to 100)
+                float normalizedMS = (*stereoMidSide / 100 + 1.0f) * 0.5f; // 0 to 1
+                float divVolume = abs(*stereoMidSide / 100) + 1.0f; // 1 to 2
+                mid  *= (1.0 - normalizedMS) / divVolume;
+                side *=        normalizedMS  / divVolume;
+            }
+
+            leftChannel[i] = (mid - side);
+            rightChannel[i] = (mid + side);
         }
     }
 
@@ -193,7 +202,8 @@ void UtilitycloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     juce::dsp::AudioBlock<float> audioBlock(buffer);
     juce::dsp::ProcessContextReplacing<float> context(audioBlock);
 
-    buffer.clear();
+    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
+        buffer.clear(i, 0, buffer.getNumSamples());
 
     gainDSP.setGainDecibels(*gain);
     pannerDSP.setPan(*pan / 50.0f);
