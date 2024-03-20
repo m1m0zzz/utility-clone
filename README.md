@@ -15,7 +15,7 @@
 - [x] pan
 - [x] mono
 - [ ] bass mono
-- [ ] stereo width
+- [x] stereo width
 
 **UI**
 - [ ] knob component
