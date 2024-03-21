@@ -118,8 +118,7 @@ void UtilitycloneAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     spec.numChannels = 2;
     spec.sampleRate = sampleRate;
 
-    lowpass.prepare(spec);
-    highpass.prepare(spec);
+    lrFilter.prepare(spec);
 
     gainDSP.prepare(spec);
     gainDSP.setRampDurationSeconds(0.005); // should consider arguments or using SmoothValue
@@ -163,8 +162,9 @@ bool UtilitycloneAudioProcessor::isBusesLayoutSupported (const BusesLayout& layo
 void UtilitycloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     juce::ScopedNoDenormals noDenormals;
-    auto totalNumInputChannels = getTotalNumInputChannels();
-    auto totalNumOutputChannels = getTotalNumOutputChannels();
+    const int totalNumInputChannels = getTotalNumInputChannels();
+    const int totalNumOutputChannels = getTotalNumOutputChannels();
+    const int numSamples = buffer.getNumSamples();
 
     // phase
     auto phase = *isInvertPhase ? -1.0f : 1.0f;
@@ -204,21 +204,51 @@ void UtilitycloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         buffer.copyFrom(1, 0, buffer, 0, 0, buffer.getNumSamples());
         buffer.applyGain(0.5f);
     }
+
+    // bass mono
+    DBG("Bass Mono = " << *isBassMono);
+    DBG("BM Freq   = " << *bassMonoFrequency);
+    lrFilter.setCutoffFrequency(*bassMonoFrequency);
+    if (*isBassMono && !(*isMono)) {
+        // TODO
+        juce::AudioSampleBuffer lowOutput;
+        juce::AudioSampleBuffer highOutput;
+
+        lowOutput.makeCopyOf(buffer);
+        highOutput.makeCopyOf(buffer);
+
+        auto* lowOutputL = lowOutput.getWritePointer(0);
+        auto* lowOutputR = lowOutput.getWritePointer(1);
+        auto* highOutputL = highOutput.getWritePointer(0);
+        auto* highOutputR = highOutput.getWritePointer(1);
+
+        auto* inputL = buffer.getWritePointer(0);
+        auto* inputR = buffer.getWritePointer(1);
+
+        // process filter
+        for (int i = 0; i < numSamples; ++i) {
+            lrFilter.processSample(0, inputL[i], lowOutputL[i], highOutputL[i]);
+            lrFilter.processSample(1, inputR[i], lowOutputR[i], highOutputR[i]);
+        }
+
+        // make lowOutput mono
+        lowOutput.addFrom( 0, 0, lowOutput, 1, 0, numSamples);
+        lowOutput.copyFrom(1, 0, lowOutput, 0, 0, numSamples);
+        lowOutput.applyGain(0.5f);
+
+        buffer.clear();
+        for (int channel = 0; channel < totalNumInputChannels; channel++)
+        {
+            buffer.addFrom(channel, 0, lowOutput, channel, 0, numSamples);
+            buffer.addFrom(channel, 0, highOutput, channel, 0, numSamples);
+        }
+    }
     
     juce::dsp::AudioBlock<float> audioBlock(buffer);
     juce::dsp::ProcessContextReplacing<float> context(audioBlock);
 
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear(i, 0, buffer.getNumSamples());
-
-    // bass mono
-    DBG("Bass Mono = " << *isBassMono);
-    DBG("BM Freq   = " << *bassMonoFrequency);
-    lowpass.setCutoffFrequency(*bassMonoFrequency);
-    if (*isBassMono && !(*isMono)) {
-        // TODO
-        lowpass.process(context);
-    }
 
     gainDSP.setGainDecibels(*gain);
     pannerDSP.setPan(*pan / 50.0f);

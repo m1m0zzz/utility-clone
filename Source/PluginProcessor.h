@@ -62,8 +62,7 @@ private:
     juce::dsp::ProcessSpec spec;
     juce::dsp::Gain<float> gainDSP;
     juce::dsp::Panner<float> pannerDSP;
-    juce::dsp::LinkwitzRileyFilter<float> lowpass;
-    juce::dsp::LinkwitzRileyFilter<float> highpass;
+    juce::dsp::LinkwitzRileyFilter<float> lrFilter;
 
     std::atomic<float>* gain = nullptr;
     std::atomic<float>* isInvertPhase = nullptr;
