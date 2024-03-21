@@ -56,6 +56,18 @@ UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor (
     stereoMidSideSliderAttachment.reset(new SliderAttachment(valueTreeState, "stereoMidSide", stereoMidSideSlider));
     addAndMakeVisible(stereoMidSideSlider);
 
+    bassMonoToggleButtonAttachment.reset(new ButtonAttachment(valueTreeState, "isBassMono", bassMonoToggleButton));
+    bassMonoToggleButton.setClickingTogglesState(true);
+    bassMonoToggleButton.setButtonText("Bass Mono");
+    bassMonoToggleButton.setColour(juce::TextButton::buttonOnColourId, juce::Colour::fromRGB(255, 183, 53));
+    bassMonoToggleButton.setColour(juce::TextButton::buttonColourId, juce::Colour::fromRGB(50, 50, 50));
+    bassMonoToggleButton.setColour(juce::TextButton::textColourOnId, juce::Colours::black);
+    addAndMakeVisible(bassMonoToggleButton);
+
+    bassMonoFrequencySliderAttachment.reset(new SliderAttachment(valueTreeState, "bassMonoFrequency", bassMonoFrequencySlider));
+    bassMonoFrequencySlider.setTextValueSuffix(" Hz");
+    addAndMakeVisible(bassMonoFrequencySlider);
+
     setSize (200, 400);
 }
 
@@ -79,4 +91,6 @@ void UtilitycloneAudioProcessorEditor::resized()
     stereoModeComboBox.setBounds(10, 170, 180, 30);
     stereoWidthSlider.setBounds(10, 210, 180, 30);
     stereoMidSideSlider.setBounds(10, 250, 180, 30);
+    bassMonoToggleButton.setBounds(10, 290, 180, 30);
+    bassMonoFrequencySlider.setBounds(10, 330, 180, 30);
 }

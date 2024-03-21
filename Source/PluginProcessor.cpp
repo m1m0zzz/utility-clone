@@ -30,15 +30,19 @@ UtilitycloneAudioProcessor::UtilitycloneAudioProcessor()
             std::make_unique<juce::AudioParameterChoice>("stereoMode", "Stereo Mode", stereoModeList, 0),
             std::make_unique<juce::AudioParameterFloat>("stereoWidth", "Width", 0.0f, 400.0f, 100.0f),
             std::make_unique<juce::AudioParameterFloat>("stereoMidSide", "Mid/Side", -100.0f, 100.0f, 0.0f),
+            std::make_unique<juce::AudioParameterBool>("isBassMono", "Bass Mono", false),
+            std::make_unique<juce::AudioParameterFloat>("bassMonoFrequency", "Bass Mono freq", 50.0f, 500.0f, 120.0f),
         })
 {
-    gain          = parameters.getRawParameterValue("gain");
-    isInvertPhase = parameters.getRawParameterValue("invertPhase");
-    isMono        = parameters.getRawParameterValue("mono");
-    pan           = parameters.getRawParameterValue("pan");
-    stereoMode    = parameters.getRawParameterValue("stereoMode");
-    stereoWidth   = parameters.getRawParameterValue("stereoWidth");
-    stereoMidSide = parameters.getRawParameterValue("stereoMidSide");
+    gain              = parameters.getRawParameterValue("gain");
+    isInvertPhase     = parameters.getRawParameterValue("invertPhase");
+    isMono            = parameters.getRawParameterValue("mono");
+    pan               = parameters.getRawParameterValue("pan");
+    stereoMode        = parameters.getRawParameterValue("stereoMode");
+    stereoWidth       = parameters.getRawParameterValue("stereoWidth");
+    stereoMidSide     = parameters.getRawParameterValue("stereoMidSide");
+    isBassMono        = parameters.getRawParameterValue("isBassMono");
+    bassMonoFrequency = parameters.getRawParameterValue("bassMonoFrequency");
 }
 
 UtilitycloneAudioProcessor::~UtilitycloneAudioProcessor()
@@ -114,6 +118,9 @@ void UtilitycloneAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     spec.numChannels = 2;
     spec.sampleRate = sampleRate;
 
+    lowpass.prepare(spec);
+    highpass.prepare(spec);
+
     gainDSP.prepare(spec);
     gainDSP.setRampDurationSeconds(0.005); // should consider arguments or using SmoothValue
 
@@ -159,20 +166,12 @@ void UtilitycloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     auto totalNumInputChannels = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
-    // mono
-    if (*isMono) {
-        // cf. https://forum.juce.com/t/how-do-i-sum-stereo-to-mono/37579/8
-        buffer.addFrom(0, 0, buffer, 1, 0, buffer.getNumSamples());
-        buffer.copyFrom(1, 0, buffer, 0, 0, buffer.getNumSamples());
-        buffer.applyGain(0.5f);
-    }
-
     // phase
     auto phase = *isInvertPhase ? -1.0f : 1.0f;
     buffer.applyGain(phase);
 
     // stereo
-    if (totalNumInputChannels == 2)
+    if (totalNumInputChannels == 2 && !(*isMono))
     {
         auto* leftChannel = buffer.getWritePointer(0);
         auto* rightChannel = buffer.getWritePointer(1);
@@ -198,12 +197,28 @@ void UtilitycloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         }
     }
 
+    // mono
+    if (*isMono) {
+        // cf. https://forum.juce.com/t/how-do-i-sum-stereo-to-mono/37579/8
+        buffer.addFrom(0, 0, buffer, 1, 0, buffer.getNumSamples());
+        buffer.copyFrom(1, 0, buffer, 0, 0, buffer.getNumSamples());
+        buffer.applyGain(0.5f);
+    }
     
     juce::dsp::AudioBlock<float> audioBlock(buffer);
     juce::dsp::ProcessContextReplacing<float> context(audioBlock);
 
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear(i, 0, buffer.getNumSamples());
+
+    // bass mono
+    DBG("Bass Mono = " << *isBassMono);
+    DBG("BM Freq   = " << *bassMonoFrequency);
+    lowpass.setCutoffFrequency(*bassMonoFrequency);
+    if (*isBassMono && !(*isMono)) {
+        // TODO
+        lowpass.process(context);
+    }
 
     gainDSP.setGainDecibels(*gain);
     pannerDSP.setPan(*pan / 50.0f);

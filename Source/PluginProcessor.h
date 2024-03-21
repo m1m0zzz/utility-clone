@@ -62,6 +62,8 @@ private:
     juce::dsp::ProcessSpec spec;
     juce::dsp::Gain<float> gainDSP;
     juce::dsp::Panner<float> pannerDSP;
+    juce::dsp::LinkwitzRileyFilter<float> lowpass;
+    juce::dsp::LinkwitzRileyFilter<float> highpass;
 
     std::atomic<float>* gain = nullptr;
     std::atomic<float>* isInvertPhase = nullptr;
@@ -70,10 +72,8 @@ private:
     std::atomic<float>* stereoMode = nullptr; // Width or Mid/Side
     std::atomic<float>* stereoWidth = nullptr;
     std::atomic<float>* stereoMidSide = nullptr;
-
     std::atomic<float>* isBassMono = nullptr;
     std::atomic<float>* bassMonoFrequency = nullptr;
-
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UtilitycloneAudioProcessor)

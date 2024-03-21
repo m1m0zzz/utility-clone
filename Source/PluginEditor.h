@@ -49,6 +49,8 @@ private:
     juce::ComboBox stereoModeComboBox;
     juce::Slider stereoWidthSlider;
     juce::Slider stereoMidSideSlider;
+    juce::TextButton bassMonoToggleButton;
+    juce::Slider bassMonoFrequencySlider;
     std::unique_ptr<SliderAttachment> gainSliderAttachment;
     std::unique_ptr<ButtonAttachment> invertPhaseToggleButtonAttachment;
     std::unique_ptr<ButtonAttachment> monoToggleButtonAttachment;
@@ -56,6 +58,8 @@ private:
     std::unique_ptr<ComboBoxAttachment> stereoModeComboBoxAttachment;
     std::unique_ptr<SliderAttachment> stereoWidthSliderAttachment;
     std::unique_ptr<SliderAttachment> stereoMidSideSliderAttachment;
+    std::unique_ptr<ButtonAttachment> bassMonoToggleButtonAttachment;
+    std::unique_ptr<SliderAttachment> bassMonoFrequencySliderAttachment;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UtilitycloneAudioProcessorEditor)
 };
