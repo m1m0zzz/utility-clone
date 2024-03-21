@@ -41,6 +41,13 @@ private:
     typedef juce::AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
     
     juce::AudioProcessorValueTreeState& valueTreeState;
+
+    int width = 200;
+    int height = 300;
+    double ratio = width / height;
+
+    juce::Rectangle<int> columnL{ 0, 0, width / 2, height };
+    juce::Rectangle<int> columnR{ width / 2, 0, width / 2, height };
     
     juce::Slider gainSlider;
     juce::TextButton invertPhaseToggleButton;

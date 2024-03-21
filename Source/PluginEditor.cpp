@@ -22,8 +22,16 @@ UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor (
     UtilitycloneAudioProcessor& p, juce::AudioProcessorValueTreeState& vts)
     : AudioProcessorEditor (&p), audioProcessor (p), valueTreeState(vts)
 {
+    // window
+    setResizable(true, true);
+    setResizeLimits(width, height, 400, 600);
+    //getConstrainer()->setFixedAspectRatio(ratio);
+
+    // components
     gainSliderAttachment.reset(new SliderAttachment(valueTreeState, "gain", gainSlider));
     gainSlider.setTextValueSuffix(" dB");
+    /*gainSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
+    gainSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, width * 2 / 3, 50);*/
     addAndMakeVisible(gainSlider);
 
     invertPhaseToggleButtonAttachment.reset(new ButtonAttachment(valueTreeState, "invertPhase", invertPhaseToggleButton));
@@ -68,7 +76,7 @@ UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor (
     bassMonoFrequencySlider.setTextValueSuffix(" Hz");
     addAndMakeVisible(bassMonoFrequencySlider);
 
-    setSize (200, 400);
+    setSize (width, height);
 }
 
 UtilitycloneAudioProcessorEditor::~UtilitycloneAudioProcessorEditor()
@@ -80,17 +88,68 @@ void UtilitycloneAudioProcessorEditor::paint (juce::Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
+
+    //g.setColour(juce::Colours::azure);
+    //g.fillRect(columnL.toFloat());
+    //g.setColour(juce::Colours::orange);
+    //g.fillRect(columnR.toFloat());
 }
+
+//void pushComponent(juce::Rectangle<int> column, juce::Component component, int y = 0, int height = 39) {
+//    auto a = column.reduced(5);
+//    a.setTop(y);
+//    a.setHeight(height);
+//    component.setBounds(a);
+//}
 
 void UtilitycloneAudioProcessorEditor::resized()
 {
-    invertPhaseToggleButton.setBounds(10, 10, 180, 30);
-    monoToggleButton.setBounds(10, 50, 180, 30);
-    gainSlider.setBounds(10, 90, 180, 30);
-    panSlider.setBounds(10, 130, 180, 30);
-    stereoModeComboBox.setBounds(10, 170, 180, 30);
-    stereoWidthSlider.setBounds(10, 210, 180, 30);
-    stereoMidSideSlider.setBounds(10, 250, 180, 30);
-    bassMonoToggleButton.setBounds(10, 290, 180, 30);
-    bassMonoFrequencySlider.setBounds(10, 330, 180, 30);
+    const int windowWidth  = getWidth();
+    const int windowHeight = getHeight();
+    //DBG("w = " << windowWidth << ", h = " << windowHeight);
+
+    const int padding = 5;
+    const int compoentHeight = 30;
+
+    columnL.setWidth(windowWidth / 2);
+    columnL.setHeight(windowHeight);
+
+    columnR.setLeft(windowWidth / 2);
+    columnR.setWidth(windowWidth / 2);
+    columnR.setHeight(windowHeight);
+
+    // column L
+    auto rect = columnL.reduced(padding);
+    rect.setHeight(compoentHeight);
+    invertPhaseToggleButton.setBounds(rect);
+    
+    rect.setTop(40);
+    rect.setHeight(compoentHeight);
+    stereoModeComboBox.setBounds(rect);
+
+    //stereoWidthSlider.setBounds(10, 210, 180, 30);
+    //stereoMidSideSlider.setBounds(10, 250, 180, 30);
+
+    rect.setTop(180);
+    rect.setHeight(compoentHeight);
+    monoToggleButton.setBounds(rect);
+
+    rect.setTop(220);
+    rect.setHeight(compoentHeight);
+    bassMonoToggleButton.setBounds(rect);
+
+    rect.setTop(260);
+    rect.setHeight(compoentHeight);
+    bassMonoFrequencySlider.setBounds(rect);
+
+    // column R
+
+    rect = columnR.reduced(padding);
+    rect.setTop(0);
+    rect.setHeight(compoentHeight);
+    gainSlider.setBounds(rect);
+
+    rect.setTop(height / 2);
+    rect.setHeight(compoentHeight);
+    panSlider.setBounds(rect);
 }
