@@ -206,11 +206,10 @@ void UtilitycloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     }
 
     // bass mono
-    DBG("Bass Mono = " << *isBassMono);
-    DBG("BM Freq   = " << *bassMonoFrequency);
+    //DBG("Bass Mono = " << *isBassMono);
+    //DBG("BM Freq   = " << *bassMonoFrequency);
     lrFilter.setCutoffFrequency(*bassMonoFrequency);
     if (*isBassMono && !(*isMono)) {
-        // TODO
         juce::AudioSampleBuffer lowOutput;
         juce::AudioSampleBuffer highOutput;
 

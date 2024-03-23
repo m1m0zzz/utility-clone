@@ -111,11 +111,11 @@ void UtilitycloneAudioProcessorEditor::resized()
     const int padding = 5;
     const int compoentHeight = 30;
 
-    columnL.setWidth(windowWidth / 2);
+    columnL.setWidth(windowWidth / 2 - 5);
     columnL.setHeight(windowHeight);
 
-    columnR.setLeft(windowWidth / 2);
-    columnR.setWidth(windowWidth / 2);
+    columnR.setLeft(windowWidth / 2 + 5);
+    columnR.setWidth(windowWidth / 2 - 5);
     columnR.setHeight(windowHeight);
 
     // column L

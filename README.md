@@ -14,7 +14,7 @@
 - [x] phase invert
 - [x] pan
 - [x] mono
-- [ ] bass mono
+- [x] bass mono (🔺: filter)
 - [x] stereo width
 
 **UI**
