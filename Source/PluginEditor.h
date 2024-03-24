@@ -27,12 +27,16 @@ public:
         setColour(juce::TextButton::buttonColourId, juce::Colour::fromRGB(50, 50, 50));
         setColour(juce::TextButton::textColourOnId, juce::Colours::black);
     }
+private:
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ToggleTextButton)
 };
 
 
 class KnobSlider : public juce::Slider
 {
 public:
+    using juce::Slider::Slider;
+
     KnobSlider(juce::LookAndFeel* lookAndFeel) {
         setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
         setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 80, 20);
@@ -42,6 +46,32 @@ public:
         setColour(juce::Slider::ColourIds::rotarySliderFillColourId, juce::Colour::Colour(136, 192, 208));
         setLookAndFeel(lookAndFeel);
     }
+private:
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(KnobSlider)
+};
+
+class GainKnob : public KnobSlider
+{
+public:
+    using KnobSlider::KnobSlider;
+
+    //juce::String getTextFromValue(double value) override
+    //{
+    //    return juce::Decibels::toString(value);
+    //}
+
+    //double getValueFromText(const juce::String& text) override
+    //{
+    //    auto minusInfinitydB = -100.0;
+
+    //    // TODO: changed "-INF"
+    //    // TODO: +XX dB (delete: "+")
+    //    auto decibelText = text.upToFirstOccurrenceOf("dB", false, false).trim();
+    //    return decibelText.equalsIgnoreCase("-inf") ? minusInfinitydB
+    //                                                : decibelText.getDoubleValue();
+    //}
+private:
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(GainKnob)
 };
 
 //==============================================================================
@@ -72,7 +102,7 @@ private:
     typedef juce::AudioProcessorValueTreeState::ComboBoxAttachment ComboBoxAttachment;
     typedef juce::AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
 
-    KnobSlider gainSlider{ &customLookAndFeel };
+    GainKnob gainSlider{ &customLookAndFeel };
     ToggleTextButton invertPhaseToggleButton{"Invert Phase"};
     ToggleTextButton monoToggleButton{"Mono"};
     KnobSlider panSlider{&customLookAndFeel};
@@ -97,6 +127,8 @@ private:
     juce::Rectangle<int> columnR{ width / 2, 0, width / 2, height };
     juce::Label gainLabel;
     juce::Label panLabel;
+
+    //std::unique_ptr<juce::Slider> tb;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UtilitycloneAudioProcessorEditor)
 };

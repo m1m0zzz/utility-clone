@@ -71,7 +71,12 @@ UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor (
     // components
     const juce::Colour textColor = juce::Colour::fromRGB(0, 0, 0);
     gainSliderAttachment.reset(new SliderAttachment(valueTreeState, "gain", gainSlider));
+
+    //DBG("range: " << gainSlider.getRange().getStart() << ", " << gainSlider.getRange().getEnd());
+
     gainSlider.setTextValueSuffix(" dB");
+    //gainSlider.setSkewFactor(1, true);
+    //gainSlider.setSkewFactorFromMidPoint(0);
     addAndMakeVisible(gainSlider);
 
     invertPhaseToggleButtonAttachment.reset(new ButtonAttachment(valueTreeState, "invertPhase", invertPhaseToggleButton));
@@ -86,9 +91,34 @@ UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor (
 
     stereoModeComboBox.addItemList(stereoModeList, 1);
     stereoModeComboBoxAttachment.reset(new ComboBoxAttachment(valueTreeState, "stereoMode", stereoModeComboBox));
+    //stereoModeComboBox.onChange = [this]() {//can't use this unless you capture it!
+    //    if (this->tb.get() == nullptr) 
+    //    {
+    //        DBG("item: " << stereoModeComboBox.getSelectedId());
+    //        //make a new one
+    //        if (stereoModeComboBox.getSelectedId() == 1) {
+    //            this->tb = std::make_unique<KnobSlider>(&customLookAndFeel);
+    //            stereoWidthSliderAttachment.reset(new SliderAttachment(valueTreeState, "stereoWidth", this->tb));
+
+    //        }
+    //        else {
+    //            this->tb = std::make_unique<KnobSlider>(&customLookAndFeel);
+    //        }
+    //        //give it something to do when you click on it
+    //        this->tb->onValueChange = []() { DBG("you clicked the hidden button!"); };
+    //        //make it visible
+    //        this->addAndMakeVisible(tb.get());
+    //        //addAndMakeVisible doesn't always call resized(), so do it manually
+    //        this->resized();
+    //        //in 5 seconds, delete 'tb'
+    //        juce::Timer::callAfterDelay(5 * 1000, [this]() { this->tb.reset(); });
+    //    }
+    //};
+    //addAndMakeVisible(textButton);
     addAndMakeVisible(stereoModeComboBox);
 
     stereoWidthSliderAttachment.reset(new SliderAttachment(valueTreeState, "stereoWidth", stereoWidthSlider));
+    stereoWidthSlider.setSkewFactorFromMidPoint(100);
     addAndMakeVisible(stereoWidthSlider);
 
     stereoMidSideSliderAttachment.reset(new SliderAttachment(valueTreeState, "stereoMidSide", stereoMidSideSlider));
@@ -204,4 +234,8 @@ void UtilitycloneAudioProcessorEditor::resized()
     rect.setTop(height / 2 + 30);
     rect.setHeight(80);
     panSlider.setBounds(rect);
+
+    //if tb exists, stick it 10 px below textButton.
+    //if (tb.get() != nullptr)
+    //    tb->setBounds(stereoWidthSlider.getBounds());
 }
