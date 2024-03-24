@@ -17,12 +17,32 @@ class CustomLookAndFeel : public juce::LookAndFeel_V4 {
         float rotaryEndAngle, juce::Slider&) override;
 };
 
-//class ToggleTextButton : public juce::TextButton
-//{
-//public:
-//    using juce::TextButton::TextButton;
-//    ToggleTextButton() {}
-//};
+class ToggleTextButton : public juce::TextButton
+{
+public:
+    ToggleTextButton(juce::String text) {
+        setClickingTogglesState(true);
+        setButtonText(text);
+        setColour(juce::TextButton::buttonOnColourId, juce::Colour::fromRGB(255, 183, 53));
+        setColour(juce::TextButton::buttonColourId, juce::Colour::fromRGB(50, 50, 50));
+        setColour(juce::TextButton::textColourOnId, juce::Colours::black);
+    }
+};
+
+
+class KnobSlider : public juce::Slider
+{
+public:
+    KnobSlider(juce::LookAndFeel* lookAndFeel) {
+        setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
+        setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 80, 20);
+        setColour(juce::Slider::textBoxTextColourId, juce::Colours::black);
+        setColour(juce::Slider::ColourIds::thumbColourId, juce::Colour::Colour(46, 52, 64));
+        setColour(juce::Slider::ColourIds::rotarySliderOutlineColourId, juce::Colour::Colour(46, 52, 64));
+        setColour(juce::Slider::ColourIds::rotarySliderFillColourId, juce::Colour::Colour(136, 192, 208));
+        setLookAndFeel(lookAndFeel);
+    }
+};
 
 //==============================================================================
 /**
@@ -52,15 +72,15 @@ private:
     typedef juce::AudioProcessorValueTreeState::ComboBoxAttachment ComboBoxAttachment;
     typedef juce::AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
 
-    juce::Slider gainSlider;
-    juce::TextButton invertPhaseToggleButton;
-    juce::TextButton monoToggleButton;
-    juce::Slider panSlider;
+    KnobSlider gainSlider{ &customLookAndFeel };
+    ToggleTextButton invertPhaseToggleButton{"Invert Phase"};
+    ToggleTextButton monoToggleButton{"Mono"};
+    KnobSlider panSlider{&customLookAndFeel};
     juce::ComboBox stereoModeComboBox;
-    juce::Slider stereoWidthSlider;
-    juce::Slider stereoMidSideSlider;
-    juce::TextButton bassMonoToggleButton;
-    juce::Slider bassMonoFrequencySlider;
+    KnobSlider stereoWidthSlider{ &customLookAndFeel };
+    KnobSlider stereoMidSideSlider{ &customLookAndFeel };
+    ToggleTextButton bassMonoToggleButton{"Bass Mono"};
+    KnobSlider bassMonoFrequencySlider{ &customLookAndFeel };
 
     std::unique_ptr<SliderAttachment> gainSliderAttachment;
     std::unique_ptr<ButtonAttachment> invertPhaseToggleButtonAttachment;

@@ -71,41 +71,17 @@ UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor (
     // components
     const juce::Colour textColor = juce::Colour::fromRGB(0, 0, 0);
     gainSliderAttachment.reset(new SliderAttachment(valueTreeState, "gain", gainSlider));
-    gainSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    gainSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, width / 2 - 20, 20);
     gainSlider.setTextValueSuffix(" dB");
-    gainSlider.setColour(juce::Slider::textBoxTextColourId, textColor);
-    gainSlider.setColour(juce::Slider::ColourIds::thumbColourId, juce::Colour::Colour(46, 52, 64));
-    gainSlider.setColour(juce::Slider::ColourIds::rotarySliderOutlineColourId, juce::Colour::Colour(46, 52, 64));
-    gainSlider.setColour(juce::Slider::ColourIds::rotarySliderFillColourId, juce::Colour::Colour(136, 192, 208));
-    gainSlider.setLookAndFeel(&customLookAndFeel);
     addAndMakeVisible(gainSlider);
 
     invertPhaseToggleButtonAttachment.reset(new ButtonAttachment(valueTreeState, "invertPhase", invertPhaseToggleButton));
-    invertPhaseToggleButton.setClickingTogglesState(true);
-    invertPhaseToggleButton.setButtonText("Invert Phase");
-    invertPhaseToggleButton.setColour(juce::TextButton::buttonOnColourId, juce::Colour::fromRGB(255, 183, 53));
-    invertPhaseToggleButton.setColour(juce::TextButton::buttonColourId, juce::Colour::fromRGB(50, 50, 50));
-    invertPhaseToggleButton.setColour(juce::TextButton::textColourOnId, juce::Colours::black);
     addAndMakeVisible(invertPhaseToggleButton);
 
     monoToggleButtonAttachment.reset(new ButtonAttachment(valueTreeState, "mono", monoToggleButton));
-    monoToggleButton.setClickingTogglesState(true);
-    monoToggleButton.setButtonText("Mono");
-    monoToggleButton.setColour(juce::TextButton::buttonOnColourId, juce::Colour::fromRGB(255, 183, 53));
-    monoToggleButton.setColour(juce::TextButton::buttonColourId, juce::Colour::fromRGB(50, 50, 50));
-    monoToggleButton.setColour(juce::TextButton::textColourOnId, juce::Colours::black);
     addAndMakeVisible(monoToggleButton);
 
     panSliderAttachment.reset(new SliderAttachment(valueTreeState, "pan", panSlider));
     // TODO: prefix (pan < 0 ? L : R) abs(pan)
-    panSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    panSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, width / 2 - 20, 20);
-    panSlider.setColour(juce::Slider::textBoxTextColourId, textColor);
-    panSlider.setColour(juce::Slider::ColourIds::thumbColourId, juce::Colour::Colour(46, 52, 64));
-    panSlider.setColour(juce::Slider::ColourIds::rotarySliderOutlineColourId, juce::Colour::Colour(46, 52, 64));
-    panSlider.setColour(juce::Slider::ColourIds::rotarySliderFillColourId, juce::Colour::Colour(136, 192, 208));
-    panSlider.setLookAndFeel(&customLookAndFeel);
     addAndMakeVisible(panSlider);
 
     stereoModeComboBox.addItemList(stereoModeList, 1);
@@ -113,36 +89,16 @@ UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor (
     addAndMakeVisible(stereoModeComboBox);
 
     stereoWidthSliderAttachment.reset(new SliderAttachment(valueTreeState, "stereoWidth", stereoWidthSlider));
-    stereoWidthSlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    stereoWidthSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, width / 2 - 20, 20);
-    stereoWidthSlider.setColour(juce::Slider::textBoxTextColourId, textColor);
-    stereoWidthSlider.setColour(juce::Slider::ColourIds::thumbColourId, juce::Colour::Colour(46, 52, 64));
-    stereoWidthSlider.setColour(juce::Slider::ColourIds::rotarySliderOutlineColourId, juce::Colour::Colour(46, 52, 64));
-    stereoWidthSlider.setColour(juce::Slider::ColourIds::rotarySliderFillColourId, juce::Colour::Colour(136, 192, 208));
-    stereoWidthSlider.setLookAndFeel(&customLookAndFeel);
     addAndMakeVisible(stereoWidthSlider);
 
     stereoMidSideSliderAttachment.reset(new SliderAttachment(valueTreeState, "stereoMidSide", stereoMidSideSlider));
-    stereoMidSideSlider.setColour(juce::Slider::textBoxTextColourId, textColor);
-    addAndMakeVisible(stereoMidSideSlider);
+    //addAndMakeVisible(stereoMidSideSlider);
 
     bassMonoToggleButtonAttachment.reset(new ButtonAttachment(valueTreeState, "isBassMono", bassMonoToggleButton));
-    bassMonoToggleButton.setClickingTogglesState(true);
-    bassMonoToggleButton.setButtonText("Bass Mono");
-    bassMonoToggleButton.setColour(juce::TextButton::buttonOnColourId, juce::Colour::fromRGB(255, 183, 53));
-    bassMonoToggleButton.setColour(juce::TextButton::buttonColourId, juce::Colour::fromRGB(50, 50, 50));
-    bassMonoToggleButton.setColour(juce::TextButton::textColourOnId, juce::Colours::black);
     addAndMakeVisible(bassMonoToggleButton);
 
     bassMonoFrequencySliderAttachment.reset(new SliderAttachment(valueTreeState, "bassMonoFrequency", bassMonoFrequencySlider));
     bassMonoFrequencySlider.setTextValueSuffix(" Hz");
-    bassMonoFrequencySlider.setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
-    bassMonoFrequencySlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, width / 2 - 20, 20);
-    bassMonoFrequencySlider.setColour(juce::Slider::textBoxTextColourId, textColor);
-    bassMonoFrequencySlider.setColour(juce::Slider::ColourIds::thumbColourId, juce::Colour::Colour(46, 52, 64));
-    bassMonoFrequencySlider.setColour(juce::Slider::ColourIds::rotarySliderOutlineColourId, juce::Colour::Colour(46, 52, 64));
-    bassMonoFrequencySlider.setColour(juce::Slider::ColourIds::rotarySliderFillColourId, juce::Colour::Colour(136, 192, 208));
-    bassMonoFrequencySlider.setLookAndFeel(&customLookAndFeel);
     addAndMakeVisible(bassMonoFrequencySlider);
 
     gainLabel.setText("Gain", juce::dontSendNotification);
