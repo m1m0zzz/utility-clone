@@ -11,6 +11,12 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 
+class CustomLookAndFeel : public juce::LookAndFeel_V4 {
+    void drawRotarySlider(juce::Graphics&, int x, int y, int width, int height,
+        float sliderPosProportional, float rotaryStartAngle,
+        float rotaryEndAngle, juce::Slider&) override;
+};
+
 //class ToggleTextButton : public juce::TextButton
 //{
 //public:
@@ -32,13 +38,8 @@ public:
     void resized() override;
 
 private:
-    // This reference is provided as a quick way for your editor to
-    // access the processor object that created it.
     UtilitycloneAudioProcessor& audioProcessor;
-
-    typedef juce::AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
-    typedef juce::AudioProcessorValueTreeState::ComboBoxAttachment ComboBoxAttachment;
-    typedef juce::AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
+    CustomLookAndFeel customLookAndFeel;
     
     juce::AudioProcessorValueTreeState& valueTreeState;
 
@@ -46,9 +47,11 @@ private:
     int height = 300;
     double ratio = width / height;
 
-    juce::Rectangle<int> columnL{ 0, 0, width / 2, height };
-    juce::Rectangle<int> columnR{ width / 2, 0, width / 2, height };
-    
+    // parameter components   
+    typedef juce::AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
+    typedef juce::AudioProcessorValueTreeState::ComboBoxAttachment ComboBoxAttachment;
+    typedef juce::AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
+
     juce::Slider gainSlider;
     juce::TextButton invertPhaseToggleButton;
     juce::TextButton monoToggleButton;
@@ -58,6 +61,7 @@ private:
     juce::Slider stereoMidSideSlider;
     juce::TextButton bassMonoToggleButton;
     juce::Slider bassMonoFrequencySlider;
+
     std::unique_ptr<SliderAttachment> gainSliderAttachment;
     std::unique_ptr<ButtonAttachment> invertPhaseToggleButtonAttachment;
     std::unique_ptr<ButtonAttachment> monoToggleButtonAttachment;
@@ -67,6 +71,12 @@ private:
     std::unique_ptr<SliderAttachment> stereoMidSideSliderAttachment;
     std::unique_ptr<ButtonAttachment> bassMonoToggleButtonAttachment;
     std::unique_ptr<SliderAttachment> bassMonoFrequencySliderAttachment;
+
+    // ui components
+    juce::Rectangle<int> columnL{ 0, 0, width / 2, height };
+    juce::Rectangle<int> columnR{ width / 2, 0, width / 2, height };
+    juce::Label gainLabel;
+    juce::Label panLabel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UtilitycloneAudioProcessorEditor)
 };

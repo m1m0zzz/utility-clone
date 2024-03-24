@@ -18,9 +18,10 @@
 - [x] stereo width
 
 **UI**
-- [ ] knob component
-- [ ] gain unit dB
+- [x] knob component
+- [x] gain unit dB
 - [ ] toggle text button
+- [ ] switch width <=> mid/side
 - [ ] undo/redo
   - [ ] button
   - [ ] keyboard shortcut
