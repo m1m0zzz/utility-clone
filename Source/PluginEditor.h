@@ -133,7 +133,7 @@ private:
     juce::Label gainLabel;
     juce::Label panLabel;
 
-    std::unique_ptr<juce::Slider> tb;
+    std::unique_ptr<juce::Slider> stereoSliderPtr;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UtilitycloneAudioProcessorEditor)
 };

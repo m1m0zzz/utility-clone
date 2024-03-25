@@ -104,32 +104,32 @@ UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor (
     stereoModeComboBoxAttachment.reset(new ComboBoxAttachment(valueTreeState, "stereoMode", stereoModeComboBox));
     stereoModeComboBox.onChange = [this]() {//can't use this unless you capture it!
         DBG("onChnage");
-        if (this->tb.get() == nullptr) 
+        if (this->stereoSliderPtr.get() == nullptr) 
         {
             DBG("item: " << stereoModeComboBox.getSelectedId());
             //make a new one
             if (stereoModeComboBox.getSelectedId() == 1) {
-                this->tb = std::make_unique<KnobSlider>(&customLookAndFeel);
-                //auto* slider = this->tb.get();
+                this->stereoSliderPtr = std::make_unique<KnobSlider>(&customLookAndFeel);
+                //auto* slider = this->stereoSliderPtr.get();
                 //slider("a");
-                //this->tb->setTextValueSuffix(" %");
-                stereoWidthSliderAttachment.reset(new SliderAttachment(valueTreeState, "stereoWidth", *(this->tb.get())));
+                //this->stereoSliderPtr->setTextValueSuffix(" %");
+                stereoWidthSliderAttachment.reset(new SliderAttachment(valueTreeState, "stereoWidth", *(this->stereoSliderPtr.get())));
             }
             else {
-                this->tb = std::make_unique<KnobSlider>(&customLookAndFeel);
-                //auto slider = this->tb.get();
-                //this->tb->setTextValueSuffix(" M");
-                stereoMidSideSliderAttachment.reset(new SliderAttachment(valueTreeState, "stereoMidSide", *(this->tb.get())));
+                this->stereoSliderPtr = std::make_unique<KnobSlider>(&customLookAndFeel);
+                //auto slider = this->stereoSliderPtr.get();
+                //this->stereoSliderPtr->setTextValueSuffix(" M");
+                stereoMidSideSliderAttachment.reset(new SliderAttachment(valueTreeState, "stereoMidSide", *(this->stereoSliderPtr.get())));
             }
             //give it something to do when you click on it
-            this->tb->onValueChange = []() { DBG("you clicked the hidden button!"); };
+            this->stereoSliderPtr->onValueChange = []() { DBG("you clicked the hidden button!"); };
             //make it visible
-            this->addAndMakeVisible(tb.get());
+            this->addAndMakeVisible(stereoSliderPtr.get());
             //addAndMakeVisible doesn't always call resized(), so do it manually
             this->resized();
-            //in 5 seconds, delete 'tb'
-            this->tb.reset();
-            //juce::Timer::callAfterDelay(1 * 1000, [this]() { this->tb.reset(); });
+            //in 5 seconds, delete 'stereoSliderPtr'
+            this->stereoSliderPtr.reset();
+            //juce::Timer::callAfterDelay(1 * 1000, [this]() { this->stereoSliderPtr.reset(); });
         }
     };
     //addAndMakeVisible(textButton);
@@ -256,9 +256,9 @@ void UtilitycloneAudioProcessorEditor::resized()
     rect.setHeight(80);
     panSlider.setBounds(rect);
 
-    //if tb exists, stick it 10 px below textButton.
-    if (tb.get() != nullptr) {
+    //if stereoSliderPtr exists, stick it 10 px below textButton.
+    if (stereoSliderPtr.get() != nullptr) {
         DBG("set Bounds");
-        tb->setBounds(stereoWidthSlider.getBounds());
+        stereoSliderPtr->setBounds(stereoWidthSlider.getBounds());
     }
 }
