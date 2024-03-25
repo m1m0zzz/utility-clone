@@ -15,17 +15,22 @@ class CustomLookAndFeel : public juce::LookAndFeel_V4 {
     void drawRotarySlider(juce::Graphics&, int x, int y, int width, int height,
         float sliderPosProportional, float rotaryStartAngle,
         float rotaryEndAngle, juce::Slider&) override;
+
+    void drawButtonBackground(juce::Graphics&, juce::Button&, const juce::Colour& backgroundColour,
+        bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
 };
 
 class ToggleTextButton : public juce::TextButton
 {
 public:
-    ToggleTextButton(juce::String text) {
+    ToggleTextButton(juce::String text, juce::LookAndFeel* lookAndFeel) {
         setClickingTogglesState(true);
         setButtonText(text);
-        setColour(juce::TextButton::buttonOnColourId, juce::Colour::fromRGB(255, 183, 53));
-        setColour(juce::TextButton::buttonColourId, juce::Colour::fromRGB(50, 50, 50));
-        setColour(juce::TextButton::textColourOnId, juce::Colours::black);
+        setColour(juce::TextButton::ColourIds::buttonOnColourId, juce::Colour::fromRGB(255, 177, 0));
+        setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colour::fromRGB(183, 183, 183));
+        setColour(juce::TextButton::ColourIds::textColourOnId, juce::Colours::black);
+        setColour(juce::TextButton::ColourIds::textColourOffId, juce::Colours::black);
+        //setLookAndFeel(lookAndFeel); // ˆê‰ñ‚µ‚©“K—p‚³‚ê‚È‚¢
     }
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ToggleTextButton)
@@ -41,9 +46,9 @@ public:
         setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
         setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 80, 20);
         setColour(juce::Slider::textBoxTextColourId, juce::Colours::black);
-        setColour(juce::Slider::ColourIds::thumbColourId, juce::Colour::Colour(46, 52, 64));
-        setColour(juce::Slider::ColourIds::rotarySliderOutlineColourId, juce::Colour::Colour(46, 52, 64));
-        setColour(juce::Slider::ColourIds::rotarySliderFillColourId, juce::Colour::Colour(136, 192, 208));
+        setColour(juce::Slider::ColourIds::thumbColourId, juce::Colour::Colour(42, 42, 42));
+        setColour(juce::Slider::ColourIds::rotarySliderOutlineColourId, juce::Colour::Colour(42, 42, 42));
+        setColour(juce::Slider::ColourIds::rotarySliderFillColourId, juce::Colour::Colour(85, 222, 246));
         setLookAndFeel(lookAndFeel);
     }
 private:
@@ -103,13 +108,13 @@ private:
     typedef juce::AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
 
     GainKnob gainSlider{ &customLookAndFeel };
-    ToggleTextButton invertPhaseToggleButton{"Invert Phase"};
-    ToggleTextButton monoToggleButton{"Mono"};
+    ToggleTextButton invertPhaseToggleButton{ "Invert Phase", &customLookAndFeel };
+    ToggleTextButton monoToggleButton{ "Mono", &customLookAndFeel };
     KnobSlider panSlider{&customLookAndFeel};
     juce::ComboBox stereoModeComboBox;
     KnobSlider stereoWidthSlider{ &customLookAndFeel };
     KnobSlider stereoMidSideSlider{ &customLookAndFeel };
-    ToggleTextButton bassMonoToggleButton{"Bass Mono"};
+    ToggleTextButton bassMonoToggleButton{ "Bass Mono", &customLookAndFeel };
     KnobSlider bassMonoFrequencySlider{ &customLookAndFeel };
 
     std::unique_ptr<SliderAttachment> gainSliderAttachment;

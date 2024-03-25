@@ -11,9 +11,11 @@
 
 #define _USE_MATH_DEFINES
 #include "math.h"
+
 void CustomLookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, int height,
     float sliderPos, float rotaryStartAngle,
     float rotaryEndAngle, juce::Slider& slider) {
+    //DBG("drawRotarySlider");
 
     auto outline = slider.findColour(juce::Slider::rotarySliderOutlineColourId);
     auto fill = slider.findColour(juce::Slider::rotarySliderFillColourId);
@@ -24,7 +26,7 @@ void CustomLookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int wi
     auto radius = juce::jmin(bounds.getWidth(), bounds.getHeight()) / 2.0f;
 
     auto toAngle = rotaryStartAngle + sliderPos * (rotaryEndAngle - rotaryStartAngle);
-    auto lineW = juce::jmin(4.0f, radius * 0.5f);
+    auto lineW = juce::jmin(3.0f, radius * 0.5f);
     auto arcRadius = radius - lineW * 0.5f;
 
     juce::Path backgroundArc;
@@ -37,12 +39,9 @@ void CustomLookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int wi
     g.setColour(fill);
     g.strokePath(valueArc, juce::PathStrokeType(lineW, juce::PathStrokeType::curved, juce::PathStrokeType::rounded));
 
-    radius = radius - lineW * 2;
-    g.setColour(background);
-    g.fillEllipse(bounds.getCentreX() - radius, bounds.getCentreY() - radius, radius * 2, radius * 2);
-
     juce::Path p;
-    auto pointerLength = radius * 0.5f;
+    radius = radius - lineW * 2;
+    auto pointerLength = radius;
     auto pointerThickness = 2.4f;
     p.addRectangle(-pointerThickness * 0.5f, -radius, pointerThickness, pointerLength);
     p.applyTransform(juce::AffineTransform::rotation(toAngle).translated(bounds.getCentreX(), bounds.getCentreY()));
@@ -50,13 +49,24 @@ void CustomLookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int wi
     g.fillPath(p);
 }
 
-//ToggleTextButton::ToggleTextButton() {
-//    setClickingTogglesState(true);
-//    setButtonText("Invert Phase");
-//    setColour(juce::TextButton::buttonOnColourId, juce::Colour::fromRGB(255, 183, 53));
-//    setColour(juce::TextButton::buttonColourId, juce::Colour::fromRGB(50, 50, 50));
-//    setColour(juce::TextButton::textColourOnId, juce::Colours::black);
-//}
+void CustomLookAndFeel::drawButtonBackground(juce::Graphics& g,
+    juce::Button& button,
+    const juce::Colour& backgroundColour,
+    bool shouldDrawButtonAsHighlighted,
+    bool shouldDrawButtonAsDown) {
+    // custom look
+    //DBG("drawButtonBackground");
+
+    //auto cButtonOn  = button.findColour(juce::TextButton::ColourIds::buttonOnColourId);
+    //auto cButtonOff = button.findColour(juce::TextButton::ColourIds::buttonColourId);
+    //auto cTextOn    = button.findColour(juce::TextButton::ColourIds::textColourOnId);
+    //auto cTextOff   = button.findColour(juce::TextButton::ColourIds::textColourOffId);
+
+    auto bounds = button.getBounds();
+
+    g.setColour(backgroundColour);
+    g.fillRect(bounds);
+}
 
 //==============================================================================
 UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor (
@@ -70,13 +80,14 @@ UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor (
 
     // components
     const juce::Colour textColor = juce::Colour::fromRGB(0, 0, 0);
-    gainSliderAttachment.reset(new SliderAttachment(valueTreeState, "gain", gainSlider));
 
+    gainSliderAttachment.reset(new SliderAttachment(valueTreeState, "gain", gainSlider));
     //DBG("range: " << gainSlider.getRange().getStart() << ", " << gainSlider.getRange().getEnd());
+    auto gainRange = valueTreeState.getParameterRange("gain");
+    gainSlider.setRange(gainRange.start, gainRange.end);
+    gainSlider.setSkewFactorFromMidPoint(0);
 
     gainSlider.setTextValueSuffix(" dB");
-    //gainSlider.setSkewFactor(1, true);
-    //gainSlider.setSkewFactorFromMidPoint(0);
     addAndMakeVisible(gainSlider);
 
     invertPhaseToggleButtonAttachment.reset(new ButtonAttachment(valueTreeState, "invertPhase", invertPhaseToggleButton));
@@ -118,11 +129,14 @@ UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor (
     addAndMakeVisible(stereoModeComboBox);
 
     stereoWidthSliderAttachment.reset(new SliderAttachment(valueTreeState, "stereoWidth", stereoWidthSlider));
+    auto widthRange = valueTreeState.getParameterRange("stereoWidth");
+    stereoWidthSlider.setRange(widthRange.start, widthRange.end);
     stereoWidthSlider.setSkewFactorFromMidPoint(100);
     addAndMakeVisible(stereoWidthSlider);
 
     stereoMidSideSliderAttachment.reset(new SliderAttachment(valueTreeState, "stereoMidSide", stereoMidSideSlider));
-    //addAndMakeVisible(stereoMidSideSlider);
+    // TODO: suffix abs(val) (val < 0 ? M : S)
+    addAndMakeVisible(stereoMidSideSlider);
 
     bassMonoToggleButtonAttachment.reset(new ButtonAttachment(valueTreeState, "isBassMono", bassMonoToggleButton));
     addAndMakeVisible(bassMonoToggleButton);
@@ -153,11 +167,11 @@ void UtilitycloneAudioProcessorEditor::paint (juce::Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     //g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
-    g.fillAll(juce::Colour::fromRGB(140, 140, 140));
+    g.fillAll(juce::Colour::fromRGB(143, 143, 143));
 
     // hr
-    g.setColour(juce::Colour::fromRGB(112, 112, 112));
-    g.fillRect(width / 2 - 1, 10, 2, height - 20);
+    g.setColour(juce::Colour::fromRGB(80, 80, 80));
+    g.fillRect(width / 2, 10, 1, height - 20);
 
     //g.setColour(juce::Colours::azure);
     //g.fillRect(columnL.toFloat());
