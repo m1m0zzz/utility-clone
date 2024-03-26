@@ -70,13 +70,15 @@ void CustomLookAndFeel::drawButtonBackground(juce::Graphics& g,
 
 //==============================================================================
 UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor (
-    UtilitycloneAudioProcessor& p, juce::AudioProcessorValueTreeState& vts)
-    : AudioProcessorEditor (&p), audioProcessor (p), valueTreeState(vts)
+    UtilitycloneAudioProcessor& p, juce::AudioProcessorValueTreeState& vts, std::atomic<float>* stereo)
+    : AudioProcessorEditor (&p), audioProcessor (p), valueTreeState(vts), stereoMode(stereo)
 {
     // window
     setResizable(true, true);
     setResizeLimits(width, height, 400, 600);
     //getConstrainer()->setFixedAspectRatio(ratio);
+
+    //addAndMakeVisible(&tabs);
 
     // components
     const juce::Colour textColor = juce::Colour::fromRGB(0, 0, 0);
@@ -102,48 +104,26 @@ UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor (
 
     stereoModeComboBox.addItemList(stereoModeList, 1);
     stereoModeComboBoxAttachment.reset(new ComboBoxAttachment(valueTreeState, "stereoMode", stereoModeComboBox));
-    stereoModeComboBox.onChange = [this]() {//can't use this unless you capture it!
-        DBG("onChnage");
-        if (this->stereoSliderPtr.get() == nullptr) 
-        {
-            DBG("item: " << stereoModeComboBox.getSelectedId());
-            //make a new one
-            if (stereoModeComboBox.getSelectedId() == 1) {
-                this->stereoSliderPtr = std::make_unique<KnobSlider>(&customLookAndFeel);
-                //auto* slider = this->stereoSliderPtr.get();
-                //slider("a");
-                //this->stereoSliderPtr->setTextValueSuffix(" %");
-                stereoWidthSliderAttachment.reset(new SliderAttachment(valueTreeState, "stereoWidth", *(this->stereoSliderPtr.get())));
-            }
-            else {
-                this->stereoSliderPtr = std::make_unique<KnobSlider>(&customLookAndFeel);
-                //auto slider = this->stereoSliderPtr.get();
-                //this->stereoSliderPtr->setTextValueSuffix(" M");
-                stereoMidSideSliderAttachment.reset(new SliderAttachment(valueTreeState, "stereoMidSide", *(this->stereoSliderPtr.get())));
-            }
-            //give it something to do when you click on it
-            this->stereoSliderPtr->onValueChange = []() { DBG("you clicked the hidden button!"); };
-            //make it visible
-            this->addAndMakeVisible(stereoSliderPtr.get());
-            //addAndMakeVisible doesn't always call resized(), so do it manually
-            this->resized();
-            //in 5 seconds, delete 'stereoSliderPtr'
-            this->stereoSliderPtr.reset();
-            //juce::Timer::callAfterDelay(1 * 1000, [this]() { this->stereoSliderPtr.reset(); });
-        }
+    //addAndMakeVisible(stereoModeComboBox);
+
+    stereoTab.addTab("Width", juce::Colour::fromRGB(183, 183, 183), &stereoWidthSlider, true);
+    stereoTab.addTab("M/S",   juce::Colour::fromRGB(183, 183, 183), &stereoMidSideSlider, true);
+    stereoTab.onTabChanged = [this](int index, juce::String name) {
+        DBG("added func");
+        //valueTreeState.getParameter("stereoMode")->setValue(static_cast<float>(index));
+        this->stereoMode->store(static_cast<float>(index));
     };
-    //addAndMakeVisible(textButton);
-    addAndMakeVisible(stereoModeComboBox);
+    addAndMakeVisible(stereoTab);
 
     stereoWidthSliderAttachment.reset(new SliderAttachment(valueTreeState, "stereoWidth", stereoWidthSlider));
     auto widthRange = valueTreeState.getParameterRange("stereoWidth");
     stereoWidthSlider.setRange(widthRange.start, widthRange.end);
     stereoWidthSlider.setSkewFactorFromMidPoint(100);
-    addAndMakeVisible(stereoWidthSlider);
+    //addAndMakeVisible(stereoWidthSlider);
 
     stereoMidSideSliderAttachment.reset(new SliderAttachment(valueTreeState, "stereoMidSide", stereoMidSideSlider));
     // TODO: suffix abs(val) (val < 0 ? M : S)
-    addAndMakeVisible(stereoMidSideSlider);
+    //addAndMakeVisible(stereoMidSideSlider);
 
     bassMonoToggleButtonAttachment.reset(new ButtonAttachment(valueTreeState, "isBassMono", bassMonoToggleButton));
     addAndMakeVisible(bassMonoToggleButton);
@@ -214,13 +194,17 @@ void UtilitycloneAudioProcessorEditor::resized()
     rect.setHeight(compoentHeight);
     invertPhaseToggleButton.setBounds(rect);
     
-    rect.setTop(35);
-    rect.setHeight(compoentHeight);
-    stereoModeComboBox.setBounds(rect);
+    //rect.setTop(35);
+    //rect.setHeight(compoentHeight);
+    //stereoModeComboBox.setBounds(rect);
 
-    rect.setTop(70);
-    rect.setHeight(80);
-    stereoWidthSlider.setBounds(rect);
+    rect.setTop(35);
+    rect.setHeight(120);
+    stereoTab.setBounds(rect);
+
+    //rect.setTop(70);
+    //rect.setHeight(80);
+    //stereoWidthSlider.setBounds(rect);
 
     //stereoWidthSlider.setBounds(10, 210, 180, 30);
     //stereoMidSideSlider.setBounds(10, 250, 180, 30);
@@ -255,10 +239,4 @@ void UtilitycloneAudioProcessorEditor::resized()
     rect.setTop(height / 2 + 30);
     rect.setHeight(80);
     panSlider.setBounds(rect);
-
-    //if stereoSliderPtr exists, stick it 10 px below textButton.
-    if (stereoSliderPtr.get() != nullptr) {
-        DBG("set Bounds");
-        stereoSliderPtr->setBounds(stereoWidthSlider.getBounds());
-    }
 }

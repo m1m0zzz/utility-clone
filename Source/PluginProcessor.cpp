@@ -171,6 +171,9 @@ void UtilitycloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     buffer.applyGain(phase);
 
     // stereo
+    DBG("stereoMode: " << *stereoMode);
+    //DBG(*parameters.getRawParameterValue("stereoMode"));
+
     if (totalNumInputChannels == 2 && !(*isMono))
     {
         auto* leftChannel = buffer.getWritePointer(0);
@@ -264,7 +267,7 @@ bool UtilitycloneAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* UtilitycloneAudioProcessor::createEditor()
 {
-    return new UtilitycloneAudioProcessorEditor (*this, parameters);
+    return new UtilitycloneAudioProcessorEditor (*this, parameters, stereoMode);
 }
 
 //==============================================================================

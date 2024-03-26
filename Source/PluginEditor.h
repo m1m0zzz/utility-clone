@@ -79,13 +79,30 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(GainKnob)
 };
 
+class SliderTab : public juce::TabbedComponent
+{
+public:
+    using juce::TabbedComponent::TabbedComponent;
+
+    void currentTabChanged(int index, const juce::String& name) override {
+        //DBG("currentTabChanged(" << index << ", " << name << ")");
+        if (onTabChanged) {
+            onTabChanged(index, name);
+        }
+    };
+
+    std::function<void(int index, const juce::String& name)> onTabChanged = nullptr;
+private:
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SliderTab)
+};
+
 //==============================================================================
 /**
 */
 class UtilitycloneAudioProcessorEditor  : public juce::AudioProcessorEditor
 {
 public:
-    UtilitycloneAudioProcessorEditor (UtilitycloneAudioProcessor&, juce::AudioProcessorValueTreeState& vts);
+    UtilitycloneAudioProcessorEditor (UtilitycloneAudioProcessor&, juce::AudioProcessorValueTreeState& vts, std::atomic<float>* stereo);
     ~UtilitycloneAudioProcessorEditor() override;
 
     //==============================================================================
@@ -97,6 +114,7 @@ private:
     CustomLookAndFeel customLookAndFeel;
     
     juce::AudioProcessorValueTreeState& valueTreeState;
+    std::atomic<float>* stereoMode; // Width or Mid/Side
 
     int width = 200;
     int height = 300;
@@ -128,12 +146,11 @@ private:
     std::unique_ptr<SliderAttachment> bassMonoFrequencySliderAttachment;
 
     // ui components
+    SliderTab stereoTab{ juce::TabbedButtonBar::TabsAtTop };
     juce::Rectangle<int> columnL{ 0, 0, width / 2, height };
     juce::Rectangle<int> columnR{ width / 2, 0, width / 2, height };
     juce::Label gainLabel;
     juce::Label panLabel;
-
-    std::unique_ptr<juce::Slider> stereoSliderPtr;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UtilitycloneAudioProcessorEditor)
 };
