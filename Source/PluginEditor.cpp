@@ -106,12 +106,13 @@ UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor (
     stereoModeComboBoxAttachment.reset(new ComboBoxAttachment(valueTreeState, "stereoMode", stereoModeComboBox));
     //addAndMakeVisible(stereoModeComboBox);
 
-    stereoTab.addTab("Width", juce::Colour::fromRGB(183, 183, 183), &stereoWidthSlider, true);
-    stereoTab.addTab("M/S",   juce::Colour::fromRGB(183, 183, 183), &stereoMidSideSlider, true);
+    stereoTab.addTab("Width", themeColours.at("grey"), &stereoWidthSlider, true);
+    stereoTab.addTab("M/S",   themeColours.at("grey"), &stereoMidSideSlider, true);
     stereoTab.onTabChanged = [this](int index, juce::String name) {
         DBG("added func");
+        //TODO: memory error
         //valueTreeState.getParameter("stereoMode")->setValue(static_cast<float>(index));
-        this->stereoMode->store(static_cast<float>(index));
+        *this->stereoMode = (static_cast<float>(index));
     };
     addAndMakeVisible(stereoTab);
 
@@ -154,24 +155,12 @@ void UtilitycloneAudioProcessorEditor::paint (juce::Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     //g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
-    g.fillAll(juce::Colour::fromRGB(143, 143, 143));
+    g.fillAll(themeColours.at("grey"));
 
     // hr
     g.setColour(juce::Colour::fromRGB(80, 80, 80));
     g.fillRect(width / 2, 10, 1, height - 20);
-
-    //g.setColour(juce::Colours::azure);
-    //g.fillRect(columnL.toFloat());
-    //g.setColour(juce::Colours::orange);
-    //g.fillRect(columnR.toFloat());
 }
-
-//void pushComponent(juce::Rectangle<int> column, juce::Component component, int y = 0, int height = 39) {
-//    auto a = column.reduced(5);
-//    a.setTop(y);
-//    a.setHeight(height);
-//    component.setBounds(a);
-//}
 
 void UtilitycloneAudioProcessorEditor::resized()
 {
@@ -181,6 +170,7 @@ void UtilitycloneAudioProcessorEditor::resized()
 
     const int padding = 5;
     const int compoentHeight = 26;
+    const int knobHeight = 80;
 
     columnL.setWidth(width / 2 - 5);
     columnL.setHeight(height);
@@ -198,8 +188,8 @@ void UtilitycloneAudioProcessorEditor::resized()
     //rect.setHeight(compoentHeight);
     //stereoModeComboBox.setBounds(rect);
 
-    rect.setTop(35);
-    rect.setHeight(120);
+    rect.setTop(40);
+    rect.setHeight(knobHeight + stereoTab.getTabBarDepth());
     stereoTab.setBounds(rect);
 
     //rect.setTop(70);
@@ -218,7 +208,7 @@ void UtilitycloneAudioProcessorEditor::resized()
     bassMonoToggleButton.setBounds(rect);
 
     rect.setTop(220);
-    rect.setHeight(80);
+    rect.setHeight(knobHeight);
     bassMonoFrequencySlider.setBounds(rect);
 
     // column R
@@ -229,7 +219,7 @@ void UtilitycloneAudioProcessorEditor::resized()
     gainLabel.setBounds(rect);
 
     rect.setTop(30);
-    rect.setHeight(80);
+    rect.setHeight(knobHeight);
     gainSlider.setBounds(rect);
 
     rect.setTop(height / 2 + 10);
@@ -237,6 +227,6 @@ void UtilitycloneAudioProcessorEditor::resized()
     panLabel.setBounds(rect);
 
     rect.setTop(height / 2 + 30);
-    rect.setHeight(80);
+    rect.setHeight(knobHeight);
     panSlider.setBounds(rect);
 }

@@ -11,6 +11,14 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 
+const std::unordered_map<std::string, juce::Colour> themeColours = {
+    { "grey",       juce::Colour::fromRGB(143, 143, 143) },
+    { "lightgrey",  juce::Colour::fromRGB(183, 183, 183) },
+    { "blue",       juce::Colour::fromRGB(85, 222, 246) },
+    { "orange",     juce::Colour::fromRGB(255, 177, 0) },
+    { "lightblack", juce::Colour::Colour(42, 42, 42) },
+};
+
 class CustomLookAndFeel : public juce::LookAndFeel_V4 {
     void drawRotarySlider(juce::Graphics&, int x, int y, int width, int height,
         float sliderPosProportional, float rotaryStartAngle,
@@ -26,8 +34,8 @@ public:
     ToggleTextButton(juce::String text, juce::LookAndFeel* lookAndFeel) {
         setClickingTogglesState(true);
         setButtonText(text);
-        setColour(juce::TextButton::ColourIds::buttonOnColourId, juce::Colour::fromRGB(255, 177, 0));
-        setColour(juce::TextButton::ColourIds::buttonColourId, juce::Colour::fromRGB(183, 183, 183));
+        setColour(juce::TextButton::ColourIds::buttonOnColourId, themeColours.at("orange"));
+        setColour(juce::TextButton::ColourIds::buttonColourId, themeColours.at("lightgrey"));
         setColour(juce::TextButton::ColourIds::textColourOnId, juce::Colours::black);
         setColour(juce::TextButton::ColourIds::textColourOffId, juce::Colours::black);
         //setLookAndFeel(lookAndFeel); // ˆê‰ñ‚µ‚©“K—p‚³‚ê‚È‚¢
@@ -46,9 +54,9 @@ public:
         setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
         setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 80, 20);
         setColour(juce::Slider::textBoxTextColourId, juce::Colours::black);
-        setColour(juce::Slider::ColourIds::thumbColourId, juce::Colour::Colour(42, 42, 42));
-        setColour(juce::Slider::ColourIds::rotarySliderOutlineColourId, juce::Colour::Colour(42, 42, 42));
-        setColour(juce::Slider::ColourIds::rotarySliderFillColourId, juce::Colour::Colour(85, 222, 246));
+        setColour(juce::Slider::ColourIds::thumbColourId, themeColours.at("lightblack"));
+        setColour(juce::Slider::ColourIds::rotarySliderOutlineColourId, themeColours.at("lightblack"));
+        setColour(juce::Slider::ColourIds::rotarySliderFillColourId, themeColours.at("blue"));
         setLookAndFeel(lookAndFeel);
     }
 private:
@@ -147,8 +155,8 @@ private:
 
     // ui components
     SliderTab stereoTab{ juce::TabbedButtonBar::TabsAtTop };
-    juce::Rectangle<int> columnL{ 0, 0, width / 2, height };
-    juce::Rectangle<int> columnR{ width / 2, 0, width / 2, height };
+    juce::Rectangle<int> columnL;
+    juce::Rectangle<int> columnR;
     juce::Label gainLabel;
     juce::Label panLabel;
 
