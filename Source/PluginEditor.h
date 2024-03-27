@@ -71,26 +71,34 @@ class MiniTextSlider : public juce::Slider
 public:
     using juce::Slider::Slider;
 
-    std::atomic<float>* parameterRef;
-    float min, max;
+    juce::AudioProcessorValueTreeState& valueTreeState;
+    juce::String parameterID;
+    bool disableFlag = false;
 
-    MiniTextSlider(std::atomic<float>* parameterRef, float min, float max) :
-        parameterRef(parameterRef), min(min), max(max)
+    MiniTextSlider(juce::AudioProcessorValueTreeState& valueTreeState, const juce::String parameterID, bool disableFlag = false) :
+        valueTreeState(valueTreeState), parameterID(parameterID), disableFlag(disableFlag)
     {
+        //const float min = range.start;
+        //const float max = range.end;
+        //const float mid = sqrt(min * max);
+        //DBG("min: " << min << ", max: " << max << ", mid: " << mid);
+        //range.skew = log(1 / 2) / log((mid - min) / (max - min));
+        //range.setSkewForCentre(mid);
         setSliderStyle(juce::Slider::SliderStyle::LinearBarVertical);
         setColour(juce::Slider::ColourIds::trackColourId, juce::Colours::transparentWhite);
         setColour(juce::Slider::ColourIds::textBoxTextColourId, themeColours.at("text"));
         setColour(juce::Slider::ColourIds::textBoxOutlineColourId, themeColours.at("text"));
-        //setColour(juce::Slider::ColourIds::textBoxBackgroundColourId, juce::Colours::white);
+        setColour(juce::Slider::ColourIds::textBoxBackgroundColourId, themeColours.at("text"));
         setVelocityBasedMode(true);
-        setVelocityModeParameters(0.4, 1, 0.09, false);
+        setVelocityModeParameters(1.6, 1, 0.09);
     }
 
     void paint(juce::Graphics& g) override
     {
         //DBG("paint");
         // TODO: 重み付け
-        const float percent = std::clamp((parameterRef->load() - min) / (max - min), 0.0f, 1.0f);
+        const auto range = valueTreeState.getParameterRange(parameterID);
+        const float percent = range.convertTo0to1(*valueTreeState.getRawParameterValue(parameterID));
         g.setColour(themeColours.at("white"));
         g.fillRect(0, 0, getWidth(), getHeight());
         g.setColour(themeColours.at("blue"));

@@ -45,7 +45,11 @@ UtilityCloneAudioProcessor::UtilityCloneAudioProcessor()
                 }
             ),
             std::make_unique<juce::AudioParameterBool>("isBassMono", "Bass Mono", false),
-            std::make_unique<juce::AudioParameterFloat>("bassMonoFrequency", "Bass Mono freq", juce::NormalisableRange(50.0f, 500.0f, 1.0f), 120.0f),
+            std::make_unique<juce::AudioParameterFloat>(
+                "bassMonoFrequency", "Bass Mono freq",
+                juce::NormalisableRange(50.0f, 500.0f, 1.0f, 0.86f),
+                120.0f
+            ),
         })
 {
     gain              = parameters.getRawParameterValue("gain");
