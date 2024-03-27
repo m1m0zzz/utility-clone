@@ -69,10 +69,10 @@ void CustomLookAndFeel::drawButtonBackground(juce::Graphics& g,
 }
 
 //==============================================================================
-UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor (
+UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor(
     UtilitycloneAudioProcessor& p, juce::AudioProcessorValueTreeState& vts, juce::UndoManager& um)
-    : AudioProcessorEditor (&p), audioProcessor (p), valueTreeState(vts), undoManager(um),
-      undoButton("Undo"), redoButton("Redo")
+    : AudioProcessorEditor(&p), audioProcessor(p), valueTreeState(vts), undoManager(um),
+    undoButton("Undo"), redoButton("Redo")
 {
     // window
     setResizable(true, true);
@@ -101,14 +101,14 @@ UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor (
     stereoWidthSlider.setRange(widthRange.start, widthRange.end);
     stereoWidthSlider.setSkewFactorFromMidPoint(100);
     stereoWidthSlider.setTextValueSuffix("%");
-    
+
     stereoMidSideSliderAttachment.reset(new SliderAttachment(valueTreeState, "stereoMidSide", stereoMidSideSlider));
-    
+
     stereoTab.addTab("Width", themeColours.at("grey"), &stereoWidthSlider, true);
     stereoTab.addTab("M/S", themeColours.at("grey"), &stereoMidSideSlider, true);
     stereoTab.onTabChanged = [this](int index, juce::String name) {
         valueTreeState.getRawParameterValue("stereoMode")->store(static_cast<float>(index));
-    };
+        };
     addAndMakeVisible(stereoTab);
 
     bassMonoToggleButtonAttachment.reset(new ButtonAttachment(valueTreeState, "isBassMono", bassMonoToggleButton));
@@ -139,7 +139,7 @@ UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor (
     //    DBG("redo");
     //};
 
-    setSize (width, height);
+    setSize(width, height);
 }
 
 UtilitycloneAudioProcessorEditor::~UtilitycloneAudioProcessorEditor()
@@ -147,7 +147,7 @@ UtilitycloneAudioProcessorEditor::~UtilitycloneAudioProcessorEditor()
 }
 
 //==============================================================================
-void UtilitycloneAudioProcessorEditor::paint (juce::Graphics& g)
+void UtilitycloneAudioProcessorEditor::paint(juce::Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     //g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
@@ -160,7 +160,7 @@ void UtilitycloneAudioProcessorEditor::paint (juce::Graphics& g)
 
 void UtilitycloneAudioProcessorEditor::resized()
 {
-    width  = getWidth();
+    width = getWidth();
     height = getHeight();
     //DBG("w = " << width << ", h = " << height);
 
@@ -179,7 +179,7 @@ void UtilitycloneAudioProcessorEditor::resized()
     auto rect = columnL.reduced(padding);
     rect.setHeight(compoentHeight);
     invertPhaseToggleButton.setBounds(rect);
-    
+
     rect.setTop(40);
     rect.setHeight(knobHeight + stereoTab.getTabBarDepth());
     stereoTab.setBounds(rect);

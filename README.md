@@ -16,12 +16,13 @@
 - [x] mono
 - [x] bass mono (🔺: filter)
 - [x] stereo width
+  - [ ] smoothing
 
 **UI**
 - [x] knob component
 - [x] gain unit dB
-- [ ] toggle text button
-- [ ] switch width <=> mid/side
+- [x] toggle text button
+- [x] switch width <=> mid/side
 - [ ] undo/redo
   - [ ] button
   - [ ] keyboard shortcut

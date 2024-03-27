@@ -39,7 +39,7 @@ public:
         setColour(juce::TextButton::ColourIds::buttonColourId, themeColours.at("lightgrey"));
         setColour(juce::TextButton::ColourIds::textColourOnId, themeColours.at("text"));
         setColour(juce::TextButton::ColourIds::textColourOffId, themeColours.at("text"));
-        //setLookAndFeel(lookAndFeel); // ˆê‰ñ‚µ‚©“K—p‚³‚ê‚È‚¢
+        //setLookAndFeel(lookAndFeel); // ä¸€å›ã—ã‹é©ç”¨ã•ã‚Œãªã„
     }
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ToggleTextButton)
