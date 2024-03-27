@@ -72,7 +72,7 @@ void CustomLookAndFeel::drawButtonBackground(juce::Graphics& g,
 UtilityCloneAudioProcessorEditor::UtilityCloneAudioProcessorEditor(
     UtilityCloneAudioProcessor& p, juce::AudioProcessorValueTreeState& vts, juce::UndoManager& um)
     : AudioProcessorEditor(&p), audioProcessor(p), valueTreeState(vts), undoManager(um),
-    undoButton("Undo"), redoButton("Redo")
+    undoButton("Undo"), redoButton("Redo"), bassMonoFrequencySlider(vts.getRawParameterValue("bassMonoFrequency"), 120.0f, 500.0f)
 {
     // window
     setResizable(true, true);
@@ -193,7 +193,7 @@ void UtilityCloneAudioProcessorEditor::resized()
     bassMonoToggleButton.setBounds(rect);
 
     rect.setTop(220);
-    rect.setHeight(knobHeight);
+    rect.setHeight(20);
     bassMonoFrequencySlider.setBounds(rect);
 
     // column R

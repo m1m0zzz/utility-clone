@@ -17,6 +17,7 @@ const std::unordered_map<std::string, juce::Colour> themeColours = {
     { "blue",       juce::Colour::fromRGB(85, 222, 246) },
     { "orange",     juce::Colour::fromRGB(255, 177, 0) },
     { "lightblack", juce::Colour::fromRGB(42, 42, 42) },
+    { "white",      juce::Colour::fromRGB(220, 220,220) },
     { "text",       juce::Colours::black },
 };
 
@@ -64,29 +65,42 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(KnobSlider)
 };
 
-class GainKnob : public KnobSlider
+
+class MiniTextSlider : public juce::Slider
 {
 public:
-    using KnobSlider::KnobSlider;
+    using juce::Slider::Slider;
 
-    //juce::String getTextFromValue(double value) override
-    //{
-    //    return juce::Decibels::toString(value);
-    //}
+    std::atomic<float>* parameterRef;
+    float min, max;
 
-    //double getValueFromText(const juce::String& text) override
-    //{
-    //    auto minusInfinitydB = -100.0;
+    MiniTextSlider(std::atomic<float>* parameterRef, float min, float max) :
+        parameterRef(parameterRef), min(min), max(max)
+    {
+        setSliderStyle(juce::Slider::SliderStyle::LinearBarVertical);
+        setColour(juce::Slider::ColourIds::trackColourId, juce::Colours::transparentWhite);
+        setColour(juce::Slider::ColourIds::textBoxTextColourId, themeColours.at("text"));
+        setColour(juce::Slider::ColourIds::textBoxOutlineColourId, themeColours.at("text"));
+        //setColour(juce::Slider::ColourIds::textBoxBackgroundColourId, juce::Colours::white);
+        setVelocityBasedMode(true);
+        setVelocityModeParameters(0.4, 1, 0.09, false);
+    }
 
-    //    // TODO: changed "-INF"
-    //    // TODO: +XX dB (delete: "+")
-    //    auto decibelText = text.upToFirstOccurrenceOf("dB", false, false).trim();
-    //    return decibelText.equalsIgnoreCase("-inf") ? minusInfinitydB
-    //                                                : decibelText.getDoubleValue();
-    //}
+    void paint(juce::Graphics& g) override
+    {
+        //DBG("paint");
+        // TODO: 重み付け
+        const float percent = std::clamp((parameterRef->load() - min) / (max - min), 0.0f, 1.0f);
+        g.setColour(themeColours.at("white"));
+        g.fillRect(0, 0, getWidth(), getHeight());
+        g.setColour(themeColours.at("blue"));
+        g.fillRect(0, 0, static_cast<int>(getWidth() * percent), getHeight());
+    }
+
 private:
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(GainKnob)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MiniTextSlider)
 };
+
 
 class SliderTab : public juce::TabbedComponent
 {
@@ -134,21 +148,19 @@ private:
     typedef juce::AudioProcessorValueTreeState::ComboBoxAttachment ComboBoxAttachment;
     typedef juce::AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
 
-    GainKnob gainSlider{ &customLookAndFeel };
+    KnobSlider gainSlider{ &customLookAndFeel };
     ToggleTextButton invertPhaseToggleButton{ "Invert Phase", &customLookAndFeel };
     ToggleTextButton monoToggleButton{ "Mono", &customLookAndFeel };
     KnobSlider panSlider{&customLookAndFeel};
-    juce::ComboBox stereoModeComboBox;
     KnobSlider stereoWidthSlider{ &customLookAndFeel };
     KnobSlider stereoMidSideSlider{ &customLookAndFeel };
     ToggleTextButton bassMonoToggleButton{ "Bass Mono", &customLookAndFeel };
-    KnobSlider bassMonoFrequencySlider{ &customLookAndFeel };
+    MiniTextSlider bassMonoFrequencySlider;
 
     std::unique_ptr<SliderAttachment> gainSliderAttachment;
     std::unique_ptr<ButtonAttachment> invertPhaseToggleButtonAttachment;
     std::unique_ptr<ButtonAttachment> monoToggleButtonAttachment;
     std::unique_ptr<SliderAttachment> panSliderAttachment;
-    std::unique_ptr<ComboBoxAttachment> stereoModeComboBoxAttachment;
     std::unique_ptr<SliderAttachment> stereoWidthSliderAttachment;
     std::unique_ptr<SliderAttachment> stereoMidSideSliderAttachment;
     std::unique_ptr<ButtonAttachment> bassMonoToggleButtonAttachment;
