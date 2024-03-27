@@ -15,13 +15,13 @@ const juce::StringArray stereoModeList = juce::StringArray("Width", "Mid/Side");
 //==============================================================================
 /**
 */
-class UtilitycloneAudioProcessor  : public juce::AudioProcessor
+class UtilityCloneAudioProcessor  : public juce::AudioProcessor
 {
 public:
 
     //==============================================================================
-    UtilitycloneAudioProcessor();
-    ~UtilitycloneAudioProcessor() override;
+    UtilityCloneAudioProcessor();
+    ~UtilityCloneAudioProcessor() override;
 
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
@@ -77,5 +77,5 @@ private:
     std::atomic<float>* bassMonoFrequency = nullptr;
 
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UtilitycloneAudioProcessor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UtilityCloneAudioProcessor)
 };

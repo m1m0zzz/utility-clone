@@ -69,8 +69,8 @@ void CustomLookAndFeel::drawButtonBackground(juce::Graphics& g,
 }
 
 //==============================================================================
-UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor(
-    UtilitycloneAudioProcessor& p, juce::AudioProcessorValueTreeState& vts, juce::UndoManager& um)
+UtilityCloneAudioProcessorEditor::UtilityCloneAudioProcessorEditor(
+    UtilityCloneAudioProcessor& p, juce::AudioProcessorValueTreeState& vts, juce::UndoManager& um)
     : AudioProcessorEditor(&p), audioProcessor(p), valueTreeState(vts), undoManager(um),
     undoButton("Undo"), redoButton("Redo")
 {
@@ -142,12 +142,12 @@ UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor(
     setSize(width, height);
 }
 
-UtilitycloneAudioProcessorEditor::~UtilitycloneAudioProcessorEditor()
+UtilityCloneAudioProcessorEditor::~UtilityCloneAudioProcessorEditor()
 {
 }
 
 //==============================================================================
-void UtilitycloneAudioProcessorEditor::paint(juce::Graphics& g)
+void UtilityCloneAudioProcessorEditor::paint(juce::Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     //g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
@@ -158,7 +158,7 @@ void UtilitycloneAudioProcessorEditor::paint(juce::Graphics& g)
     g.fillRect(width / 2, 10, 1, height - 20);
 }
 
-void UtilitycloneAudioProcessorEditor::resized()
+void UtilityCloneAudioProcessorEditor::resized()
 {
     width = getWidth();
     height = getHeight();

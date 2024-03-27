@@ -108,18 +108,18 @@ private:
 //==============================================================================
 /**
 */
-class UtilitycloneAudioProcessorEditor  : public juce::AudioProcessorEditor
+class UtilityCloneAudioProcessorEditor  : public juce::AudioProcessorEditor
 {
 public:
-    UtilitycloneAudioProcessorEditor (UtilitycloneAudioProcessor&, juce::AudioProcessorValueTreeState& vts, juce::UndoManager& um);
-    ~UtilitycloneAudioProcessorEditor() override;
+    UtilityCloneAudioProcessorEditor (UtilityCloneAudioProcessor&, juce::AudioProcessorValueTreeState& vts, juce::UndoManager& um);
+    ~UtilityCloneAudioProcessorEditor() override;
 
     //==============================================================================
     void paint (juce::Graphics&) override;
     void resized() override;
 
 private:
-    UtilitycloneAudioProcessor& audioProcessor;
+    UtilityCloneAudioProcessor& audioProcessor;
     CustomLookAndFeel customLookAndFeel;
     
     juce::AudioProcessorValueTreeState& valueTreeState;
@@ -162,5 +162,5 @@ private:
     juce::Label panLabel;
     juce::TextButton undoButton, redoButton;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UtilitycloneAudioProcessorEditor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UtilityCloneAudioProcessorEditor)
 };
