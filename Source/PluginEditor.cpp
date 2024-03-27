@@ -70,8 +70,8 @@ void CustomLookAndFeel::drawButtonBackground(juce::Graphics& g,
 
 //==============================================================================
 UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor (
-    UtilitycloneAudioProcessor& p, juce::AudioProcessorValueTreeState& vts, std::atomic<float>* stereo)
-    : AudioProcessorEditor (&p), audioProcessor (p), valueTreeState(vts), stereoMode(stereo)
+    UtilitycloneAudioProcessor& p, juce::AudioProcessorValueTreeState& vts)
+    : AudioProcessorEditor (&p), audioProcessor (p), valueTreeState(vts)
 {
     // window
     setResizable(true, true);
@@ -110,9 +110,7 @@ UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor (
     stereoTab.addTab("M/S",   themeColours.at("grey"), &stereoMidSideSlider, true);
     stereoTab.onTabChanged = [this](int index, juce::String name) {
         DBG("added func");
-        //TODO: memory error
-        //valueTreeState.getParameter("stereoMode")->setValue(static_cast<float>(index));
-        *this->stereoMode = (static_cast<float>(index));
+        valueTreeState.getRawParameterValue("stereoMode")->store(static_cast<float>(index));
     };
     addAndMakeVisible(stereoTab);
 

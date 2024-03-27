@@ -99,7 +99,7 @@ public:
         }
     };
 
-    std::function<void(int index, const juce::String& name)> onTabChanged = nullptr;
+    std::function<void(int index, const juce::String& name)> onTabChanged;
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SliderTab)
 };
@@ -110,7 +110,7 @@ private:
 class UtilitycloneAudioProcessorEditor  : public juce::AudioProcessorEditor
 {
 public:
-    UtilitycloneAudioProcessorEditor (UtilitycloneAudioProcessor&, juce::AudioProcessorValueTreeState& vts, std::atomic<float>* stereo);
+    UtilitycloneAudioProcessorEditor (UtilitycloneAudioProcessor&, juce::AudioProcessorValueTreeState& vts);
     ~UtilitycloneAudioProcessorEditor() override;
 
     //==============================================================================
@@ -122,7 +122,6 @@ private:
     CustomLookAndFeel customLookAndFeel;
     
     juce::AudioProcessorValueTreeState& valueTreeState;
-    std::atomic<float>* stereoMode; // Width or Mid/Side
 
     int width = 200;
     int height = 300;

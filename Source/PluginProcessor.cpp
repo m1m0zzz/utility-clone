@@ -267,7 +267,7 @@ bool UtilitycloneAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* UtilitycloneAudioProcessor::createEditor()
 {
-    return new UtilitycloneAudioProcessorEditor (*this, parameters, stereoMode);
+    return new UtilitycloneAudioProcessorEditor (*this, parameters);
 }
 
 //==============================================================================
