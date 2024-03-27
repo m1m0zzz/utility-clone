@@ -78,8 +78,6 @@ UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor (
     setResizeLimits(width, height, 400, 600);
     //getConstrainer()->setFixedAspectRatio(ratio);
 
-    //addAndMakeVisible(&tabs);
-
     // components
     const juce::Colour textColor = juce::Colour::fromRGB(0, 0, 0);
 
@@ -102,18 +100,6 @@ UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor (
     // TODO: prefix (pan < 0 ? L : R) abs(pan)
     addAndMakeVisible(panSlider);
 
-    stereoModeComboBox.addItemList(stereoModeList, 1);
-    stereoModeComboBoxAttachment.reset(new ComboBoxAttachment(valueTreeState, "stereoMode", stereoModeComboBox));
-    //addAndMakeVisible(stereoModeComboBox);
-
-    stereoTab.addTab("Width", themeColours.at("grey"), &stereoWidthSlider, true);
-    stereoTab.addTab("M/S",   themeColours.at("grey"), &stereoMidSideSlider, true);
-    stereoTab.onTabChanged = [this](int index, juce::String name) {
-        DBG("added func");
-        valueTreeState.getRawParameterValue("stereoMode")->store(static_cast<float>(index));
-    };
-    addAndMakeVisible(stereoTab);
-
     stereoWidthSliderAttachment.reset(new SliderAttachment(valueTreeState, "stereoWidth", stereoWidthSlider));
     auto widthRange = valueTreeState.getParameterRange("stereoWidth");
     stereoWidthSlider.setRange(widthRange.start, widthRange.end);
@@ -123,6 +109,13 @@ UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor (
     stereoMidSideSliderAttachment.reset(new SliderAttachment(valueTreeState, "stereoMidSide", stereoMidSideSlider));
     // TODO: suffix abs(val) (val < 0 ? M : S)
     //addAndMakeVisible(stereoMidSideSlider);
+
+    stereoTab.addTab("Width", themeColours.at("grey"), &stereoWidthSlider, true);
+    stereoTab.addTab("M/S", themeColours.at("grey"), &stereoMidSideSlider, true);
+    stereoTab.onTabChanged = [this](int index, juce::String name) {
+        valueTreeState.getRawParameterValue("stereoMode")->store(static_cast<float>(index));
+        };
+    addAndMakeVisible(stereoTab);
 
     bassMonoToggleButtonAttachment.reset(new ButtonAttachment(valueTreeState, "isBassMono", bassMonoToggleButton));
     addAndMakeVisible(bassMonoToggleButton);
@@ -182,20 +175,9 @@ void UtilitycloneAudioProcessorEditor::resized()
     rect.setHeight(compoentHeight);
     invertPhaseToggleButton.setBounds(rect);
     
-    //rect.setTop(35);
-    //rect.setHeight(compoentHeight);
-    //stereoModeComboBox.setBounds(rect);
-
     rect.setTop(40);
     rect.setHeight(knobHeight + stereoTab.getTabBarDepth());
     stereoTab.setBounds(rect);
-
-    //rect.setTop(70);
-    //rect.setHeight(80);
-    //stereoWidthSlider.setBounds(rect);
-
-    //stereoWidthSlider.setBounds(10, 210, 180, 30);
-    //stereoMidSideSlider.setBounds(10, 250, 180, 30);
 
     rect.setTop(160);
     rect.setHeight(compoentHeight);
@@ -210,7 +192,6 @@ void UtilitycloneAudioProcessorEditor::resized()
     bassMonoFrequencySlider.setBounds(rect);
 
     // column R
-
     rect = columnR.reduced(padding);
     rect.setTop(10);
     rect.setHeight(compoentHeight);

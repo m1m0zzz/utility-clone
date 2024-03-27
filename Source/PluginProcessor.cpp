@@ -171,9 +171,7 @@ void UtilitycloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     buffer.applyGain(phase);
 
     // stereo
-    DBG("stereoMode: " << *stereoMode);
-    //DBG(*parameters.getRawParameterValue("stereoMode"));
-
+    //DBG("stereoMode: " << *stereoMode);
     if (totalNumInputChannels == 2 && !(*isMono))
     {
         auto* leftChannel = buffer.getWritePointer(0);
