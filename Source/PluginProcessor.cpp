@@ -21,17 +21,31 @@ UtilitycloneAudioProcessor::UtilitycloneAudioProcessor()
                      #endif
                        )
 #endif
-    , parameters(*this, nullptr, juce::Identifier("Utility-clone"),
+    , parameters(*this, &undoManager, juce::Identifier("Utility-clone"),
         {
-            std::make_unique<juce::AudioParameterFloat>("gain", "Gain", -100.0f, 35.0f, 0.0f),
+            std::make_unique<juce::AudioParameterFloat>("gain", "Gain", juce::NormalisableRange(-100.0f, 35.0f, 0.1f), 0.0f),
             std::make_unique<juce::AudioParameterBool>("invertPhase", "Invert Phase", false),
             std::make_unique<juce::AudioParameterBool>("mono", "Mono", false),
-            std::make_unique<juce::AudioParameterFloat>("pan", "Pan", -50.0f, 50.0f, 0.0f),
+            std::make_unique<juce::AudioParameterFloat>(
+                "pan", "Pan", juce::NormalisableRange(-50.0f, 50.0f, 1.0f), 0.0f, "Pan", juce::AudioProcessorParameter::genericParameter,
+                [](float value, int) {
+                    return (value == 0) ? "C" : (
+                        juce::String(abs(value)) + ((value < 0) ? "L" : "R")
+                    );
+                }
+            ),
             std::make_unique<juce::AudioParameterChoice>("stereoMode", "Stereo Mode", stereoModeList, 0),
-            std::make_unique<juce::AudioParameterFloat>("stereoWidth", "Width", 0.0f, 400.0f, 100.0f),
-            std::make_unique<juce::AudioParameterFloat>("stereoMidSide", "Mid/Side", -100.0f, 100.0f, 0.0f),
+            std::make_unique<juce::AudioParameterFloat>("stereoWidth", "Width", juce::NormalisableRange(0.0f, 400.0f, 1.0f), 100.0f),
+            std::make_unique<juce::AudioParameterFloat>(
+                "stereoMidSide", "Mid/Side", juce::NormalisableRange(-100.0f, 100.0f, 1.0f), 0.0f, "Mid/Side", juce::AudioProcessorParameter::genericParameter,
+                [](float value, int) {
+                    return (value == 0) ? "0" : (
+                        juce::String(abs(value)) + ((value < 0) ? "M" : "S")
+                    );
+                }
+            ),
             std::make_unique<juce::AudioParameterBool>("isBassMono", "Bass Mono", false),
-            std::make_unique<juce::AudioParameterFloat>("bassMonoFrequency", "Bass Mono freq", 50.0f, 500.0f, 120.0f),
+            std::make_unique<juce::AudioParameterFloat>("bassMonoFrequency", "Bass Mono freq", juce::NormalisableRange(50.0f, 500.0f, 1.0f), 120.0f),
         })
 {
     gain              = parameters.getRawParameterValue("gain");
@@ -265,21 +279,24 @@ bool UtilitycloneAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* UtilitycloneAudioProcessor::createEditor()
 {
-    return new UtilitycloneAudioProcessorEditor (*this, parameters);
+    return new UtilitycloneAudioProcessorEditor (*this, parameters, undoManager);
 }
 
 //==============================================================================
 void UtilitycloneAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
+    auto state = parameters.copyState();
+    std::unique_ptr<juce::XmlElement> xml(state.createXml());
+    copyXmlToBinary(*xml, destData);
 }
 
 void UtilitycloneAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
+    std::unique_ptr<juce::XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
+
+    if (xmlState.get() != nullptr)
+        if (xmlState->hasTagName(parameters.state.getType()))
+            parameters.replaceState(juce::ValueTree::fromXml(*xmlState));
 }
 
 //==============================================================================

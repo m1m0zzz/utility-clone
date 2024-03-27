@@ -70,8 +70,9 @@ void CustomLookAndFeel::drawButtonBackground(juce::Graphics& g,
 
 //==============================================================================
 UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor (
-    UtilitycloneAudioProcessor& p, juce::AudioProcessorValueTreeState& vts)
-    : AudioProcessorEditor (&p), audioProcessor (p), valueTreeState(vts)
+    UtilitycloneAudioProcessor& p, juce::AudioProcessorValueTreeState& vts, juce::UndoManager& um)
+    : AudioProcessorEditor (&p), audioProcessor (p), valueTreeState(vts), undoManager(um),
+      undoButton("Undo"), redoButton("Redo")
 {
     // window
     setResizable(true, true);
@@ -79,14 +80,10 @@ UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor (
     //getConstrainer()->setFixedAspectRatio(ratio);
 
     // components
-    const juce::Colour textColor = juce::Colour::fromRGB(0, 0, 0);
-
     gainSliderAttachment.reset(new SliderAttachment(valueTreeState, "gain", gainSlider));
-    //DBG("range: " << gainSlider.getRange().getStart() << ", " << gainSlider.getRange().getEnd());
     auto gainRange = valueTreeState.getParameterRange("gain");
     gainSlider.setRange(gainRange.start, gainRange.end);
     gainSlider.setSkewFactorFromMidPoint(0);
-
     gainSlider.setTextValueSuffix(" dB");
     addAndMakeVisible(gainSlider);
 
@@ -97,24 +94,21 @@ UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor (
     addAndMakeVisible(monoToggleButton);
 
     panSliderAttachment.reset(new SliderAttachment(valueTreeState, "pan", panSlider));
-    // TODO: prefix (pan < 0 ? L : R) abs(pan)
     addAndMakeVisible(panSlider);
 
     stereoWidthSliderAttachment.reset(new SliderAttachment(valueTreeState, "stereoWidth", stereoWidthSlider));
     auto widthRange = valueTreeState.getParameterRange("stereoWidth");
     stereoWidthSlider.setRange(widthRange.start, widthRange.end);
     stereoWidthSlider.setSkewFactorFromMidPoint(100);
-    //addAndMakeVisible(stereoWidthSlider);
-
+    stereoWidthSlider.setTextValueSuffix("%");
+    
     stereoMidSideSliderAttachment.reset(new SliderAttachment(valueTreeState, "stereoMidSide", stereoMidSideSlider));
-    // TODO: suffix abs(val) (val < 0 ? M : S)
-    //addAndMakeVisible(stereoMidSideSlider);
-
+    
     stereoTab.addTab("Width", themeColours.at("grey"), &stereoWidthSlider, true);
     stereoTab.addTab("M/S", themeColours.at("grey"), &stereoMidSideSlider, true);
     stereoTab.onTabChanged = [this](int index, juce::String name) {
         valueTreeState.getRawParameterValue("stereoMode")->store(static_cast<float>(index));
-        };
+    };
     addAndMakeVisible(stereoTab);
 
     bassMonoToggleButtonAttachment.reset(new ButtonAttachment(valueTreeState, "isBassMono", bassMonoToggleButton));
@@ -125,14 +119,25 @@ UtilitycloneAudioProcessorEditor::UtilitycloneAudioProcessorEditor (
     addAndMakeVisible(bassMonoFrequencySlider);
 
     gainLabel.setText("Gain", juce::dontSendNotification);
-    gainLabel.setColour(juce::Label::textColourId, textColor);
+    gainLabel.setColour(juce::Label::textColourId, themeColours.at("text"));
     gainLabel.setJustificationType(juce::Justification::centred);
     addAndMakeVisible(gainLabel);
 
     panLabel.setText("Balance", juce::dontSendNotification);
-    panLabel.setColour(juce::Label::textColourId, textColor);
+    panLabel.setColour(juce::Label::textColourId, themeColours.at("text"));
     panLabel.setJustificationType(juce::Justification::centred);
     addAndMakeVisible(panLabel);
+
+    //addAndMakeVisible(undoButton);
+    //addAndMakeVisible(redoButton);
+    //undoButton.onClick = [this] {
+    //    undoManager.undo();
+    //    DBG("undo");
+    //};
+    //redoButton.onClick = [this] {
+    //    undoManager.redo();
+    //    DBG("redo");
+    //};
 
     setSize (width, height);
 }
@@ -208,4 +213,7 @@ void UtilitycloneAudioProcessorEditor::resized()
     rect.setTop(height / 2 + 30);
     rect.setHeight(knobHeight);
     panSlider.setBounds(rect);
+
+    //undoButton.setBounds(10, 50, 50, 30);
+    //redoButton.setBounds(60, 50, 50, 30);
 }

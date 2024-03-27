@@ -16,7 +16,8 @@ const std::unordered_map<std::string, juce::Colour> themeColours = {
     { "lightgrey",  juce::Colour::fromRGB(183, 183, 183) },
     { "blue",       juce::Colour::fromRGB(85, 222, 246) },
     { "orange",     juce::Colour::fromRGB(255, 177, 0) },
-    { "lightblack", juce::Colour::Colour(42, 42, 42) },
+    { "lightblack", juce::Colour::fromRGB(42, 42, 42) },
+    { "text",       juce::Colours::black },
 };
 
 class CustomLookAndFeel : public juce::LookAndFeel_V4 {
@@ -36,8 +37,8 @@ public:
         setButtonText(text);
         setColour(juce::TextButton::ColourIds::buttonOnColourId, themeColours.at("orange"));
         setColour(juce::TextButton::ColourIds::buttonColourId, themeColours.at("lightgrey"));
-        setColour(juce::TextButton::ColourIds::textColourOnId, juce::Colours::black);
-        setColour(juce::TextButton::ColourIds::textColourOffId, juce::Colours::black);
+        setColour(juce::TextButton::ColourIds::textColourOnId, themeColours.at("text"));
+        setColour(juce::TextButton::ColourIds::textColourOffId, themeColours.at("text"));
         //setLookAndFeel(lookAndFeel); // ˆê‰ñ‚µ‚©“K—p‚³‚ê‚È‚¢
     }
 private:
@@ -53,7 +54,7 @@ public:
     KnobSlider(juce::LookAndFeel* lookAndFeel) {
         setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
         setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 80, 20);
-        setColour(juce::Slider::textBoxTextColourId, juce::Colours::black);
+        setColour(juce::Slider::textBoxTextColourId, themeColours.at("text"));
         setColour(juce::Slider::ColourIds::thumbColourId, themeColours.at("lightblack"));
         setColour(juce::Slider::ColourIds::rotarySliderOutlineColourId, themeColours.at("lightblack"));
         setColour(juce::Slider::ColourIds::rotarySliderFillColourId, themeColours.at("blue"));
@@ -110,7 +111,7 @@ private:
 class UtilitycloneAudioProcessorEditor  : public juce::AudioProcessorEditor
 {
 public:
-    UtilitycloneAudioProcessorEditor (UtilitycloneAudioProcessor&, juce::AudioProcessorValueTreeState& vts);
+    UtilitycloneAudioProcessorEditor (UtilitycloneAudioProcessor&, juce::AudioProcessorValueTreeState& vts, juce::UndoManager& um);
     ~UtilitycloneAudioProcessorEditor() override;
 
     //==============================================================================
@@ -122,6 +123,7 @@ private:
     CustomLookAndFeel customLookAndFeel;
     
     juce::AudioProcessorValueTreeState& valueTreeState;
+    juce::UndoManager& undoManager;
 
     int width = 200;
     int height = 300;
@@ -158,6 +160,7 @@ private:
     juce::Rectangle<int> columnR;
     juce::Label gainLabel;
     juce::Label panLabel;
+    juce::TextButton undoButton, redoButton;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UtilitycloneAudioProcessorEditor)
 };

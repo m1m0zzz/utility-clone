@@ -56,6 +56,8 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    juce::UndoManager undoManager;
+
 private:
     juce::AudioProcessorValueTreeState parameters;
 
