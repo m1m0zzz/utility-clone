@@ -27,11 +27,7 @@ class CustomLookAndFeel : public juce::LookAndFeel_V4 {
         float sliderPosProportional, float rotaryStartAngle,
         float rotaryEndAngle, juce::Slider&) override;
     // slider textbox
-    //void drawLabel(juce::Graphics&, juce::Label&) override;
-    // slider textbox editing
-    //void fillTextEditorBackground(juce::Graphics& g, int width, int height, juce::TextEditor& editor) override;
-    //void drawTextEditorOutline(juce::Graphics& g, int width, int	height, juce::TextEditor& editor) override;
-    // button background
+    void drawLabel(juce::Graphics&, juce::Label&) override;
     juce::Label* createSliderTextBox(juce::Slider& slider) override;
     void drawButtonBackground(juce::Graphics&, juce::Button&, const juce::Colour& backgroundColour,
         bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
@@ -83,7 +79,7 @@ public:
     juce::String parameterID;
     bool disableFlag = false;
 
-    MiniTextSlider(juce::AudioProcessorValueTreeState& valueTreeState, const juce::String parameterID, bool disableFlag = false) :
+    MiniTextSlider(juce::AudioProcessorValueTreeState& valueTreeState, const juce::String parameterID, juce::LookAndFeel* lookAndFeel = nullptr, bool disableFlag = false) :
         valueTreeState(valueTreeState), parameterID(parameterID), disableFlag(disableFlag)
     {
         setSliderStyle(juce::Slider::SliderStyle::LinearBarVertical);
@@ -93,6 +89,7 @@ public:
         setColour(juce::Slider::ColourIds::textBoxBackgroundColourId, themeColours.at("text"));
         setVelocityBasedMode(true);
         setVelocityModeParameters(1.6, 1, 0.09);
+        if (lookAndFeel != nullptr) setLookAndFeel(lookAndFeel);
     }
 
     void paint(juce::Graphics& g) override
