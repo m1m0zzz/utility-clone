@@ -49,6 +49,67 @@ void CustomLookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int wi
     g.fillPath(p);
 }
 
+// slider textbox
+//void CustomLookAndFeel::drawLabel(juce::Graphics& g, juce::Label& label)
+//{
+//    const auto text = label.findColour(juce::Label::ColourIds::textColourId);
+//    const auto rect = juce::Rectangle(0, 0, label.getWidth(), label.getHeight());
+//    //const auto editor = label.getCurrentTextEditor();
+//    //const bool isEdit = editor == nullptr ? false : editor->isTextInputActive();
+//
+//    //if (isEdit) {
+//    //    DBG("isEdit");
+//    //    g.setColour(themeColours.at("lightgrey")); // background
+//    //    g.fillRect(rect);
+//    //    g.setColour(juce::Colours::black); // outline
+//    //    g.drawRect(rect);
+//    //}
+//    //else {
+//    //}
+//    g.setColour(text);
+//    g.drawText(label.getText(), rect, juce::Justification::Flags::centred);
+//
+//}
+
+//void CustomLookAndFeel::fillTextEditorBackground(juce::Graphics& g, int width, int height, juce::TextEditor& editor)
+//{
+//    //DBG("fillTextEditorBackground");
+//    const auto rect = juce::Rectangle(0, 0, width, height);
+//
+//    g.setColour(themeColours.at("lightgrey")); // background
+//    g.fillRect(0, 0, width, height);
+//    //g.setColour(juce::Colours::black); // outline
+//    //g.drawRect(rect);
+//}
+//
+//void CustomLookAndFeel::drawTextEditorOutline(juce::Graphics& g, int width, int height, juce::TextEditor& editor)
+//{
+//    DBG("drawTextEditorOutline");
+//    g.setColour(juce::Colours::black); // outline
+//    g.drawRect(0, 0, width, height);
+//}
+
+juce::Label* CustomLookAndFeel::createSliderTextBox(juce::Slider& slider)
+{
+    DBG("createSliderTextBox");
+    juce::Label* label = LookAndFeel_V4::createSliderTextBox(slider);
+    label->setColour(juce::Label::ColourIds::textColourId,       themeColours.at("text"));
+    label->setColour(juce::Label::ColourIds::backgroundColourId, juce::Colours::transparentWhite);
+    label->setColour(juce::Label::ColourIds::outlineColourId, juce::Colours::transparentWhite);
+    label->setColour(juce::TextEditor::ColourIds::textColourId,  themeColours.at("text")); // no effect
+    label->setColour(juce::Label::ColourIds::outlineWhenEditingColourId, themeColours.at("text"));
+    label->setColour(juce::TextEditor::ColourIds::backgroundColourId, themeColours.at("text")); // TODO: white
+    label->setColour(juce::TextEditor::ColourIds::outlineColourId, themeColours.at("text"));
+    label->setColour(juce::TextEditor::ColourIds::highlightColourId, juce::Colours::transparentWhite);
+    const auto editor = label->getCurrentTextEditor();
+    if (editor != nullptr) {
+        DBG("editor");
+        editor->applyColourToAllText(themeColours.at("text"), true);
+    }
+    ;
+    return label;
+}
+
 void CustomLookAndFeel::drawButtonBackground(juce::Graphics& g,
     juce::Button& button,
     const juce::Colour& backgroundColour,

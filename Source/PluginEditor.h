@@ -22,10 +22,17 @@ const std::unordered_map<std::string, juce::Colour> themeColours = {
 };
 
 class CustomLookAndFeel : public juce::LookAndFeel_V4 {
+    // knob
     void drawRotarySlider(juce::Graphics&, int x, int y, int width, int height,
         float sliderPosProportional, float rotaryStartAngle,
         float rotaryEndAngle, juce::Slider&) override;
-
+    // slider textbox
+    //void drawLabel(juce::Graphics&, juce::Label&) override;
+    // slider textbox editing
+    //void fillTextEditorBackground(juce::Graphics& g, int width, int height, juce::TextEditor& editor) override;
+    //void drawTextEditorOutline(juce::Graphics& g, int width, int	height, juce::TextEditor& editor) override;
+    // button background
+    juce::Label* createSliderTextBox(juce::Slider& slider) override;
     void drawButtonBackground(juce::Graphics&, juce::Button&, const juce::Colour& backgroundColour,
         bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
 };
@@ -55,10 +62,11 @@ public:
     KnobSlider(juce::LookAndFeel* lookAndFeel) {
         setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
         setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 80, 20);
-        setColour(juce::Slider::textBoxTextColourId, themeColours.at("text"));
+        setColour(juce::Slider::ColourIds::textBoxTextColourId, themeColours.at("text"));
         setColour(juce::Slider::ColourIds::thumbColourId, themeColours.at("lightblack"));
         setColour(juce::Slider::ColourIds::rotarySliderOutlineColourId, themeColours.at("lightblack"));
         setColour(juce::Slider::ColourIds::rotarySliderFillColourId, themeColours.at("blue"));
+        setColour(juce::Label::ColourIds::outlineWhenEditingColourId, themeColours.at("white"));
         setLookAndFeel(lookAndFeel);
     }
 private:
