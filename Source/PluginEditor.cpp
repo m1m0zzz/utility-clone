@@ -109,16 +109,13 @@ UtilityCloneAudioProcessorEditor::UtilityCloneAudioProcessorEditor(
     stereoTab.addTab("M/S", themeColours.at("grey"), &stereoMidSideSlider, true);
     stereoTab.onTabChanged = [this](int index, juce::String name) {
         valueTreeState.getRawParameterValue("stereoMode")->store(static_cast<float>(index));
-        };
+    };
     addAndMakeVisible(stereoTab);
 
     bassMonoToggleButtonAttachment.reset(new ButtonAttachment(valueTreeState, "isBassMono", bassMonoToggleButton));
     addAndMakeVisible(bassMonoToggleButton);
 
     bassMonoFrequencySliderAttachment.reset(new SliderAttachment(valueTreeState, "bassMonoFrequency", bassMonoFrequencySlider));
-    //auto freqRange = valueTreeState.getParameterRange("bassMonoFrequency");
-    //bassMonoFrequencySlider.setRange(freqRange.start, freqRange.end);
-    //bassMonoFrequencySlider.setSkewFactorFromMidPoint(158); // sqrt(start * end)
     bassMonoFrequencySlider.setTextValueSuffix(" Hz");
     addAndMakeVisible(bassMonoFrequencySlider);
 

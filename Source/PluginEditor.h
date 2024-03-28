@@ -78,12 +78,6 @@ public:
     MiniTextSlider(juce::AudioProcessorValueTreeState& valueTreeState, const juce::String parameterID, bool disableFlag = false) :
         valueTreeState(valueTreeState), parameterID(parameterID), disableFlag(disableFlag)
     {
-        //const float min = range.start;
-        //const float max = range.end;
-        //const float mid = sqrt(min * max);
-        //DBG("min: " << min << ", max: " << max << ", mid: " << mid);
-        //range.skew = log(1 / 2) / log((mid - min) / (max - min));
-        //range.setSkewForCentre(mid);
         setSliderStyle(juce::Slider::SliderStyle::LinearBarVertical);
         setColour(juce::Slider::ColourIds::trackColourId, juce::Colours::transparentWhite);
         setColour(juce::Slider::ColourIds::textBoxTextColourId, themeColours.at("text"));
@@ -95,8 +89,6 @@ public:
 
     void paint(juce::Graphics& g) override
     {
-        //DBG("paint");
-        // TODO: 重み付け
         const auto range = valueTreeState.getParameterRange(parameterID);
         const float percent = range.convertTo0to1(*valueTreeState.getRawParameterValue(parameterID));
         g.setColour(themeColours.at("white"));

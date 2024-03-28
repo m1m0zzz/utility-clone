@@ -9,6 +9,12 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+template <typename T>
+T calcSkew(T min, T max) {
+    T mid = sqrt(min * max);
+    return static_cast<T>(log10(0.5)) / log10((mid - min) / (max - min));
+}
+
 //==============================================================================
 UtilityCloneAudioProcessor::UtilityCloneAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
@@ -47,7 +53,7 @@ UtilityCloneAudioProcessor::UtilityCloneAudioProcessor()
             std::make_unique<juce::AudioParameterBool>("isBassMono", "Bass Mono", false),
             std::make_unique<juce::AudioParameterFloat>(
                 "bassMonoFrequency", "Bass Mono freq",
-                juce::NormalisableRange(50.0f, 500.0f, 1.0f, 0.86f),
+                juce::NormalisableRange(50.0f, 500.0f, 1.0f, calcSkew(50.0f, 500.0f), false),
                 120.0f
             ),
         })
