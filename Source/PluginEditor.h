@@ -107,24 +107,6 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MiniTextSlider)
 };
 
-
-//class SliderTab : public juce::TabbedComponent
-//{
-//public:
-//    using juce::TabbedComponent::TabbedComponent;
-//
-//    void currentTabChanged(int index, const juce::String& name) override {
-//        //DBG("currentTabChanged(" << index << ", " << name << ")");
-//        if (onTabChanged) {
-//            onTabChanged(index, name);
-//        }
-//    };
-//
-//    std::function<void(int index, const juce::String& name)> onTabChanged;
-//private:
-//    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SliderTab)
-//};
-
 //==============================================================================
 /**
 */
@@ -135,6 +117,7 @@ public:
     ~UtilityCloneAudioProcessorEditor() override;
 
     //==============================================================================
+    bool keyPressed(const juce::KeyPress& key) override;
     void paint (juce::Graphics&) override;
     void resized() override;
 
@@ -158,16 +141,17 @@ private:
     ToggleTextButton invertPhaseToggleButton{ "Invert Phase", &customLookAndFeel };
     ToggleTextButton monoToggleButton{ "Mono", &customLookAndFeel };
     KnobSlider panSlider{&customLookAndFeel};
+    juce::TextButton stereoModeSwitchButton;
     KnobSlider stereoWidthSlider{ &customLookAndFeel };
     KnobSlider stereoMidSideSlider{ &customLookAndFeel };
     ToggleTextButton bassMonoToggleButton{ "Bass Mono", &customLookAndFeel };
     MiniTextSlider bassMonoFrequencySlider;
-    juce::TextButton stereoModeSwitchButton;
 
     std::unique_ptr<SliderAttachment> gainSliderAttachment;
     std::unique_ptr<ButtonAttachment> invertPhaseToggleButtonAttachment;
     std::unique_ptr<ButtonAttachment> monoToggleButtonAttachment;
     std::unique_ptr<SliderAttachment> panSliderAttachment;
+    std::unique_ptr<ButtonAttachment> stereoModeSwitchButtonAttachment;
     std::unique_ptr<SliderAttachment> stereoWidthSliderAttachment;
     std::unique_ptr<SliderAttachment> stereoMidSideSliderAttachment;
     std::unique_ptr<ButtonAttachment> bassMonoToggleButtonAttachment;

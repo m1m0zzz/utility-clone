@@ -139,17 +139,20 @@ UtilityCloneAudioProcessorEditor::UtilityCloneAudioProcessorEditor(
     stereoModeLabel.setJustificationType(juce::Justification::centred);
     addAndMakeVisible(stereoModeLabel);
 
+    stereoModeSwitchButtonAttachment.reset(new ButtonAttachment(valueTreeState, "stereoMode", stereoModeSwitchButton));
     stereoModeSwitchButton.setButtonText("S");
+    stereoModeSwitchButton.setClickingTogglesState(true);
     stereoModeSwitchButton.setColour(juce::TextButton::ColourIds::buttonColourId, themeColours.at("lightgrey"));
     stereoModeSwitchButton.setColour(juce::TextButton::ColourIds::textColourOffId, themeColours.at("text"));
+    stereoModeSwitchButton.setColour(juce::TextButton::ColourIds::buttonOnColourId, themeColours.at("lightgrey"));
+    stereoModeSwitchButton.setColour(juce::TextButton::ColourIds::textColourOnId, themeColours.at("text"));
     stereoModeSwitchButton.setColour(juce::ComboBox::ColourIds::outlineColourId, themeColours.at("text"));
     stereoModeSwitchButton.onClick = [this]() {
         auto mode = valueTreeState.getRawParameterValue("stereoMode");
-        auto boolean = static_cast<bool>(*mode);
+        auto boolean = !(static_cast<bool>(*mode));
         stereoWidthSlider.setVisible(boolean);
         stereoMidSideSlider.setVisible(!boolean);
-        stereoModeLabel.setText(boolean ? "Width" : "Mid/Side", juce::dontSendNotification);
-        mode->store(*mode == 0 ? 1 : 0);
+        stereoModeLabel.setText(boolean ? "Width" : "Mid/Side", juce::sendNotification);
     };
     addAndMakeVisible(stereoModeSwitchButton);
 
@@ -207,6 +210,30 @@ UtilityCloneAudioProcessorEditor::~UtilityCloneAudioProcessorEditor()
 }
 
 //==============================================================================
+bool UtilityCloneAudioProcessorEditor::keyPressed(const juce::KeyPress& key)
+{
+    //DBG("keyPressed");
+    if (key.getModifiers().isCommandDown() || key.getModifiers().isCtrlDown()) {
+        if (key.getKeyCode() == 'z' || key.getKeyCode() == 'Z') {
+            undoManager.undo();
+            auto mode = valueTreeState.getRawParameterValue("stereoMode"); // TODO: refactor
+            auto boolean = !(static_cast<bool>(*mode));
+            stereoWidthSlider.setVisible(boolean);
+            stereoMidSideSlider.setVisible(!boolean);
+            stereoModeLabel.setText(boolean ? "Width" : "Mid/Side", juce::sendNotification);
+        }
+        else if (key.getKeyCode() == 'y' || key.getKeyCode() == 'Y') {
+            undoManager.redo();
+            auto mode = valueTreeState.getRawParameterValue("stereoMode");
+            auto boolean = !(static_cast<bool>(*mode));
+            stereoWidthSlider.setVisible(boolean);
+            stereoMidSideSlider.setVisible(!boolean);
+            stereoModeLabel.setText(boolean ? "Width" : "Mid/Side", juce::sendNotification);
+        }
+    }
+    return true;
+}
+
 void UtilityCloneAudioProcessorEditor::paint(juce::Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
