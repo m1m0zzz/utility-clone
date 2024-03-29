@@ -43,7 +43,8 @@ public:
         setColour(juce::TextButton::ColourIds::buttonColourId, themeColours.at("lightgrey"));
         setColour(juce::TextButton::ColourIds::textColourOnId, themeColours.at("text"));
         setColour(juce::TextButton::ColourIds::textColourOffId, themeColours.at("text"));
-        //setLookAndFeel(lookAndFeel); // 一回しか適用されない
+        setColour(juce::ComboBox::ColourIds::outlineColourId, themeColours.at("lightblack"));
+        setLookAndFeel(lookAndFeel);
     }
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ToggleTextButton)
@@ -107,22 +108,22 @@ private:
 };
 
 
-class SliderTab : public juce::TabbedComponent
-{
-public:
-    using juce::TabbedComponent::TabbedComponent;
-
-    void currentTabChanged(int index, const juce::String& name) override {
-        //DBG("currentTabChanged(" << index << ", " << name << ")");
-        if (onTabChanged) {
-            onTabChanged(index, name);
-        }
-    };
-
-    std::function<void(int index, const juce::String& name)> onTabChanged;
-private:
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SliderTab)
-};
+//class SliderTab : public juce::TabbedComponent
+//{
+//public:
+//    using juce::TabbedComponent::TabbedComponent;
+//
+//    void currentTabChanged(int index, const juce::String& name) override {
+//        //DBG("currentTabChanged(" << index << ", " << name << ")");
+//        if (onTabChanged) {
+//            onTabChanged(index, name);
+//        }
+//    };
+//
+//    std::function<void(int index, const juce::String& name)> onTabChanged;
+//private:
+//    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SliderTab)
+//};
 
 //==============================================================================
 /**
@@ -161,6 +162,7 @@ private:
     KnobSlider stereoMidSideSlider{ &customLookAndFeel };
     ToggleTextButton bassMonoToggleButton{ "Bass Mono", &customLookAndFeel };
     MiniTextSlider bassMonoFrequencySlider;
+    juce::TextButton stereoModeSwitchButton;
 
     std::unique_ptr<SliderAttachment> gainSliderAttachment;
     std::unique_ptr<ButtonAttachment> invertPhaseToggleButtonAttachment;
@@ -172,11 +174,14 @@ private:
     std::unique_ptr<SliderAttachment> bassMonoFrequencySliderAttachment;
 
     // ui components
-    SliderTab stereoTab{ juce::TabbedButtonBar::TabsAtTop };
+    //SliderTab stereoTab{ juce::TabbedButtonBar::TabsAtTop };
     juce::Rectangle<int> columnL;
     juce::Rectangle<int> columnR;
+    juce::Label inputLabel;
+    juce::Label outputLabel;
     juce::Label gainLabel;
     juce::Label panLabel;
+    juce::Label stereoModeLabel;
     juce::TextButton undoButton, redoButton;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UtilityCloneAudioProcessorEditor)

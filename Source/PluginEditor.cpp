@@ -78,23 +78,23 @@ juce::Label* CustomLookAndFeel::createSliderTextBox(juce::Slider& slider)
     return label;
 }
 
-void CustomLookAndFeel::drawButtonBackground(juce::Graphics& g,
-    juce::Button& button,
-    const juce::Colour& backgroundColour,
-    bool shouldDrawButtonAsHighlighted,
-    bool shouldDrawButtonAsDown) {
-    // custom look
-    //DBG("drawButtonBackground");
+void CustomLookAndFeel::drawButtonBackground(juce::Graphics& g, juce::Button& button,const juce::Colour& backgroundColour,
+    bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown)
+{
+    auto isOn = button.getToggleState();
+    auto bounds = juce::Rectangle(0, 0, button.getWidth(), button.getHeight());
+    auto bg = button.findColour(juce::TextButton::ColourIds::buttonColourId);
+    auto bgOn = button.findColour(juce::TextButton::ColourIds::buttonOnColourId);
+    auto outline = button.findColour(juce::ComboBox::ColourIds::outlineColourId);
 
-    //auto cButtonOn  = button.findColour(juce::TextButton::ColourIds::buttonOnColourId);
-    //auto cButtonOff = button.findColour(juce::TextButton::ColourIds::buttonColourId);
-    //auto cTextOn    = button.findColour(juce::TextButton::ColourIds::textColourOnId);
-    //auto cTextOff   = button.findColour(juce::TextButton::ColourIds::textColourOffId);
-
-    auto bounds = button.getBounds();
-
-    g.setColour(backgroundColour);
+    g.setColour(isOn ? bgOn : bg);
     g.fillRect(bounds);
+    if (shouldDrawButtonAsHighlighted) {
+        g.setColour(juce::Colour::fromFloatRGBA(0, 0, 0, 0.05));
+        g.fillRect(bounds);
+    }
+    g.setColour(outline);
+    g.drawRect(bounds);
 }
 
 //==============================================================================
@@ -105,8 +105,8 @@ UtilityCloneAudioProcessorEditor::UtilityCloneAudioProcessorEditor(
     bassMonoFrequencySlider(vts, "bassMonoFrequency", &customLookAndFeel)
 {
     // window
-    setResizable(true, true);
-    setResizeLimits(width, height, 400, 600);
+    //setResizable(true, true);
+    //setResizeLimits(width, height, 400, 600);
     //getConstrainer()->setFixedAspectRatio(ratio);
 
     // components
@@ -134,12 +134,28 @@ UtilityCloneAudioProcessorEditor::UtilityCloneAudioProcessorEditor(
 
     stereoMidSideSliderAttachment.reset(new SliderAttachment(valueTreeState, "stereoMidSide", stereoMidSideSlider));
 
-    stereoTab.addTab("Width", themeColours.at("grey"), &stereoWidthSlider, true);
-    stereoTab.addTab("M/S", themeColours.at("grey"), &stereoMidSideSlider, true);
-    stereoTab.onTabChanged = [this](int index, juce::String name) {
-        valueTreeState.getRawParameterValue("stereoMode")->store(static_cast<float>(index));
+    stereoModeLabel.setText("Width", juce::dontSendNotification);
+    stereoModeLabel.setColour(juce::Label::textColourId, themeColours.at("text"));
+    stereoModeLabel.setJustificationType(juce::Justification::centred);
+    addAndMakeVisible(stereoModeLabel);
+
+    stereoModeSwitchButton.setButtonText("S");
+    stereoModeSwitchButton.setColour(juce::TextButton::ColourIds::buttonColourId, themeColours.at("lightgrey"));
+    stereoModeSwitchButton.setColour(juce::TextButton::ColourIds::textColourOffId, themeColours.at("text"));
+    stereoModeSwitchButton.setColour(juce::ComboBox::ColourIds::outlineColourId, themeColours.at("text"));
+    stereoModeSwitchButton.onClick = [this]() {
+        auto mode = valueTreeState.getRawParameterValue("stereoMode");
+        auto boolean = static_cast<bool>(*mode);
+        stereoWidthSlider.setVisible(boolean);
+        stereoMidSideSlider.setVisible(!boolean);
+        stereoModeLabel.setText(boolean ? "Width" : "Mid/Side", juce::dontSendNotification);
+        mode->store(*mode == 0 ? 1 : 0);
     };
-    addAndMakeVisible(stereoTab);
+    addAndMakeVisible(stereoModeSwitchButton);
+
+    addAndMakeVisible(stereoWidthSlider);
+    addAndMakeVisible(stereoMidSideSlider);
+    stereoMidSideSlider.setVisible(false);
 
     bassMonoToggleButtonAttachment.reset(new ButtonAttachment(valueTreeState, "isBassMono", bassMonoToggleButton));
     addAndMakeVisible(bassMonoToggleButton);
@@ -157,6 +173,20 @@ UtilityCloneAudioProcessorEditor::UtilityCloneAudioProcessorEditor(
     panLabel.setColour(juce::Label::textColourId, themeColours.at("text"));
     panLabel.setJustificationType(juce::Justification::centred);
     addAndMakeVisible(panLabel);
+
+    auto fontBold = inputLabel.getFont();
+    fontBold.setStyleFlags(juce::Font::FontStyleFlags::bold);
+    inputLabel.setText("Input", juce::dontSendNotification);
+    inputLabel.setFont(fontBold);
+    inputLabel.setColour(juce::Label::textColourId, themeColours.at("text"));
+    inputLabel.setJustificationType(juce::Justification::centred);
+    addAndMakeVisible(inputLabel);
+
+    outputLabel.setText("Output", juce::dontSendNotification);
+    outputLabel.setFont(fontBold);
+    outputLabel.setColour(juce::Label::textColourId, themeColours.at("text"));
+    outputLabel.setJustificationType(juce::Justification::centred);
+    addAndMakeVisible(outputLabel);
 
     //addAndMakeVisible(undoButton);
     //addAndMakeVisible(redoButton);
@@ -192,11 +222,11 @@ void UtilityCloneAudioProcessorEditor::resized()
 {
     width = getWidth();
     height = getHeight();
-    //DBG("w = " << width << ", h = " << height);
 
     const int padding = 5;
     const int compoentHeight = 26;
     const int knobHeight = 80;
+    const auto buttonSize = 20; // stereoModeSwitchButton
 
     columnL.setWidth(width / 2 - 5);
     columnL.setHeight(height);
@@ -207,32 +237,55 @@ void UtilityCloneAudioProcessorEditor::resized()
 
     // column L
     auto rect = columnL.reduced(padding);
+    rect.setTop(padding);
+    rect.setHeight(compoentHeight);
+    inputLabel.setBounds(rect);
+
+    rect.setTop(35);
     rect.setHeight(compoentHeight);
     invertPhaseToggleButton.setBounds(rect);
 
-    rect.setTop(40);
-    rect.setHeight(knobHeight + stereoTab.getTabBarDepth());
-    stereoTab.setBounds(rect);
+    rect.setTop(80);
+    rect.setWidth(columnL.getWidth() - padding - buttonSize);
+    rect.setHeight(compoentHeight);
+    stereoModeLabel.setBounds(rect);
 
-    rect.setTop(160);
+    rect = columnL.reduced(padding);
+    rect.setTop(80 + (compoentHeight - buttonSize) / 2);
+    rect.setX(rect.getX() + rect.getWidth() - buttonSize);
+    rect.setWidth(buttonSize);
+    rect.setHeight(buttonSize);
+    stereoModeSwitchButton.setBounds(rect);
+
+    rect = columnL.reduced(padding);
+    rect.setTop(110);
+    rect.setHeight(knobHeight);
+    stereoWidthSlider.setBounds(rect);
+    stereoMidSideSlider.setBounds(rect);
+
+    rect.setTop(200);
     rect.setHeight(compoentHeight);
     monoToggleButton.setBounds(rect);
 
-    rect.setTop(190);
+    rect.setTop(235);
     rect.setHeight(compoentHeight);
     bassMonoToggleButton.setBounds(rect);
 
-    rect.setTop(220);
+    rect.setTop(270);
     rect.setHeight(20);
     bassMonoFrequencySlider.setBounds(rect);
 
     // column R
     rect = columnR.reduced(padding);
-    rect.setTop(10);
+    rect.setTop(padding);
+    rect.setHeight(compoentHeight);
+    outputLabel.setBounds(rect);
+
+    rect.setTop(30);
     rect.setHeight(compoentHeight);
     gainLabel.setBounds(rect);
 
-    rect.setTop(30);
+    rect.setTop(50);
     rect.setHeight(knobHeight);
     gainSlider.setBounds(rect);
 
