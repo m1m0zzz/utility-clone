@@ -101,8 +101,7 @@ void CustomLookAndFeel::drawButtonBackground(juce::Graphics& g, juce::Button& bu
 UtilityCloneAudioProcessorEditor::UtilityCloneAudioProcessorEditor(
     UtilityCloneAudioProcessor& p, juce::AudioProcessorValueTreeState& vts, juce::UndoManager& um)
     : AudioProcessorEditor(&p), audioProcessor(p), valueTreeState(vts), undoManager(um),
-    undoButton("Undo"), redoButton("Redo"),
-    bassMonoFrequencySlider(vts, "bassMonoFrequency", &customLookAndFeel)
+    undoButton("Undo"), redoButton("Redo")
 {
     // window
     //setResizable(true, true);
@@ -121,7 +120,16 @@ UtilityCloneAudioProcessorEditor::UtilityCloneAudioProcessorEditor(
     addAndMakeVisible(invertPhaseToggleButton);
 
     monoToggleButtonAttachment.reset(new ButtonAttachment(valueTreeState, "mono", monoToggleButton));
+    monoToggleButton.onClick = [this]() {
+        DBG("monoToggleButton.onClick()");
+        auto state = monoToggleButton.getToggleState();
+        stereoWidthSlider.setAndUpdateDisabled(state);
+        stereoMidSideSlider.setAndUpdateDisabled(state);
+        bassMonoToggleButton.setAndUpdateDisabled(state);
+        bassMonoFrequencySlider.setAndUpdateDisabled(state || !*isBassMono);
+    };
     addAndMakeVisible(monoToggleButton);
+    DBG("editor init mono: " << *valueTreeState.getRawParameterValue("mono"));
 
     panSliderAttachment.reset(new SliderAttachment(valueTreeState, "pan", panSlider));
     addAndMakeVisible(panSlider);
@@ -131,8 +139,11 @@ UtilityCloneAudioProcessorEditor::UtilityCloneAudioProcessorEditor(
     stereoWidthSlider.setRange(widthRange.start, widthRange.end);
     stereoWidthSlider.setSkewFactorFromMidPoint(100);
     stereoWidthSlider.setTextValueSuffix("%");
+    addAndMakeVisible(stereoWidthSlider);
 
     stereoMidSideSliderAttachment.reset(new SliderAttachment(valueTreeState, "stereoMidSide", stereoMidSideSlider));
+    addAndMakeVisible(stereoMidSideSlider);
+    stereoMidSideSlider.setVisible(false);
 
     stereoModeLabel.setText("Width", juce::dontSendNotification);
     stereoModeLabel.setColour(juce::Label::textColourId, themeColours.at("text"));
@@ -148,19 +159,16 @@ UtilityCloneAudioProcessorEditor::UtilityCloneAudioProcessorEditor(
     stereoModeSwitchButton.setColour(juce::TextButton::ColourIds::textColourOnId, themeColours.at("text"));
     stereoModeSwitchButton.setColour(juce::ComboBox::ColourIds::outlineColourId, themeColours.at("text"));
     stereoModeSwitchButton.onClick = [this]() {
-        auto mode = valueTreeState.getRawParameterValue("stereoMode");
-        auto boolean = !(static_cast<bool>(*mode));
-        stereoWidthSlider.setVisible(boolean);
-        stereoMidSideSlider.setVisible(!boolean);
-        stereoModeLabel.setText(boolean ? "Width" : "Mid/Side", juce::sendNotification);
+        updateStereoLabel();
     };
     addAndMakeVisible(stereoModeSwitchButton);
-
-    addAndMakeVisible(stereoWidthSlider);
-    addAndMakeVisible(stereoMidSideSlider);
-    stereoMidSideSlider.setVisible(false);
+    updateStereoLabel();
 
     bassMonoToggleButtonAttachment.reset(new ButtonAttachment(valueTreeState, "isBassMono", bassMonoToggleButton));
+    bassMonoToggleButton.onClick = [this]() {
+        auto state = bassMonoToggleButton.getToggleState();
+        bassMonoFrequencySlider.setAndUpdateDisabled(*isMono || !state);
+    };
     addAndMakeVisible(bassMonoToggleButton);
 
     bassMonoFrequencySliderAttachment.reset(new SliderAttachment(valueTreeState, "bassMonoFrequency", bassMonoFrequencySlider));
@@ -191,17 +199,6 @@ UtilityCloneAudioProcessorEditor::UtilityCloneAudioProcessorEditor(
     outputLabel.setJustificationType(juce::Justification::centred);
     addAndMakeVisible(outputLabel);
 
-    //addAndMakeVisible(undoButton);
-    //addAndMakeVisible(redoButton);
-    //undoButton.onClick = [this] {
-    //    undoManager.undo();
-    //    DBG("undo");
-    //};
-    //redoButton.onClick = [this] {
-    //    undoManager.redo();
-    //    DBG("redo");
-    //};
-
     setSize(width, height);
 }
 
@@ -216,19 +213,13 @@ bool UtilityCloneAudioProcessorEditor::keyPressed(const juce::KeyPress& key)
     if (key.getModifiers().isCommandDown() || key.getModifiers().isCtrlDown()) {
         if (key.getKeyCode() == 'z' || key.getKeyCode() == 'Z') {
             undoManager.undo();
-            auto mode = valueTreeState.getRawParameterValue("stereoMode"); // TODO: refactor
-            auto boolean = !(static_cast<bool>(*mode));
-            stereoWidthSlider.setVisible(boolean);
-            stereoMidSideSlider.setVisible(!boolean);
-            stereoModeLabel.setText(boolean ? "Width" : "Mid/Side", juce::sendNotification);
+            updateStereoLabel();
+            bassMonoFrequencySlider.updateDisabled();
         }
         else if (key.getKeyCode() == 'y' || key.getKeyCode() == 'Y') {
             undoManager.redo();
-            auto mode = valueTreeState.getRawParameterValue("stereoMode");
-            auto boolean = !(static_cast<bool>(*mode));
-            stereoWidthSlider.setVisible(boolean);
-            stereoMidSideSlider.setVisible(!boolean);
-            stereoModeLabel.setText(boolean ? "Width" : "Mid/Side", juce::sendNotification);
+            updateStereoLabel();
+            bassMonoFrequencySlider.updateDisabled();
         }
     }
     return true;
@@ -236,8 +227,6 @@ bool UtilityCloneAudioProcessorEditor::keyPressed(const juce::KeyPress& key)
 
 void UtilityCloneAudioProcessorEditor::paint(juce::Graphics& g)
 {
-    // (Our component is opaque, so we must completely fill the background with a solid colour)
-    //g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
     g.fillAll(themeColours.at("grey"));
 
     // hr
@@ -326,4 +315,12 @@ void UtilityCloneAudioProcessorEditor::resized()
 
     //undoButton.setBounds(10, 50, 50, 30);
     //redoButton.setBounds(60, 50, 50, 30);
+}
+
+void UtilityCloneAudioProcessorEditor::updateStereoLabel()
+{
+    auto boolean = !(static_cast<bool>(*stereoMode));
+    stereoWidthSlider.setVisible(boolean);
+    stereoMidSideSlider.setVisible(!boolean);
+    stereoModeLabel.setText(boolean ? "Width" : "Mid/Side", juce::sendNotification);
 }
