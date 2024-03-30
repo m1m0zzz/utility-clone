@@ -12,13 +12,13 @@
 #include "PluginProcessor.h"
 
 const std::unordered_map<std::string, juce::Colour> themeColours = {
-    { "grey",       juce::Colour::fromRGB(143, 143, 143) },
-    { "lightgrey",  juce::Colour::fromRGB(183, 183, 183) },
     { "blue",       juce::Colour::fromRGB(85, 222, 246) },
     { "orange",     juce::Colour::fromRGB(255, 177, 0) },
-    { "lightblack", juce::Colour::fromRGB(42, 42, 42) },
     { "white",      juce::Colour::fromRGB(220, 220,220) },
+    { "lightgrey",  juce::Colour::fromRGB(183, 183, 183) },
+    { "grey",       juce::Colour::fromRGB(143, 143, 143) },
     { "disabled",   juce::Colour::fromRGB(105, 105,105) },
+    { "lightblack", juce::Colour::fromRGB(42, 42, 42) },
     { "text",       juce::Colours::black },
 };
 
@@ -30,6 +30,7 @@ class CustomLookAndFeel : public juce::LookAndFeel_V4 {
     // slider textbox
     void drawLabel(juce::Graphics&, juce::Label&) override;
     juce::Label* createSliderTextBox(juce::Slider& slider) override;
+    // square button
     void drawButtonBackground(juce::Graphics&, juce::Button&, const juce::Colour& backgroundColour,
         bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
 };
@@ -187,7 +188,6 @@ public:
 private:
     UtilityCloneAudioProcessor& audioProcessor;
     CustomLookAndFeel customLookAndFeel;
-    
     juce::AudioProcessorValueTreeState& valueTreeState;
     juce::UndoManager& undoManager;
 
@@ -195,16 +195,10 @@ private:
     int height = 300;
     double ratio = width / height;
 
-    // param copy
-    std::atomic<float>* gain              = valueTreeState.getRawParameterValue("gain");
-    std::atomic<float>* isInvertPhase     = valueTreeState.getRawParameterValue("invertPhase");
-    std::atomic<float>* isMono            = valueTreeState.getRawParameterValue("mono");
-    std::atomic<float>* pan               = valueTreeState.getRawParameterValue("pan");
-    std::atomic<float>* stereoMode        = valueTreeState.getRawParameterValue("stereoMode");
-    std::atomic<float>* stereoWidth       = valueTreeState.getRawParameterValue("stereoWidth");
-    std::atomic<float>* stereoMidSide     = valueTreeState.getRawParameterValue("stereoMidSide");
-    std::atomic<float>* isBassMono        = valueTreeState.getRawParameterValue("isBassMono");
-    std::atomic<float>* bassMonoFrequency = valueTreeState.getRawParameterValue("bassMonoFrequency");
+    // watch parameter for ui
+    std::atomic<float>* isMono     = valueTreeState.getRawParameterValue("mono");
+    std::atomic<float>* stereoMode = valueTreeState.getRawParameterValue("stereoMode");
+    std::atomic<float>* isBassMono = valueTreeState.getRawParameterValue("isBassMono");
 
     // parameter components   
     typedef juce::AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
@@ -217,9 +211,9 @@ private:
     KnobSlider panSlider{&customLookAndFeel};
     juce::TextButton stereoModeSwitchButton;
     KnobSlider stereoWidthSlider{ &customLookAndFeel, *isMono != 0 };
-    KnobSlider stereoMidSideSlider{ &customLookAndFeel };
-    ToggleTextButton bassMonoToggleButton{ "Bass Mono", &customLookAndFeel };
-    MiniTextSlider bassMonoFrequencySlider{ valueTreeState, "bassMonoFrequency", &customLookAndFeel, *isBassMono == 0 };
+    KnobSlider stereoMidSideSlider{ &customLookAndFeel, *isMono != 0 };
+    ToggleTextButton bassMonoToggleButton{ "Bass Mono", &customLookAndFeel, *isMono != 0 };
+    MiniTextSlider bassMonoFrequencySlider{ valueTreeState, "bassMonoFrequency", &customLookAndFeel, *isMono != 0 || *isBassMono == 0 };
 
     std::unique_ptr<SliderAttachment> gainSliderAttachment;
     std::unique_ptr<ButtonAttachment> invertPhaseToggleButtonAttachment;
