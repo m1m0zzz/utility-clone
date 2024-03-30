@@ -15,7 +15,6 @@
 void CustomLookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, int height,
     float sliderPos, float rotaryStartAngle,
     float rotaryEndAngle, juce::Slider& slider) {
-    //DBG("drawRotarySlider");
 
     auto outline = slider.findColour(juce::Slider::rotarySliderOutlineColourId);
     auto fill = slider.findColour(juce::Slider::rotarySliderFillColourId);
@@ -121,7 +120,6 @@ UtilityCloneAudioProcessorEditor::UtilityCloneAudioProcessorEditor(
 
     monoToggleButtonAttachment.reset(new ButtonAttachment(valueTreeState, "mono", monoToggleButton));
     monoToggleButton.onClick = [this]() {
-        DBG("monoToggleButton.onClick()");
         auto state = monoToggleButton.getToggleState();
         stereoWidthSlider.setAndUpdateDisabled(state);
         stereoMidSideSlider.setAndUpdateDisabled(state);
@@ -129,7 +127,6 @@ UtilityCloneAudioProcessorEditor::UtilityCloneAudioProcessorEditor(
         bassMonoFrequencySlider.setAndUpdateDisabled(state || !*isBassMono);
     };
     addAndMakeVisible(monoToggleButton);
-    DBG("editor init mono: " << *valueTreeState.getRawParameterValue("mono"));
 
     panSliderAttachment.reset(new SliderAttachment(valueTreeState, "pan", panSlider));
     addAndMakeVisible(panSlider);
