@@ -144,6 +144,9 @@ void UtilityCloneAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
     spec.numChannels = 2;
     spec.sampleRate = sampleRate;
 
+    width.reset(sampleRate, 0.001);
+    midSide.reset(sampleRate, 0.001);
+
     lrFilter.prepare(spec);
 
     gainDSP.prepare(spec);
@@ -201,6 +204,8 @@ void UtilityCloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
 
     // stereo
     //DBG("stereoMode: " << *stereoMode);
+    width.setTargetValue(*stereoWidth);
+    midSide.setTargetValue(*stereoMidSide);
     if (totalNumInputChannels == 2 && !(*isMono))
     {
         auto* leftChannel = buffer.getWritePointer(0);
@@ -213,11 +218,11 @@ void UtilityCloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
 
             if (*stereoMode == 0) { // Width (0 to 400)
                 mid  *= 0.5f; // no change
-                side *= 0.5f * *stereoWidth / 100;
+                side *= 0.5f * width.getNextValue() / 100;
             }
             else { // Mid/Side (-100 to 100)
-                float normalizedMS = (*stereoMidSide / 100 + 1.0f) * 0.5f; // 0 to 1
-                float divVolume = abs(*stereoMidSide / 100) + 1.0f; // 1 to 2
+                float normalizedMS = (midSide.getNextValue() / 100 + 1.0f) * 0.5f; // 0 to 1
+                float divVolume = abs(midSide.getNextValue() / 100) + 1.0f; // 1 to 2
                 mid  *= (1.0 - normalizedMS) / divVolume;
                 side *=        normalizedMS  / divVolume;
             }

@@ -77,6 +77,9 @@ private:
     std::atomic<float>* isBassMono = nullptr;
     std::atomic<float>* bassMonoFrequency = nullptr;
 
+    juce::LinearSmoothedValue<float> width;
+    juce::LinearSmoothedValue<float> midSide;
+
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UtilityCloneAudioProcessor)
 };
