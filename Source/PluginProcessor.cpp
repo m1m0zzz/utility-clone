@@ -30,7 +30,8 @@ UtilityCloneAudioProcessor::UtilityCloneAudioProcessor()
     , parameters(*this, &undoManager, juce::Identifier("Utility-clone"),
         {
             std::make_unique<juce::AudioParameterFloat>("gain", "Gain", juce::NormalisableRange(-100.0f, 35.0f, 0.1f), 0.0f),
-            std::make_unique<juce::AudioParameterBool>("invertPhase", "Invert Phase", false),
+            std::make_unique<juce::AudioParameterBool>("invertPhaseL", "Invert Phase L", false),
+            std::make_unique<juce::AudioParameterBool>("invertPhaseR", "Invert Phase R", false),
             std::make_unique<juce::AudioParameterBool>("mono", "Mono", false),
             std::make_unique<juce::AudioParameterFloat>(
                 "pan", "Pan", juce::NormalisableRange(-50.0f, 50.0f, 1.0f), 0.0f, "Pan", juce::AudioProcessorParameter::genericParameter,
@@ -59,7 +60,8 @@ UtilityCloneAudioProcessor::UtilityCloneAudioProcessor()
         })
 {
     gain              = parameters.getRawParameterValue("gain");
-    isInvertPhase     = parameters.getRawParameterValue("invertPhase");
+    isInvertPhaseL    = parameters.getRawParameterValue("invertPhaseL");
+    isInvertPhaseR    = parameters.getRawParameterValue("invertPhaseR");
     isMono            = parameters.getRawParameterValue("mono");
     pan               = parameters.getRawParameterValue("pan");
     stereoMode        = parameters.getRawParameterValue("stereoMode");
@@ -191,8 +193,11 @@ void UtilityCloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     const int numSamples = buffer.getNumSamples();
 
     // phase
-    auto phase = *isInvertPhase ? -1.0f : 1.0f;
-    buffer.applyGain(phase);
+    auto phaseL = *isInvertPhaseL ? -1.0f : 1.0f;
+    auto phaseR = *isInvertPhaseR ? -1.0f : 1.0f;
+    buffer.applyGain(0, 0, numSamples, phaseL);
+    if (totalNumInputChannels == 2)
+        buffer.applyGain(1, 0, numSamples, phaseR);
 
     // stereo
     //DBG("stereoMode: " << *stereoMode);

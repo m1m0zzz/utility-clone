@@ -115,8 +115,11 @@ UtilityCloneAudioProcessorEditor::UtilityCloneAudioProcessorEditor(
     gainSlider.setTextValueSuffix(" dB");
     addAndMakeVisible(gainSlider);
 
-    invertPhaseToggleButtonAttachment.reset(new ButtonAttachment(valueTreeState, "invertPhase", invertPhaseToggleButton));
-    addAndMakeVisible(invertPhaseToggleButton);
+    invertPhaseLToggleButtonAttachment.reset(new ButtonAttachment(valueTreeState, "invertPhaseL", invertPhaseLToggleButton));
+    addAndMakeVisible(invertPhaseLToggleButton);
+
+    invertPhaseRToggleButtonAttachment.reset(new ButtonAttachment(valueTreeState, "invertPhaseR", invertPhaseRToggleButton));
+    addAndMakeVisible(invertPhaseRToggleButton);
 
     monoToggleButtonAttachment.reset(new ButtonAttachment(valueTreeState, "mono", monoToggleButton));
     monoToggleButton.onClick = [this]() {
@@ -255,9 +258,14 @@ void UtilityCloneAudioProcessorEditor::resized()
     inputLabel.setBounds(rect);
 
     rect.setTop(35);
+    rect.setWidth(rect.getWidth() / 2 - 2);
     rect.setHeight(compoentHeight);
-    invertPhaseToggleButton.setBounds(rect);
+    invertPhaseLToggleButton.setBounds(rect);
 
+    rect.setX((columnL.getWidth() + 2) / 2);
+    invertPhaseRToggleButton.setBounds(rect);
+
+    rect = columnL.reduced(padding);
     rect.setTop(80);
     rect.setWidth(columnL.getWidth() - padding - buttonSize);
     rect.setHeight(compoentHeight);

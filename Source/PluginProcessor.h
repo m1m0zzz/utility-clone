@@ -67,7 +67,8 @@ private:
     juce::dsp::LinkwitzRileyFilter<float> lrFilter;
 
     std::atomic<float>* gain = nullptr;
-    std::atomic<float>* isInvertPhase = nullptr;
+    std::atomic<float>* isInvertPhaseL = nullptr;
+    std::atomic<float>* isInvertPhaseR = nullptr;
     std::atomic<float>* isMono = nullptr;
     std::atomic<float>* pan = nullptr;
     std::atomic<float>* stereoMode = nullptr; // Width or Mid/Side

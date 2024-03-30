@@ -77,6 +77,45 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ToggleTextButton)
 };
 
+class TogglePhaseButton : public ToggleTextButton
+{
+public:
+    using ToggleTextButton::ToggleTextButton;
+
+    void paintButton(juce::Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override {
+        auto& lf = getLookAndFeel();
+
+        lf.drawButtonBackground(g, *this,
+            findColour(getToggleState() ? buttonOnColourId : buttonColourId),
+            shouldDrawButtonAsHighlighted, shouldDrawButtonAsDown);
+        // draw image
+        auto width = getWidth();
+
+        juce::Font font(lf.getTextButtonFont(*this, getHeight()));
+        g.setFont(font);
+        g.setColour(findColour(getToggleState() ? TextButton::textColourOnId
+            : TextButton::textColourOffId)
+            .withMultipliedAlpha(isEnabled() ? 1.0f : 0.5f));
+
+        const int yIndent = std::min(4, proportionOfHeight(0.3f));
+        const int cornerSize = std::min(getHeight(), getWidth()) / 2;
+
+        const int fontHeight = round(font.getHeight() * 0.6f);
+        const int leftIndent = std::min(fontHeight, 2 + cornerSize / (isConnectedOnLeft() ? 4 : 2));
+        const int rightIndent = std::min(fontHeight, 2 + cornerSize / (isConnectedOnRight() ? 4 : 2));
+        const int textWidth = getWidth() - leftIndent - rightIndent;
+
+        if (textWidth > 0)
+            g.drawFittedText(getButtonText(),
+                leftIndent, yIndent, textWidth, getHeight() - yIndent * 2,
+                juce::Justification::centredRight, 2);
+
+        const float lineTickess = 1.2f;
+        g.drawEllipse(leftIndent, rightIndent, fontHeight, fontHeight, lineTickess);
+        g.drawLine(leftIndent + fontHeight, rightIndent, leftIndent, rightIndent + fontHeight, lineTickess);
+    };
+};
+
 
 class KnobSlider : public juce::Slider
 {
@@ -206,7 +245,8 @@ private:
     typedef juce::AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
 
     KnobSlider gainSlider{ &customLookAndFeel };
-    ToggleTextButton invertPhaseToggleButton{ "Invert Phase", &customLookAndFeel };
+    TogglePhaseButton invertPhaseLToggleButton{ "L", &customLookAndFeel };
+    TogglePhaseButton invertPhaseRToggleButton{ "R", &customLookAndFeel };
     ToggleTextButton monoToggleButton{ "Mono", &customLookAndFeel };
     KnobSlider panSlider{&customLookAndFeel};
     juce::TextButton stereoModeSwitchButton;
@@ -216,7 +256,8 @@ private:
     MiniTextSlider bassMonoFrequencySlider{ valueTreeState, "bassMonoFrequency", &customLookAndFeel, *isMono != 0 || *isBassMono == 0 };
 
     std::unique_ptr<SliderAttachment> gainSliderAttachment;
-    std::unique_ptr<ButtonAttachment> invertPhaseToggleButtonAttachment;
+    std::unique_ptr<ButtonAttachment> invertPhaseLToggleButtonAttachment;
+    std::unique_ptr<ButtonAttachment> invertPhaseRToggleButtonAttachment;
     std::unique_ptr<ButtonAttachment> monoToggleButtonAttachment;
     std::unique_ptr<SliderAttachment> panSliderAttachment;
     std::unique_ptr<ButtonAttachment> stereoModeSwitchButtonAttachment;
