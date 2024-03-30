@@ -1,28 +1,21 @@
 # Utility clone
 
+Ableton Utility like VST plugin
+
+![image](https://github.com/m1m0zzz/utility-clone/assets/117814895/d256fde1-0c0f-4889-8f5b-c9f0dea2a480)
+
+
 ## Features
 - gain
 - phase invert
 - pan
 - mono
 - bass mono
-- stereo width
+- stereo width, mid/side
 
 ### TODO
 **Processing**
-- [x] gain
-- [x] phase invert
-- [x] pan
-- [x] mono
-- [x] bass mono (🔺: filter)
-- [x] stereo width
-  - [ ] smoothing
+- [ ] bass mono : filter phase
 
 **UI**
-- [x] knob component
-- [x] gain unit dB
-- [x] toggle text button
-- [x] switch width <=> mid/side
-- [ ] undo/redo
-  - [ ] button
-  - [ ] keyboard shortcut
+- [ ] popup menu
