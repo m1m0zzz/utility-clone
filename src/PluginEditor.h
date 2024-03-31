@@ -27,7 +27,7 @@ class CustomLookAndFeel : public juce::LookAndFeel_V4 {
     void drawRotarySlider(juce::Graphics&, int x, int y, int width, int height,
         float sliderPosProportional, float rotaryStartAngle,
         float rotaryEndAngle, juce::Slider&) override;
-    // slider textbox
+    // slider text box
     void drawLabel(juce::Graphics&, juce::Label&) override;
     juce::Label* createSliderTextBox(juce::Slider& slider) override;
     // square button
@@ -110,9 +110,9 @@ public:
                 leftIndent, yIndent, textWidth, getHeight() - yIndent * 2,
                 juce::Justification::centredRight, 2);
 
-        const float lineTickess = 1.2f;
-        g.drawEllipse(leftIndent, rightIndent, fontHeight, fontHeight, lineTickess);
-        g.drawLine(leftIndent + fontHeight, rightIndent, leftIndent, rightIndent + fontHeight, lineTickess);
+        const float lineThickness = 1.2f;
+        g.drawEllipse(leftIndent, rightIndent, fontHeight, fontHeight, lineThickness);
+        g.drawLine(leftIndent + fontHeight, rightIndent, leftIndent, rightIndent + fontHeight, lineThickness);
     };
 };
 
@@ -130,7 +130,7 @@ public:
         setAndUpdateDisabled(disabled);
         setLookAndFeel(lookAndFeel);
     }
-    
+
     void updateColourAll() {
         setColour(juce::Slider::ColourIds::textBoxTextColourId, themeColours.at("text"));
         if (!disabled) {
@@ -170,7 +170,7 @@ public:
     juce::String parameterID;
     bool disabled; // show disabled color
 
-    MiniTextSlider(juce::AudioProcessorValueTreeState& valueTreeState, const juce::String parameterID, 
+    MiniTextSlider(juce::AudioProcessorValueTreeState& valueTreeState, const juce::String parameterID,
         juce::LookAndFeel* lookAndFeel = nullptr, bool disabled = false) :
         valueTreeState(valueTreeState), parameterID(parameterID), disabled(disabled)
     {
@@ -239,7 +239,7 @@ private:
     std::atomic<float>* stereoMode = valueTreeState.getRawParameterValue("stereoMode");
     std::atomic<float>* isBassMono = valueTreeState.getRawParameterValue("isBassMono");
 
-    // parameter components   
+    // parameter components
     typedef juce::AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
     typedef juce::AudioProcessorValueTreeState::ComboBoxAttachment ComboBoxAttachment;
     typedef juce::AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;

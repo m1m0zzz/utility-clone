@@ -48,7 +48,7 @@ void CustomLookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int wi
     g.fillPath(p);
 }
 
-// slider textbox
+// slider text box
 void CustomLookAndFeel::drawLabel(juce::Graphics& g, juce::Label& label)
 {
     const auto text = label.findColour(juce::Label::ColourIds::textColourId);
@@ -240,7 +240,7 @@ void UtilityCloneAudioProcessorEditor::resized()
     height = getHeight();
 
     const int padding = 5;
-    const int compoentHeight = 26;
+    const int componentHeight = 26;
     const int knobHeight = 80;
     const auto buttonSize = 20; // stereoModeSwitchButton
 
@@ -254,12 +254,12 @@ void UtilityCloneAudioProcessorEditor::resized()
     // column L
     auto rect = columnL.reduced(padding);
     rect.setTop(padding);
-    rect.setHeight(compoentHeight);
+    rect.setHeight(componentHeight);
     inputLabel.setBounds(rect);
 
     rect.setTop(35);
     rect.setWidth(rect.getWidth() / 2 - 2);
-    rect.setHeight(compoentHeight);
+    rect.setHeight(componentHeight);
     invertPhaseLToggleButton.setBounds(rect);
 
     rect.setX((columnL.getWidth() + 2) / 2);
@@ -268,11 +268,11 @@ void UtilityCloneAudioProcessorEditor::resized()
     rect = columnL.reduced(padding);
     rect.setTop(80);
     rect.setWidth(columnL.getWidth() - padding - buttonSize);
-    rect.setHeight(compoentHeight);
+    rect.setHeight(componentHeight);
     stereoModeLabel.setBounds(rect);
 
     rect = columnL.reduced(padding);
-    rect.setTop(80 + (compoentHeight - buttonSize) / 2);
+    rect.setTop(80 + (componentHeight - buttonSize) / 2);
     rect.setX(rect.getX() + rect.getWidth() - buttonSize);
     rect.setWidth(buttonSize);
     rect.setHeight(buttonSize);
@@ -285,11 +285,11 @@ void UtilityCloneAudioProcessorEditor::resized()
     stereoMidSideSlider.setBounds(rect);
 
     rect.setTop(200);
-    rect.setHeight(compoentHeight);
+    rect.setHeight(componentHeight);
     monoToggleButton.setBounds(rect);
 
     rect.setTop(235);
-    rect.setHeight(compoentHeight);
+    rect.setHeight(componentHeight);
     bassMonoToggleButton.setBounds(rect);
 
     rect.setTop(270);
@@ -299,11 +299,11 @@ void UtilityCloneAudioProcessorEditor::resized()
     // column R
     rect = columnR.reduced(padding);
     rect.setTop(padding);
-    rect.setHeight(compoentHeight);
+    rect.setHeight(componentHeight);
     outputLabel.setBounds(rect);
 
     rect.setTop(30);
-    rect.setHeight(compoentHeight);
+    rect.setHeight(componentHeight);
     gainLabel.setBounds(rect);
 
     rect.setTop(50);
@@ -311,7 +311,7 @@ void UtilityCloneAudioProcessorEditor::resized()
     gainSlider.setBounds(rect);
 
     rect.setTop(height / 2 + 10);
-    rect.setHeight(compoentHeight);
+    rect.setHeight(componentHeight);
     panLabel.setBounds(rect);
 
     rect.setTop(height / 2 + 30);

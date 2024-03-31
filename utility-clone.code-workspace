@@ -38,11 +38,15 @@
 			],
 			"cSpell.words": [
 				"jmin",
-				"juce"
+				"juce",
+				"Linkwitz"
 			],
-			"cSpell.enableFiletypes": [
-				"!jsonc"
-			],
+			"cSpell.ignorePaths": [
+				".git",
+				"lib",
+				"build",
+				"*.code-workspace",
+			]
 	},
 	"launch": {
 			"configurations": [
