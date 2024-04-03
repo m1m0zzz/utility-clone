@@ -39,7 +39,9 @@
 			"cSpell.words": [
 				"jmin",
 				"juce",
-				"Linkwitz"
+				"jucer",
+				"Linkwitz",
+				"Projucer"
 			],
 			"cSpell.ignorePaths": [
 				".git",
