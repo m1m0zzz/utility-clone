@@ -13,4 +13,4 @@ endif()
 # Enable JUCE. Do not use find_package to prevent from mix up with one globally installed.
 add_subdirectory(lib/JUCE)
 
-add_subdirectory(src)
+add_subdirectory(Source)
