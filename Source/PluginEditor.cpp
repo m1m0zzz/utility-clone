@@ -175,6 +175,9 @@ UtilityCloneAudioProcessorEditor::UtilityCloneAudioProcessorEditor(
     bassMonoFrequencySlider.setTextValueSuffix(" Hz");
     addAndMakeVisible(bassMonoFrequencySlider);
 
+    bassMonoListeningButtonAttachment.reset(new ButtonAttachment(valueTreeState, "isBassMonoListening", bassMonoListeningButton));
+    addAndMakeVisible(bassMonoListeningButton);
+
     gainLabel.setText("Gain", juce::dontSendNotification);
     gainLabel.setColour(juce::Label::textColourId, themeColours.at("text"));
     gainLabel.setJustificationType(juce::Justification::centred);
@@ -293,8 +296,16 @@ void UtilityCloneAudioProcessorEditor::resized()
     bassMonoToggleButton.setBounds(rect);
 
     rect.setTop(270);
+    rect.setWidth(rect.getWidth() - 24);
     rect.setHeight(20);
     bassMonoFrequencySlider.setBounds(rect);
+
+    rect = columnL.reduced(padding);
+    rect.setTop(270);
+    rect.setX(rect.getX() + rect.getWidth() - 20);
+    rect.setWidth(20);
+    rect.setHeight(20);
+    bassMonoListeningButton.setBounds(rect);
 
     // column R
     rect = columnR.reduced(padding);

@@ -76,6 +76,7 @@ private:
     std::atomic<float>* stereoMidSide = nullptr;
     std::atomic<float>* isBassMono = nullptr;
     std::atomic<float>* bassMonoFrequency = nullptr;
+    std::atomic<float>* isBassMonoListening = nullptr;
 
     juce::LinearSmoothedValue<float> width;
     juce::LinearSmoothedValue<float> midSide;

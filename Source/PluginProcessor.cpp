@@ -57,18 +57,20 @@ UtilityCloneAudioProcessor::UtilityCloneAudioProcessor()
                 juce::NormalisableRange(50.0f, 500.0f, 1.0f, calcSkew(50.0f, 500.0f), false),
                 120.0f
             ),
+            std::make_unique<juce::AudioParameterBool>("isBassMonoListening", "Bass Mono Listening", false),
         })
 {
-    gain              = parameters.getRawParameterValue("gain");
-    isInvertPhaseL    = parameters.getRawParameterValue("invertPhaseL");
-    isInvertPhaseR    = parameters.getRawParameterValue("invertPhaseR");
-    isMono            = parameters.getRawParameterValue("mono");
-    pan               = parameters.getRawParameterValue("pan");
-    stereoMode        = parameters.getRawParameterValue("stereoMode");
-    stereoWidth       = parameters.getRawParameterValue("stereoWidth");
-    stereoMidSide     = parameters.getRawParameterValue("stereoMidSide");
-    isBassMono        = parameters.getRawParameterValue("isBassMono");
-    bassMonoFrequency = parameters.getRawParameterValue("bassMonoFrequency");
+    gain                = parameters.getRawParameterValue("gain");
+    isInvertPhaseL      = parameters.getRawParameterValue("invertPhaseL");
+    isInvertPhaseR      = parameters.getRawParameterValue("invertPhaseR");
+    isMono              = parameters.getRawParameterValue("mono");
+    pan                 = parameters.getRawParameterValue("pan");
+    stereoMode          = parameters.getRawParameterValue("stereoMode");
+    stereoWidth         = parameters.getRawParameterValue("stereoWidth");
+    stereoMidSide       = parameters.getRawParameterValue("stereoMidSide");
+    isBassMono          = parameters.getRawParameterValue("isBassMono");
+    bassMonoFrequency   = parameters.getRawParameterValue("bassMonoFrequency");
+    isBassMonoListening = parameters.getRawParameterValue("isBassMonoListening");
 }
 
 UtilityCloneAudioProcessor::~UtilityCloneAudioProcessor()
@@ -243,8 +245,9 @@ void UtilityCloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     // bass mono
     //DBG("Bass Mono = " << *isBassMono);
     //DBG("BM Freq   = " << *bassMonoFrequency);
+    //DBG("BM L = " << *isBassMonoListening);
     lrFilter.setCutoffFrequency(*bassMonoFrequency);
-    if (*isBassMono && !(*isMono)) {
+    if ((*isBassMono && !*isMono) || *isBassMonoListening) {
         juce::AudioSampleBuffer lowOutput;
         juce::AudioSampleBuffer highOutput;
 
@@ -266,15 +269,19 @@ void UtilityCloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         }
 
         // make lowOutput mono
-        lowOutput.addFrom( 0, 0, lowOutput, 1, 0, numSamples);
-        lowOutput.copyFrom(1, 0, lowOutput, 0, 0, numSamples);
-        lowOutput.applyGain(0.5f);
+        if (*isBassMono) {
+            lowOutput.addFrom( 0, 0, lowOutput, 1, 0, numSamples);
+            lowOutput.copyFrom(1, 0, lowOutput, 0, 0, numSamples);
+            lowOutput.applyGain(0.5f);
+        }
 
         buffer.clear();
         for (int channel = 0; channel < totalNumInputChannels; channel++)
         {
             buffer.addFrom(channel, 0, lowOutput, channel, 0, numSamples);
-            buffer.addFrom(channel, 0, highOutput, channel, 0, numSamples);
+            if (!*isBassMonoListening) {
+                buffer.addFrom(channel, 0, highOutput, channel, 0, numSamples);
+            }
         }
     }
     

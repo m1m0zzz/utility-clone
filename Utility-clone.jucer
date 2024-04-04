@@ -5,6 +5,12 @@
               pluginVST3Category="Tools" companyEmail="contact.m1m0zzz@gmail.com"
               companyWebsite="m1m0zzz.github.io" companyCopyright="mimoz" displaySplashScreen="1">
   <MAINGROUP id="PrPPaK" name="Utility clone">
+    <GROUP id="{8C952588-4780-CCC3-C1BB-84BD50A7E215}" name="Assets">
+      <FILE id="gF1hzS" name="headphone_64_64.png" compile="0" resource="1"
+            file="assets/headphone_64_64.png"/>
+      <FILE id="smQKpN" name="headphone_16_16.png" compile="0" resource="1"
+            file="assets/headphone_16_16.png"/>
+    </GROUP>
     <GROUP id="{EC0E94A1-3D8F-C520-0FC0-7D3C9BE19665}" name="Source">
       <FILE id="Bf4Ovv" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
