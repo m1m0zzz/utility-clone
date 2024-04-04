@@ -107,6 +107,11 @@ UtilityCloneAudioProcessorEditor::UtilityCloneAudioProcessorEditor(
     //setResizeLimits(width, height, 400, 600);
     //getConstrainer()->setFixedAspectRatio(ratio);
 
+    customLookAndFeel.setColour(juce::PopupMenu::ColourIds::backgroundColourId, themeColours.at("white"));
+    customLookAndFeel.setColour(juce::PopupMenu::ColourIds::textColourId, themeColours.at("text"));
+    customLookAndFeel.setColour(juce::PopupMenu::ColourIds::highlightedBackgroundColourId, themeColours.at("lightblue"));
+    customLookAndFeel.setColour(juce::PopupMenu::ColourIds::highlightedTextColourId, themeColours.at("text"));
+
     // components
     gainSliderAttachment.reset(new SliderAttachment(valueTreeState, "gain", gainSlider));
     auto gainRange = valueTreeState.getParameterRange("gain");
@@ -217,15 +222,63 @@ bool UtilityCloneAudioProcessorEditor::keyPressed(const juce::KeyPress& key)
         if (key.getKeyCode() == 'z' || key.getKeyCode() == 'Z') {
             undoManager.undo();
             updateStereoLabel();
-            bassMonoFrequencySlider.updateDisabled();
         }
         else if (key.getKeyCode() == 'y' || key.getKeyCode() == 'Y') {
             undoManager.redo();
             updateStereoLabel();
-            bassMonoFrequencySlider.updateDisabled();
         }
     }
     return true;
+}
+
+void UtilityCloneAudioProcessorEditor::mouseDown(const juce::MouseEvent& mouseEnvent)
+{
+    auto& modifiers = juce::ModifierKeys::getCurrentModifiers();
+    if (!modifiers.isRightButtonDown()) return;
+
+    juce::PopupMenu menu;
+    menu.addItem(static_cast<int>(E_MENUS::UNDO), "Undo (Ctrl+z)");
+    menu.addItem(static_cast<int>(E_MENUS::REDO), "Redo (Ctrl+y)");
+    menu.addSeparator();
+    DBG("a: " << *stereoMode);
+    menu.addItem(
+        static_cast<int>(E_MENUS::TOGGLE_STEREO_MODE),
+        juce::String(*stereoMode ? "Width" : "Mid/Side") + " Mode");
+    menu.addSeparator();
+    menu.addItem(static_cast<int>(E_MENUS::SHOW_DOCUMENT), "Show document (browser)");
+    menu.setLookAndFeel(&customLookAndFeel);
+
+    // TODO
+    if (mouseEnvent.eventComponent == &stereoWidthSlider ||
+        mouseEnvent.eventComponent == &stereoMidSideSlider) {
+        DBG("stereo w, ms");
+    }
+
+    menu.showMenuAsync(juce::PopupMenu::Options(),
+        [this](int result)
+        {
+            switch (result) {
+            case 0:
+                break; // nothing
+            case static_cast<int>(E_MENUS::UNDO):
+                undoManager.undo();
+                updateStereoLabel();
+                break;
+            case static_cast<int>(E_MENUS::REDO):
+                undoManager.redo();
+                updateStereoLabel();
+                break;
+            case static_cast<int>(E_MENUS::TOGGLE_STEREO_MODE):
+                DBG("toggle");
+                *stereoMode = static_cast<float>(!*stereoMode);
+                updateStereoLabel();
+                break;
+            case static_cast<int>(E_MENUS::SHOW_DOCUMENT):
+                DBG("show doc");
+                documentURL.launchInDefaultBrowser();
+                break;
+            }
+        });
 }
 
 void UtilityCloneAudioProcessorEditor::paint(juce::Graphics& g)
@@ -328,9 +381,6 @@ void UtilityCloneAudioProcessorEditor::resized()
     rect.setTop(height / 2 + 30);
     rect.setHeight(knobHeight);
     panSlider.setBounds(rect);
-
-    //undoButton.setBounds(10, 50, 50, 30);
-    //redoButton.setBounds(60, 50, 50, 30);
 }
 
 void UtilityCloneAudioProcessorEditor::updateStereoLabel()

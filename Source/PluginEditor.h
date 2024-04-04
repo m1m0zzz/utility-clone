@@ -13,6 +13,7 @@
 
 const std::unordered_map<std::string, juce::Colour> themeColours = {
     { "blue",       juce::Colour::fromRGB(85, 222, 246) },
+    { "lightblue",  juce::Colour::fromRGB(191, 233, 255) },
     { "deepblue",   juce::Colour::fromRGB(56, 115, 255) },
     { "orange",     juce::Colour::fromRGB(255, 177, 0) },
     { "white",      juce::Colour::fromRGB(220, 220,220) },
@@ -21,6 +22,13 @@ const std::unordered_map<std::string, juce::Colour> themeColours = {
     { "disabled",   juce::Colour::fromRGB(105, 105,105) },
     { "lightblack", juce::Colour::fromRGB(42, 42, 42) },
     { "text",       juce::Colours::black },
+};
+
+enum class E_MENUS {
+    UNDO = 1,
+    REDO,
+    TOGGLE_STEREO_MODE,
+    SHOW_DOCUMENT
 };
 
 class CustomLookAndFeel : public juce::LookAndFeel_V4 {
@@ -267,6 +275,7 @@ public:
 
     //==============================================================================
     bool keyPressed(const juce::KeyPress& key) override;
+    void mouseDown(const juce::MouseEvent& mouseEnvent) override;
     void paint (juce::Graphics&) override;
     void resized() override;
 
@@ -279,6 +288,7 @@ private:
     int width = 200;
     int height = 300;
     double ratio = width / height;
+    const juce::URL documentURL = juce::URL("https://github.com/m1m0zzz/utility-clone");
 
     // watch parameter for ui
     std::atomic<float>* isMono     = valueTreeState.getRawParameterValue("mono");
