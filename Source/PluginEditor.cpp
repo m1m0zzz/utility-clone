@@ -242,7 +242,6 @@ void UtilityCloneAudioProcessorEditor::mouseDown(const juce::MouseEvent& mouseEv
     menu.addItem(static_cast<int>(E_MENUS::UNDO), "Undo (Ctrl+z)");
     menu.addItem(static_cast<int>(E_MENUS::REDO), "Redo (Ctrl+y)");
     menu.addSeparator();
-    DBG("a: " << *stereoMode);
     menu.addItem(
         static_cast<int>(E_MENUS::TOGGLE_STEREO_MODE),
         juce::String(*stereoMode ? "Width" : "Mid/Side") + " Mode");
@@ -271,12 +270,10 @@ void UtilityCloneAudioProcessorEditor::mouseDown(const juce::MouseEvent& mouseEv
                 updateStereoLabel();
                 break;
             case static_cast<int>(E_MENUS::TOGGLE_STEREO_MODE):
-                DBG("toggle");
                 *stereoMode = static_cast<float>(!*stereoMode);
                 updateStereoLabel();
                 break;
             case static_cast<int>(E_MENUS::SHOW_DOCUMENT):
-                DBG("show doc");
                 documentURL.launchInDefaultBrowser();
                 break;
             }
