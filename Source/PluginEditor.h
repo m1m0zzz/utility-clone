@@ -58,17 +58,17 @@ public:
 
     void updateColourAll() {
         if (!disabled) {
-            setColour(juce::TextButton::ColourIds::buttonOnColourId, themeColours.at("orange"));
-            setColour(juce::TextButton::ColourIds::buttonColourId, themeColours.at("lightgrey"));
-            setColour(juce::TextButton::ColourIds::textColourOnId, themeColours.at("text"));
-            setColour(juce::TextButton::ColourIds::textColourOffId, themeColours.at("text"));
+            setColour(ColourIds::buttonOnColourId, themeColours.at("orange"));
+            setColour(ColourIds::buttonColourId, themeColours.at("lightgrey"));
+            setColour(ColourIds::textColourOnId, themeColours.at("text"));
+            setColour(ColourIds::textColourOffId, themeColours.at("text"));
             setColour(juce::ComboBox::ColourIds::outlineColourId, themeColours.at("lightblack"));
         }
         else {
-            setColour(juce::TextButton::ColourIds::buttonOnColourId, themeColours.at("white"));
-            setColour(juce::TextButton::ColourIds::buttonColourId, themeColours.at("lightgrey"));
-            setColour(juce::TextButton::ColourIds::textColourOnId, themeColours.at("disabled"));
-            setColour(juce::TextButton::ColourIds::textColourOffId, themeColours.at("disabled"));
+            setColour(ColourIds::buttonOnColourId, themeColours.at("white"));
+            setColour(ColourIds::buttonColourId, themeColours.at("lightgrey"));
+            setColour(ColourIds::textColourOnId, themeColours.at("disabled"));
+            setColour(ColourIds::textColourOffId, themeColours.at("disabled"));
             setColour(juce::ComboBox::ColourIds::outlineColourId, themeColours.at("lightblack"));
         }
     }
@@ -275,7 +275,7 @@ public:
 
     //==============================================================================
     bool keyPressed(const juce::KeyPress& key) override;
-    void mouseDown(const juce::MouseEvent& mouseEnvent) override;
+    void mouseDown(const juce::MouseEvent& mouseEvent) override;
     void paint (juce::Graphics&) override;
     void resized() override;
 
@@ -284,6 +284,7 @@ private:
     CustomLookAndFeel customLookAndFeel;
     juce::AudioProcessorValueTreeState& valueTreeState;
     juce::UndoManager& undoManager;
+    juce::PopupMenu menu;
 
     int width = 200;
     int height = 300;

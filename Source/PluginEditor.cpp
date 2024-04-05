@@ -207,6 +207,8 @@ UtilityCloneAudioProcessorEditor::UtilityCloneAudioProcessorEditor(
     outputLabel.setJustificationType(juce::Justification::centred);
     addAndMakeVisible(outputLabel);
 
+    // popup menu
+    menu.setLookAndFeel(&customLookAndFeel);
     setSize(width, height);
 }
 
@@ -231,12 +233,12 @@ bool UtilityCloneAudioProcessorEditor::keyPressed(const juce::KeyPress& key)
     return true;
 }
 
-void UtilityCloneAudioProcessorEditor::mouseDown(const juce::MouseEvent& mouseEnvent)
+void UtilityCloneAudioProcessorEditor::mouseDown(const juce::MouseEvent& mouseEvent)
 {
     auto& modifiers = juce::ModifierKeys::getCurrentModifiers();
     if (!modifiers.isRightButtonDown()) return;
 
-    juce::PopupMenu menu;
+    menu.clear();
     menu.addItem(static_cast<int>(E_MENUS::UNDO), "Undo (Ctrl+z)");
     menu.addItem(static_cast<int>(E_MENUS::REDO), "Redo (Ctrl+y)");
     menu.addSeparator();
@@ -249,8 +251,8 @@ void UtilityCloneAudioProcessorEditor::mouseDown(const juce::MouseEvent& mouseEn
     menu.setLookAndFeel(&customLookAndFeel);
 
     // TODO
-    if (mouseEnvent.eventComponent == &stereoWidthSlider ||
-        mouseEnvent.eventComponent == &stereoMidSideSlider) {
+    if (mouseEvent.eventComponent == &stereoWidthSlider ||
+        mouseEvent.eventComponent == &stereoMidSideSlider) {
         DBG("stereo w, ms");
     }
 
@@ -278,7 +280,8 @@ void UtilityCloneAudioProcessorEditor::mouseDown(const juce::MouseEvent& mouseEn
                 documentURL.launchInDefaultBrowser();
                 break;
             }
-        });
+       }
+    );
 }
 
 void UtilityCloneAudioProcessorEditor::paint(juce::Graphics& g)
