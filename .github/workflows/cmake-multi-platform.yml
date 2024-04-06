@@ -60,8 +60,8 @@ jobs:
     - name: Install Dependence for Ubuntu
       if: matrix.os == 'ubuntu-latest'
       run: >
-        sudo apt update
-        sudo apt install libasound2-dev libjack-jackd2-dev \
+        sudo apt-get update
+        sudo apt-get install libasound2-dev libjack-jackd2-dev \
           ladspa-sdk \
           libcurl4-openssl-dev  \
           libfreetype6-dev \
