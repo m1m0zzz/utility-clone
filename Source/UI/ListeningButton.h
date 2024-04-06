@@ -14,10 +14,8 @@ public:
 
     void paintButton(juce::Graphics& g,
         bool shouldDrawButtonAsHighlighted,
-        bool shouldDrawButtonAsDown) override {
-        const auto isOn = getToggleState();
-
-        g.setColour(isOn ? findColour(buttonOnColourId) : findColour(buttonColourId));
+        bool) override {
+        g.setColour(getToggleState() ? findColour(buttonOnColourId) : findColour(buttonColourId));
         g.fillEllipse(0, 0, getWidth(), getHeight());
 
         g.setColour(findColour(juce::ComboBox::ColourIds::outlineColourId));

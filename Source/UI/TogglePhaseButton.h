@@ -11,8 +11,6 @@ public:
         lf.drawButtonBackground(g, *this,
             findColour(getToggleState() ? buttonOnColourId : buttonColourId),
             shouldDrawButtonAsHighlighted, shouldDrawButtonAsDown);
-        // draw image
-        auto width = getWidth();
 
         juce::Font font(lf.getTextButtonFont(*this, getHeight()));
         g.setFont(font);

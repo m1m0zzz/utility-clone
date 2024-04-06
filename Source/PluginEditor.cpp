@@ -148,7 +148,7 @@ bool UtilityCloneAudioProcessorEditor::keyPressed(const juce::KeyPress& key)
 
 void UtilityCloneAudioProcessorEditor::mouseDown(const juce::MouseEvent& mouseEvent)
 {
-    auto& modifiers = juce::ModifierKeys::getCurrentModifiers();
+    auto modifiers = juce::ModifierKeys::getCurrentModifiers();
     if (!modifiers.isRightButtonDown()) return;
 
     menu.clear();
