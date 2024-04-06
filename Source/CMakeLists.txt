@@ -60,34 +60,24 @@ target_compile_definitions(UtilityClone
     # JUCE_DISPLAY_SPLASH_SCREEN=0 #if your plugin is distributed with GPL license or paid
 )
 
-# juce_add_binary_data(JuceLogoBinary
-# SOURCES
-# ${CMAKE_SOURCE_DIR}/assets/juce-logo.svg
-# )
+juce_add_binary_data(AudioPluginData SOURCES
+    ${CMAKE_SOURCE_DIR}/assets/headphone_16_16.png
+    ${CMAKE_SOURCE_DIR}/assets/headphone_64_64.png
+)
 
 target_sources(UtilityClone PRIVATE
     PluginEditor.cpp
     PluginProcessor.cpp
 )
 
-target_link_libraries(UtilityClone PUBLIC
-# JuceLogoBinary
-juce::juce_audio_basics
-juce::juce_audio_devices
-juce::juce_audio_formats
-juce::juce_audio_plugin_client
-juce::juce_audio_processors
-juce::juce_audio_utils
-juce::juce_core
-# juce::juce_cryptography
-juce::juce_data_structures
-juce::juce_dsp
-juce::juce_events
-juce::juce_graphics
-juce::juce_gui_basics
-juce::juce_gui_extra
-# juce::juce_opengl
-# juce::juce_product_unlocking
-)
+target_link_libraries(UtilityClone
+    PRIVATE
+        AudioPluginData           # If we'd created a binary data target, we'd link to it here
+        juce::juce_audio_utils
+        juce::juce_dsp
+    PUBLIC
+        juce::juce_recommended_config_flags
+        juce::juce_recommended_lto_flags
+        juce::juce_recommended_warning_flags)
 
 juce_generate_juce_header(UtilityClone)
