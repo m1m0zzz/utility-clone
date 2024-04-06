@@ -48,6 +48,8 @@ juce_add_plugin(UtilityClone
 
     PRODUCT_NAME "Utility clone")        # The name of the final
 
+target_compile_options(UtilityClone PUBLIC -w)
+
 target_compile_features(UtilityClone PUBLIC cxx_std_17)
 
 
