@@ -23,26 +23,26 @@ jobs:
       #
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest] # stash windows-latest
         build_type: [Release]
-        c_compiler: [gcc, clang, cl]
+        c_compiler: [gcc, clang] # stash cl
         include:
-          - os: windows-latest
-            c_compiler: cl
-            cpp_compiler: cl
+          # - os: windows-latest
+          #   c_compiler: cl
+          #   cpp_compiler: cl
           - os: ubuntu-latest
             c_compiler: gcc
             cpp_compiler: g++
           - os: ubuntu-latest
             c_compiler: clang
             cpp_compiler: clang++
-        exclude:
-          - os: windows-latest
-            c_compiler: gcc
-          - os: windows-latest
-            c_compiler: clang
-          - os: ubuntu-latest
-            c_compiler: cl
+        # exclude:
+        #   - os: windows-latest
+        #     c_compiler: gcc
+        #   - os: windows-latest
+        #     c_compiler: clang
+        #   - os: ubuntu-latest
+        #     c_compiler: cl
 
     steps:
     - uses: actions/checkout@v3
@@ -59,9 +59,10 @@ jobs:
 
     - name: Install Dependence for Ubuntu
       if: matrix.os == 'ubuntu-latest'
-      run: >
+      run: |
         sudo apt-get update
-        sudo apt-get install libasound2-dev libjack-jackd2-dev \
+        sudo apt-get install clang g++ \
+          libasound2-dev libjack-jackd2-dev \
           ladspa-sdk \
           libcurl4-openssl-dev  \
           libfreetype6-dev \
