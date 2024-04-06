@@ -47,6 +47,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
       with:
+        # include JUCE folder
         submodules: recursive
 
     - name: Set reusable strings
@@ -55,6 +56,18 @@ jobs:
       shell: bash
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+
+    - name: Install Dependence for Ubuntu
+      if: matrix.os == 'ubuntu-latest'
+      run: >
+        sudo apt update
+        sudo apt install libasound2-dev libjack-jackd2-dev \
+          ladspa-sdk \
+          libcurl4-openssl-dev  \
+          libfreetype6-dev \
+          libx11-dev libxcomposite-dev libxcursor-dev libxcursor-dev libxext-dev libxinerama-dev libxrandr-dev libxrender-dev \
+          libwebkit2gtk-4.0-dev \
+          libglu1-mesa-dev mesa-common-dev
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
