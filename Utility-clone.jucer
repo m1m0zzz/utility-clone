@@ -12,6 +12,20 @@
             file="assets/headphone_16_16.png"/>
     </GROUP>
     <GROUP id="{EC0E94A1-3D8F-C520-0FC0-7D3C9BE19665}" name="Source">
+      <GROUP id="{FF58F400-EB39-1E64-0EA3-97BB98FCF84F}" name="UI">
+        <FILE id="tKgpm3" name="Constant.h" compile="0" resource="0" file="Source/UI/Constant.h"/>
+        <FILE id="ZcYWB3" name="CustomLookAndFeel.h" compile="0" resource="0"
+              file="Source/UI/CustomLookAndFeel.h"/>
+        <FILE id="tlnYSz" name="KnobSlider.h" compile="0" resource="0" file="Source/UI/KnobSlider.h"/>
+        <FILE id="VrErb4" name="ListeningButton.h" compile="0" resource="0"
+              file="Source/UI/ListeningButton.h"/>
+        <FILE id="NqpjaL" name="MiniTextSlider.h" compile="0" resource="0"
+              file="Source/UI/MiniTextSlider.h"/>
+        <FILE id="ThtNr0" name="TogglePhaseButton.h" compile="0" resource="0"
+              file="Source/UI/TogglePhaseButton.h"/>
+        <FILE id="xwJJ3y" name="ToggleTextButton.h" compile="0" resource="0"
+              file="Source/UI/ToggleTextButton.h"/>
+      </GROUP>
       <FILE id="Bf4Ovv" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="S8Rb0Y" name="PluginProcessor.h" compile="0" resource="0"
