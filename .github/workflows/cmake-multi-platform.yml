@@ -56,6 +56,8 @@ jobs:
       shell: bash
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+        hoge=${{ matrix.os }}
+        echo "os-name=${hoge%%-*}" >> "$GITHUB_OUTPUT"
 
     - name: Install Dependence for Ubuntu
       if: matrix.os == 'ubuntu-latest'
@@ -89,3 +91,12 @@ jobs:
       # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest --build-config ${{ matrix.build_type }}
+
+    - name: Deploy to branch
+      uses: s0/git-publish-subdir-action@v2.6.0
+      env:
+        REPO: self
+        BRANCH: build-${{ steps.strings.outputs.os-name }}-${{ matrix.c_compiler }}
+        FOLDER: ${{ steps.strings.outputs.build-output-dir }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
