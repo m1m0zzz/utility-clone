@@ -19,11 +19,6 @@ jobs:
       # Set fail-fast to false to ensure that feedback is delivered for all matrix combinations. Consider changing this to true when your workflow is stable.
       fail-fast: false
 
-      # Set up a matrix to run the following 3 configurations:
-      # 1. <Windows, Release, latest MSVC compiler toolchain on the default runner image, default generator>
-      # 2. <Linux, Release, latest GCC compiler toolchain on the default runner image, default generator>
-      # 3. <Linux, Release, latest Clang compiler toolchain on the default runner image, default generator>
-      #
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
         os: [ubuntu-latest] # stash windows-latest
@@ -33,12 +28,21 @@ jobs:
           # - os: windows-latest
           #   c_compiler: cl
           #   cpp_compiler: cl
+          #   release_branch: windows
+          # - os: macos-latest
+          #   c_compiler:
+          #   cpp_compiler:
+          #   release_branch: macos
           - os: ubuntu-latest
             c_compiler: gcc
             cpp_compiler: g++
+            package_name: g++
+            release_branch: linux-gcc
           - os: ubuntu-latest
             c_compiler: clang
             cpp_compiler: clang++
+            package_name: clang
+            release_branch: linux-clang
         # exclude:
         #   - os: windows-latest
         #     c_compiler: gcc
@@ -66,7 +70,7 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt-get update
-        sudo apt-get install clang g++ \
+        sudo apt-get install ${{ matrix.package_name }} \
           libasound2-dev libjack-jackd2-dev \
           ladspa-sdk \
           libcurl4-openssl-dev  \
@@ -99,7 +103,6 @@ jobs:
       uses: s0/git-publish-subdir-action@v2.6.0
       env:
         REPO: self
-        BRANCH: build-${{ steps.strings.outputs.os-name }}-${{ matrix.c_compiler }}
-        FOLDER: ${{ steps.strings.outputs.build-output-dir }}
+        BRANCH: release/${{ matrix.release_branch }}
+        FOLDER: ${{ steps.strings.outputs.build-output-dir }}/Source/UtilityClone_artefacts/Release
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
