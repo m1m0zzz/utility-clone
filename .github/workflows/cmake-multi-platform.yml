@@ -21,38 +21,38 @@ jobs:
 
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
-        os: [windows-latest] # , macos-latest, ubuntu-latest
+        os: [windows-latest, macos-latest, ubuntu-latest]
         build_type: [Release]
-        c_compiler: [cl] # , clang, gcc
+        c_compiler: [cl, clang, gcc]
         include:
           - os: windows-latest
             c_compiler: cl
             cpp_compiler: cl
             release_branch: windows
-        #   - os: macos-latest
-        #     c_compiler: clang
-        #     cpp_compiler: clang++
-        #     release_branch: macos
-        #   - os: ubuntu-latest
-        #     c_compiler: gcc
-        #     cpp_compiler: g++
-        #     package_name: g++
-        #   - os: ubuntu-latest
-        #     c_compiler: clang
-        #     cpp_compiler: clang++
-        #     package_name: clang
-        #     release_branch: linux
-        # exclude:
-        #   - os: windows-latest
-        #     c_compiler: clang
-        #   - os: windows-latest
-        #     c_compiler: gcc
-        #   - os: macos-latest
-        #     c_compiler: cl
-        #   - os: macos-latest
-        #     c_compiler: gcc
-        #   - os: ubuntu-latest
-        #     c_compiler: cl
+          - os: macos-latest
+            c_compiler: clang
+            cpp_compiler: clang++
+            release_branch: macos
+          - os: ubuntu-latest
+            c_compiler: gcc
+            cpp_compiler: g++
+            package_name: g++
+          - os: ubuntu-latest
+            c_compiler: clang
+            cpp_compiler: clang++
+            package_name: clang
+            release_branch: linux
+        exclude:
+          - os: windows-latest
+            c_compiler: clang
+          - os: windows-latest
+            c_compiler: gcc
+          - os: macos-latest
+            c_compiler: cl
+          - os: macos-latest
+            c_compiler: gcc
+          - os: ubuntu-latest
+            c_compiler: cl
 
     steps:
     - uses: actions/checkout@v3
@@ -107,13 +107,14 @@ jobs:
       shell: bash
       run: |
         ls -lh
-        rm ${{ steps.strings.outputs.release-dir }}/Utility clone_SharedCode.lib
+        rm '${{ steps.strings.outputs.release-dir }}/Utility clone_SharedCode.lib'
         ls -lh
 
     - name: Clean Release Folder (Mac/Linux)
       if: matrix.os == 'macos-latest' || (matrix.os == 'ubuntu-latest' && matrix.c_compiler != 'gcc')
       run: |
-        rm ${{ steps.strings.outputs.release-dir }}/libUtility clone_SharedCode.a
+        rm '${{ steps.strings.outputs.release-dir }}/libUtility clone_SharedCode.a'
+        rm -r '${{ steps.strings.outputs.release-dir }}/lib'
 
     - name: Deploy to branch
       if: matrix.c_compiler != 'gcc'
