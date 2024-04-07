@@ -123,10 +123,5 @@ jobs:
         BRANCH: release/${{ matrix.release_branch }}
         FOLDER: ${{ steps.strings.outputs.release-dir }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        CLEAR_GLOBS_FILE:
-          \**/*
-          \!.git
-          ${{ steps.strings.outputs.release-dir }}/VST3/*
-          ${{ steps.strings.outputs.release-dir }}/Standalone/*
-          ${{ steps.strings.outputs.release-dir }}/AU/*
+        CLEAR_GLOBS_FILE: "**/VST3/*|**/Standalone/*|**/AU/*"
 
