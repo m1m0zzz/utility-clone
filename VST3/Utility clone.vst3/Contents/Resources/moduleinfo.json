@@ -1,0 +1,58 @@
+{
+  "Name": "Utility clone",
+  "Version": "0.0.1",
+  "Factory Info": {
+    "Vendor": "mimoz",
+    "URL": "m1m0zzz.github.io",
+    "E-Mail": "contact.m1m0zzz@gmail.com",
+    "Flags": {
+      "Unicode": true,
+      "Classes Discardable": false,
+      "Component Non Discardable": false,
+    },
+  },
+  "Classes": [
+    {
+      "CID": "ABCDEF019182FAEB4343434358585858",
+      "Category": "Audio Module Class",
+      "Name": "Utility clone",
+      "Vendor": "mimoz",
+      "Version": "0.0.1",
+      "SDKVersion": "VST 3.7.8",
+      "Sub Categories": [
+        "Fx",
+      ],
+      "Class Flags": 0,
+      "Cardinality": 2147483647,
+      "Snapshots": [
+      ],
+    },
+    {
+      "CID": "ABCDEF011234ABCD4343434358585858",
+      "Category": "Component Controller Class",
+      "Name": "Utility clone",
+      "Vendor": "mimoz",
+      "Version": "0.0.1",
+      "SDKVersion": "VST 3.7.8",
+      "Sub Categories": [
+        "Fx",
+      ],
+      "Class Flags": 0,
+      "Cardinality": 2147483647,
+      "Snapshots": [
+      ],
+    },
+    {
+      "CID": "ABCDEF01C0DEF00D4343434358585858",
+      "Category": "Plugin Compatibility Class",
+      "Name": "Utility clone",
+      "Vendor": "mimoz",
+      "Version": "0.0.1",
+      "SDKVersion": "VST 3.7.8",
+      "Class Flags": 0,
+      "Cardinality": 2147483647,
+      "Snapshots": [
+      ],
+    },
+  ],
+}
