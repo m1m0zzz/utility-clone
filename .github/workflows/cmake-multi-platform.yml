@@ -21,35 +21,38 @@ jobs:
 
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
-        os: [macos-latest] # stash ubuntu-latest, windows-latest
+        os: [windows-latest, macos-latest, ubuntu-latest]
         build_type: [Release]
-        c_compiler: [clang] # stash gcc, cl
+        c_compiler: [cl, clang, gcc]
         include:
-          # - os: windows-latest
-          #   c_compiler: cl
-          #   cpp_compiler: cl
-          #   release_branch: windows
+          - os: windows-latest
+            c_compiler: cl
+            cpp_compiler: cl
+            release_branch: windows
           - os: macos-latest
             c_compiler: clang
             cpp_compiler: clang++
             release_branch: macos
-          # - os: ubuntu-latest
-          #   c_compiler: gcc
-          #   cpp_compiler: g++
-          #   package_name: g++
-          #   release_branch: linux-gcc
-          # - os: ubuntu-latest
-          #   c_compiler: clang
-          #   cpp_compiler: clang++
-          #   package_name: clang
-          #   release_branch: linux-clang
-        # exclude:
-        #   - os: windows-latest
-        #     c_compiler: gcc
-        #   - os: windows-latest
-        #     c_compiler: clang
-        #   - os: ubuntu-latest
-        #     c_compiler: cl
+          - os: ubuntu-latest
+            c_compiler: gcc
+            cpp_compiler: g++
+            package_name: g++
+          - os: ubuntu-latest
+            c_compiler: clang
+            cpp_compiler: clang++
+            package_name: clang
+            release_branch: linux
+        exclude:
+          - os: windows-latest
+            c_compiler: clang
+          - os: windows-latest
+            c_compiler: gcc
+          - os: macos-latest
+            c_compiler: cl
+          - os: macos-latest
+            c_compiler: gcc
+          - os: ubuntu-latest
+            c_compiler: cl
 
     steps:
     - uses: actions/checkout@v3
@@ -63,10 +66,10 @@ jobs:
       shell: bash
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
-        hoge=${{ matrix.os }}
-        echo "os-name=${hoge%%-*}" >> "$GITHUB_OUTPUT"
+        echo "release-dir=${{ github.workspace }}/build/Source/UtilityClone_artefacts/Release" >> "$GITHUB_OUTPUT"
 
-    - name: Install Dependence for Ubuntu
+    - name: Install Dependencies for Ubuntu
+      # https://github.com/juce-framework/JUCE/blob/master/docs/Linux%20Dependencies.md
       if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt-get update
@@ -99,10 +102,21 @@ jobs:
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest --build-config ${{ matrix.build_type }}
 
+    # - name: Clean Release Folder (Windows)
+    #   if: matrix.os == 'windows-latest'
+    #   run: |
+    #     rm -rf ${{ steps.strings.outputs.release-dir }}/
+
+    - name: Clean Release Folder (Mac/Linux)
+      if: matrix.os == 'macos-latest' || (matrix.os == 'linux-latest' && matrix.c_compiler != 'gcc')
+      run: |
+        rm -rf ${{ steps.strings.outputs.release-dir }}/libUtility clone_SharedCode.a
+
     - name: Deploy to branch
+      if: matrix.c_compiler != 'gcc'
       uses: s0/git-publish-subdir-action@v2.6.0
       env:
         REPO: self
         BRANCH: release/${{ matrix.release_branch }}
-        FOLDER: ${{ steps.strings.outputs.build-output-dir }} #/Source/UtilityClone_artefacts/Release
+        FOLDER: ${{ steps.strings.outputs.release-dir }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
