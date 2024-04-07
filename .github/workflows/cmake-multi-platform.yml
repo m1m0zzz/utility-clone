@@ -106,15 +106,16 @@ jobs:
       if: matrix.os == 'windows-latest'
       shell: bash
       run: |
-        ls -lh
+        ls -l ${{ steps.strings.outputs.release-dir }}
         rm '${{ steps.strings.outputs.release-dir }}/Utility clone_SharedCode.lib'
-        ls -lh
+        rm -r ${{ steps.strings.outputs.release-dir }}/lib
 
     - name: Clean Release Folder (Mac/Linux)
       if: matrix.os == 'macos-latest' || (matrix.os == 'ubuntu-latest' && matrix.c_compiler != 'gcc')
       run: |
+        ls -l ${{ steps.strings.outputs.release-dir }}
         rm '${{ steps.strings.outputs.release-dir }}/libUtility clone_SharedCode.a'
-        rm -r '${{ steps.strings.outputs.release-dir }}/lib'
+        rm -r ${{ steps.strings.outputs.release-dir }}/lib
 
     - name: Deploy to branch
       if: matrix.c_compiler != 'gcc'
