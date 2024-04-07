@@ -58,7 +58,7 @@ jobs:
     - uses: actions/checkout@v3
       with:
         # include JUCE folder
-        submodules: recursive
+        submodules: true
 
     - name: Set reusable strings
       # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
@@ -102,16 +102,19 @@ jobs:
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest --build-config ${{ matrix.build_type }}
 
-    # - name: Clean Release Folder (Windows)
-    #   if: matrix.os == 'windows-latest'
-    #   run: |
-    #     rm -rf ${{ steps.strings.outputs.release-dir }}/
+    - name: Clean Release Folder (Windows)
+      if: matrix.os == 'windows-latest'
+      shell: bash
+      run: |
+        rm '${{ steps.strings.outputs.release-dir }}/Utility clone_SharedCode.lib'
 
     - name: Clean Release Folder (Mac/Linux)
-      if: matrix.os == 'macos-latest' || (matrix.os == 'linux-latest' && matrix.c_compiler != 'gcc')
+      if: matrix.os == 'macos-latest' || (matrix.os == 'ubuntu-latest' && matrix.c_compiler != 'gcc')
       run: |
-        rm -rf ${{ steps.strings.outputs.release-dir }}/libUtility clone_SharedCode.a
+        rm '${{ steps.strings.outputs.release-dir }}/libUtility clone_SharedCode.a'
 
+    # TODO: submodulesが含まれるの lib ディレクトリがコピーされている？
+    # このアクションを使わずに ブランチを作成しpushする
     - name: Deploy to branch
       if: matrix.c_compiler != 'gcc'
       uses: s0/git-publish-subdir-action@v2.6.0
