@@ -117,12 +117,10 @@ jobs:
     - name: Check Submodules
       shell: bash
       run: |
-        cd ${{ github.workspace }}
         ls
         git submodule foreach
-        git submodule deinit -f JUCE
-        git rm -f JUCE
-        rm -r lib
+        git rm -r lib/JUCE
+        git config --remove-section submodule.JUCE
 
     # TODO: submodulesが含まれるの lib ディレクトリがコピーされている？
     - name: Deploy to branch
