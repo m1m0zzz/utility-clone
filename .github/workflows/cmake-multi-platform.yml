@@ -117,11 +117,12 @@ jobs:
     - name: Check Submodules
       shell: bash
       run: |
-        pwd
-        cd ${{ steps.strings.outputs.build-output-dir }}
-        ls -l
-        ls Source/UtilityClone_artefacts/Release
+        cd ${{ github.workspace }}
+        ls
         git submodule foreach
+        git submodule deinit -f JUCE
+        git rm -f JUCE
+        rm -r lib
 
     # TODO: submodulesが含まれるの lib ディレクトリがコピーされている？
     - name: Deploy to branch
