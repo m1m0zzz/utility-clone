@@ -120,7 +120,6 @@ jobs:
         ls
         git submodule foreach
         git rm -r lib/JUCE
-        git config --remove-section submodule.JUCE
 
     # TODO: submodulesが含まれるの lib ディレクトリがコピーされている？
     - name: Deploy to branch
