@@ -114,13 +114,6 @@ jobs:
         ls -l ${{ steps.strings.outputs.release-dir }}
         rm '${{ steps.strings.outputs.release-dir }}/libUtility clone_SharedCode.a'
 
-    - name: Check Submodules
-      shell: bash
-      run: |
-        ls
-        git submodule foreach
-        git rm -r lib/JUCE
-
     # TODO: submodulesが含まれるの lib ディレクトリがコピーされている？
     - name: Deploy to branch
       if: matrix.c_compiler != 'gcc'
@@ -130,3 +123,10 @@ jobs:
         BRANCH: release/${{ matrix.release_branch }}
         FOLDER: ${{ steps.strings.outputs.release-dir }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        CLEAR_GLOBS_FILE:
+          \**/*
+          \!.git
+          ${{ steps.strings.outputs.release-dir }}/VST3/*
+          ${{ steps.strings.outputs.release-dir }}/Standalone/*
+          ${{ steps.strings.outputs.release-dir }}/AU/*
+
