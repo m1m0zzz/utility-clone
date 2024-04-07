@@ -123,4 +123,4 @@ jobs:
         BRANCH: release/${{ matrix.release_branch }}
         FOLDER: ${{ steps.strings.outputs.release-dir }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        CLEAR_GLOBS_FILE: "**/lib/*"
+        CLEAR_GLOBS_FILE: "${{ secrets.GITHUB_TOKEN }}/lib/*"
