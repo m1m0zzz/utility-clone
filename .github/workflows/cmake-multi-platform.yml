@@ -111,10 +111,10 @@ jobs:
     - name: Clean Release Folder (Mac/Linux)
       if: matrix.os == 'macos-latest' || (matrix.os == 'ubuntu-latest' && matrix.c_compiler != 'gcc')
       run: |
-        ls -l ${{ steps.strings.outputs.release-dir }}
         rm '${{ steps.strings.outputs.release-dir }}/libUtility clone_SharedCode.a'
 
     # TODO: submodulesが含まれるの lib ディレクトリがコピーされている？
+    # このアクションを使わずに ブランチを作成しpushする
     - name: Deploy to branch
       if: matrix.c_compiler != 'gcc'
       uses: s0/git-publish-subdir-action@v2.6.0
@@ -123,4 +123,3 @@ jobs:
         BRANCH: release/${{ matrix.release_branch }}
         FOLDER: ${{ steps.strings.outputs.release-dir }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        CLEAR_GLOBS_FILE: "${{ steps.strings.outputs.release-dir }}/lib/*"
