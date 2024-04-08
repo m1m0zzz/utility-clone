@@ -50,3 +50,7 @@ TODO
 
 ## License
 GPL v3.0
+
+## Acknowledgment
+
+<a href="https://www.flaticon.com/free-icons/music" title="music icons">Music icons created by Freepik - Flaticon</a>
