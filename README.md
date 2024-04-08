@@ -21,6 +21,11 @@ Development with [JUCE](https://github.com/juce-framework/JUCE)
 **UI**
 - [ ] popup menu
 
+## 📂 Download
+- [Windows (zip)](https://github.com/m1m0zzz/utility-clone/archive/refs/heads/release/windows.zip)
+- [Mac (zip)](https://github.com/m1m0zzz/utility-clone/archive/refs/heads/release/macos.zip)
+- [Linux (zip)](https://github.com/m1m0zzz/utility-clone/archive/refs/heads/release/linux.zip)
+
 ## 🛠️ Build
 Currently, it is possible to build with both Projucer and CMake
 
