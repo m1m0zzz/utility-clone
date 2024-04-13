@@ -29,7 +29,13 @@ UtilityCloneAudioProcessor::UtilityCloneAudioProcessor()
 #endif
     , parameters(*this, &undoManager, juce::Identifier("Utility-clone"),
         {
-            std::make_unique<juce::AudioParameterFloat>("gain", "Gain", juce::NormalisableRange(-100.0f, 35.0f, 0.1f), 0.0f),
+            std::make_unique<juce::AudioParameterFloat>(
+                "gain", "Gain", juce::NormalisableRange(-100.0f, 35.0f), 0.0f, "Gain", juce::AudioProcessorParameter::genericParameter,
+                [](float value, int) {
+                    int digit = static_cast<int>(log10(abs(value)));
+                    return (value <= -100.0f) ? "-inf" : juce::String(value, 2 - (digit < 0 ? 0 : digit));
+                }
+            ),
             std::make_unique<juce::AudioParameterBool>("invertPhaseL", "Invert Phase L", false),
             std::make_unique<juce::AudioParameterBool>("invertPhaseR", "Invert Phase R", false),
             std::make_unique<juce::AudioParameterBool>("mono", "Mono", false),

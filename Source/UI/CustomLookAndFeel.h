@@ -3,8 +3,6 @@
 #define _USE_MATH_DEFINES
 #include "math.h"
 
-#include "Constant.h"
-
 class CustomLookAndFeel : public juce::LookAndFeel_V4 {
     // knob
     void drawRotarySlider(juce::Graphics& g, int x, int y, int width, int height,
@@ -51,6 +49,7 @@ class CustomLookAndFeel : public juce::LookAndFeel_V4 {
         const auto editor = label.getCurrentTextEditor();
         if (editor != nullptr) {
             editor->applyColourToAllText(label.findColour(juce::TextEditor::ColourIds::textColourId), true);
+            editor->setJustification(juce::Justification::Flags::centred);
         }
 
         g.setColour(text);

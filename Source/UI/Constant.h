@@ -12,10 +12,3 @@ const std::unordered_map<std::string, juce::Colour> themeColours = {
     { "lightblack", juce::Colour::fromRGB(42, 42, 42) },
     { "text",       juce::Colours::black },
 };
-
-enum class E_MENUS {
-    UNDO = 1,
-    REDO,
-    TOGGLE_STEREO_MODE,
-    SHOW_DOCUMENT
-};

@@ -4,12 +4,25 @@ class ToggleTextButton : public juce::TextButton
 {
 public:
     bool disabled; // show disabled color
+    CustomPopupMenu& menu;
 
-    ToggleTextButton(juce::String text, juce::LookAndFeel* lookAndFeel, bool disabled = false) : disabled(disabled) {
+    ToggleTextButton(juce::String text, juce::LookAndFeel* lookAndFeel,
+        CustomPopupMenu& menu, bool disabled = false) : disabled(disabled), menu(menu) {
         setClickingTogglesState(true);
         setButtonText(text);
         setAndUpdateDisabled(disabled);
         setLookAndFeel(lookAndFeel);
+    }
+
+    void mouseDown(const juce::MouseEvent& mouseEvent) override {
+        auto modifiers = juce::ModifierKeys::getCurrentModifiers();
+        if (modifiers.isRightButtonDown()) {
+            menu.setRegisteredItems();
+            menu.showDefault();
+        }
+        else {
+            TextButton::mouseDown(mouseEvent);
+        }
     }
 
     void updateColourAll() {

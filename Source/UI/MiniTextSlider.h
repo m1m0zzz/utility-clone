@@ -8,10 +8,11 @@ public:
     juce::AudioProcessorValueTreeState& valueTreeState;
     juce::String parameterID;
     bool disabled; // show disabled color
+    CustomPopupMenu& menu;
 
     MiniTextSlider(juce::AudioProcessorValueTreeState& valueTreeState, const juce::String parameterID,
-        juce::LookAndFeel* lookAndFeel = nullptr, bool disabled = false) :
-        valueTreeState(valueTreeState), parameterID(parameterID), disabled(disabled)
+        juce::LookAndFeel* lookAndFeel, CustomPopupMenu& menu, bool disabled = false) :
+        valueTreeState(valueTreeState), parameterID(parameterID), menu(menu), disabled(disabled)
     {
         setSliderStyle(juce::Slider::SliderStyle::LinearBarVertical);
         setColour(juce::Slider::ColourIds::trackColourId, juce::Colours::transparentWhite);
@@ -20,7 +21,7 @@ public:
         setColour(juce::Slider::ColourIds::textBoxBackgroundColourId, themeColours.at("text"));
         setVelocityBasedMode(true);
         setVelocityModeParameters(1.6, 1, 0.09);
-        if (lookAndFeel != nullptr) setLookAndFeel(lookAndFeel);
+        setLookAndFeel(lookAndFeel);
     }
 
     void paint(juce::Graphics& g) override
@@ -35,6 +36,17 @@ public:
         }
         g.setColour(themeColours.at("text"));
         g.drawRect(0, 0, getWidth(), getHeight());
+    }
+
+    void mouseDown(const juce::MouseEvent& mouseEvent) override {
+        auto modifiers = juce::ModifierKeys::getCurrentModifiers();
+        if (modifiers.isRightButtonDown()) {
+            menu.setRegisteredItems();
+            menu.showDefault();
+        }
+        else {
+            Slider::mouseDown(mouseEvent);
+        }
     }
 
     void updateDisabled() {

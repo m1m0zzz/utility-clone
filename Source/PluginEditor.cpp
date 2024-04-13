@@ -12,8 +12,7 @@
 //==============================================================================
 UtilityCloneAudioProcessorEditor::UtilityCloneAudioProcessorEditor(
     UtilityCloneAudioProcessor& p, juce::AudioProcessorValueTreeState& vts, juce::UndoManager& um)
-    : AudioProcessorEditor(&p), audioProcessor(p), valueTreeState(vts), undoManager(um),
-    undoButton("Undo"), redoButton("Redo")
+    : AudioProcessorEditor(&p), audioProcessor(p), valueTreeState(vts), undoManager(um)
 {
     // window
     //setResizable(true, true);
@@ -57,9 +56,11 @@ UtilityCloneAudioProcessorEditor::UtilityCloneAudioProcessorEditor(
     stereoWidthSlider.setRange(widthRange.start, widthRange.end);
     stereoWidthSlider.setSkewFactorFromMidPoint(100);
     stereoWidthSlider.setTextValueSuffix("%");
+    stereoWidthSlider.setName("stereoModeSlider");
     addAndMakeVisible(stereoWidthSlider);
 
     stereoMidSideSliderAttachment.reset(new SliderAttachment(valueTreeState, "stereoMidSide", stereoMidSideSlider));
+    stereoMidSideSlider.setName("stereoModeSlider");
     addAndMakeVisible(stereoMidSideSlider);
     stereoMidSideSlider.setVisible(false);
 
@@ -69,16 +70,10 @@ UtilityCloneAudioProcessorEditor::UtilityCloneAudioProcessorEditor(
     addAndMakeVisible(stereoModeLabel);
 
     stereoModeSwitchButtonAttachment.reset(new ButtonAttachment(valueTreeState, "stereoMode", stereoModeSwitchButton));
-    stereoModeSwitchButton.setButtonText("S");
-    stereoModeSwitchButton.setClickingTogglesState(true);
-    stereoModeSwitchButton.setColour(juce::TextButton::ColourIds::buttonColourId, themeColours.at("lightgrey"));
-    stereoModeSwitchButton.setColour(juce::TextButton::ColourIds::textColourOffId, themeColours.at("text"));
-    stereoModeSwitchButton.setColour(juce::TextButton::ColourIds::buttonOnColourId, themeColours.at("lightgrey"));
-    stereoModeSwitchButton.setColour(juce::TextButton::ColourIds::textColourOnId, themeColours.at("text"));
-    stereoModeSwitchButton.setColour(juce::ComboBox::ColourIds::outlineColourId, themeColours.at("text"));
     stereoModeSwitchButton.onClick = [this]() {
         updateStereoLabel();
     };
+    stereoModeSwitchButton.setColour(IconButton::ColourIds::buttonOnColourId, themeColours.at("lightgrey"));
     addAndMakeVisible(stereoModeSwitchButton);
     updateStereoLabel();
 
@@ -120,8 +115,6 @@ UtilityCloneAudioProcessorEditor::UtilityCloneAudioProcessorEditor(
     outputLabel.setJustificationType(juce::Justification::centred);
     addAndMakeVisible(outputLabel);
 
-    // popup menu
-    menu.setLookAndFeel(&customLookAndFeel);
     setSize(width, height);
 }
 
@@ -151,47 +144,12 @@ void UtilityCloneAudioProcessorEditor::mouseDown(const juce::MouseEvent& mouseEv
     auto modifiers = juce::ModifierKeys::getCurrentModifiers();
     if (!modifiers.isRightButtonDown()) return;
 
-    menu.clear();
-    menu.addItem(static_cast<int>(E_MENUS::UNDO), "Undo (Ctrl+z)");
-    menu.addItem(static_cast<int>(E_MENUS::REDO), "Redo (Ctrl+y)");
-    menu.addSeparator();
-    menu.addItem(
-        static_cast<int>(E_MENUS::TOGGLE_STEREO_MODE),
-        juce::String(*stereoMode ? "Width" : "Mid/Side") + " Mode");
-    menu.addSeparator();
-    menu.addItem(static_cast<int>(E_MENUS::SHOW_DOCUMENT), "Show document (browser)");
-    menu.setLookAndFeel(&customLookAndFeel);
-
-    // TODO
-    if (mouseEvent.eventComponent == &stereoWidthSlider ||
-        mouseEvent.eventComponent == &stereoMidSideSlider) {
-        DBG("stereo w, ms");
-    }
-
-    menu.showMenuAsync(juce::PopupMenu::Options(),
-        [this](int result)
-        {
-            switch (result) {
-            case 0:
-                break; // nothing
-            case static_cast<int>(E_MENUS::UNDO):
-                undoManager.undo();
-                updateStereoLabel();
-                break;
-            case static_cast<int>(E_MENUS::REDO):
-                undoManager.redo();
-                updateStereoLabel();
-                break;
-            case static_cast<int>(E_MENUS::TOGGLE_STEREO_MODE):
-                *stereoMode = static_cast<float>(!*stereoMode);
-                updateStereoLabel();
-                break;
-            case static_cast<int>(E_MENUS::SHOW_DOCUMENT):
-                documentURL.launchInDefaultBrowser();
-                break;
-            }
-       }
-    );
+    menu.setRegisteredItems(std::vector{
+        CustomPopupMenu::ItemsID::REDO,
+        CustomPopupMenu::ItemsID::UNDO,
+        CustomPopupMenu::ItemsID::SHOW_DOCUMENT,
+    });
+    menu.showDefault();
 }
 
 void UtilityCloneAudioProcessorEditor::paint(juce::Graphics& g)

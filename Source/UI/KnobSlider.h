@@ -6,12 +6,32 @@ public:
     using juce::Slider::Slider;
 
     bool disabled; // show disabled color
+    CustomPopupMenu& menu;
 
-    KnobSlider(juce::LookAndFeel* lookAndFeel, bool disabled = false) : disabled(disabled) {
+    KnobSlider(juce::LookAndFeel* lookAndFeel, CustomPopupMenu& menu, bool disabled = false) : disabled(disabled), menu(menu) {
         setSliderStyle(juce::Slider::SliderStyle::RotaryVerticalDrag);
         setTextBoxStyle(juce::Slider::TextEntryBoxPosition::TextBoxBelow, false, 80, 20);
         setAndUpdateDisabled(disabled);
         setLookAndFeel(lookAndFeel);
+    }
+
+    void mouseDown(const juce::MouseEvent& mouseEvent) override {
+        auto modifiers = juce::ModifierKeys::getCurrentModifiers();
+        if (modifiers.isRightButtonDown()) {
+            auto items = std::vector{
+                CustomPopupMenu::ItemsID::REDO,
+                CustomPopupMenu::ItemsID::UNDO,
+                CustomPopupMenu::ItemsID::SHOW_DOCUMENT,
+            };
+            if (getName() == "stereoModeSlider") {
+                items.push_back(CustomPopupMenu::ItemsID::TOGGLE_STEREO_MODE);
+            }
+            menu.setRegisteredItems(items);
+            menu.showDefault();
+        }
+        else {
+            Slider::mouseDown(mouseEvent);
+        }
     }
 
     void updateColourAll() {
