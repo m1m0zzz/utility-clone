@@ -13,9 +13,5 @@ const std::unordered_map<std::string, juce::Colour> themeColours = {
     { "text",       juce::Colours::black },
 };
 
-enum class E_MENUS {
-    UNDO = 1,
-    REDO,
-    TOGGLE_STEREO_MODE,
-    SHOW_DOCUMENT
-};
+const auto stereoModeList = juce::StringArray("Width", "Mid/Side");
+const auto channelModeList = juce::StringArray("Left", "Stereo", "Right", "Swap");

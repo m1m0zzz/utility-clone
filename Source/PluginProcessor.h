@@ -10,8 +10,6 @@
 
 #include <JuceHeader.h>
 
-const juce::StringArray stereoModeList = juce::StringArray("Width", "Mid/Side");
-
 //==============================================================================
 /**
 */
@@ -56,19 +54,22 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    juce::UndoManager undoManager;
-
 private:
+    bool isMonoByChannelMode();
+
     juce::AudioProcessorValueTreeState parameters;
+    juce::UndoManager undoManager;
 
     juce::dsp::ProcessSpec spec;
     juce::dsp::Gain<float> gainDSP;
     juce::dsp::Panner<float> pannerDSP;
     juce::dsp::LinkwitzRileyFilter<float> lrFilter;
+    juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>> dcFilter;
 
     std::atomic<float>* gain = nullptr;
     std::atomic<float>* isInvertPhaseL = nullptr;
     std::atomic<float>* isInvertPhaseR = nullptr;
+    std::atomic<float>* channelMode = nullptr;
     std::atomic<float>* isMono = nullptr;
     std::atomic<float>* pan = nullptr;
     std::atomic<float>* stereoMode = nullptr; // Width or Mid/Side
@@ -77,6 +78,7 @@ private:
     std::atomic<float>* isBassMono = nullptr;
     std::atomic<float>* bassMonoFrequency = nullptr;
     std::atomic<float>* isBassMonoListening = nullptr;
+    std::atomic<float>* isDc = nullptr;
 
     juce::LinearSmoothedValue<float> width;
     juce::LinearSmoothedValue<float> midSide;

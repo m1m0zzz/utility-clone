@@ -64,7 +64,7 @@ target_compile_definitions(UtilityClone
 
 juce_add_binary_data(AudioPluginData SOURCES
     ${CMAKE_SOURCE_DIR}/assets/headphone_16_16.png
-    ${CMAKE_SOURCE_DIR}/assets/headphone_64_64.png
+    ${CMAKE_SOURCE_DIR}/assets/swap_16_16.png
 )
 
 target_sources(UtilityClone PRIVATE
