@@ -3,23 +3,23 @@
 VST plugin like a Ableton Utility.  
 Development with [JUCE](https://github.com/juce-framework/JUCE)
 
-![image](https://github.com/m1m0zzz/utility-clone/assets/117814895/d256fde1-0c0f-4889-8f5b-c9f0dea2a480)
+![preview](https://github.com/m1m0zzz/utility-clone/assets/117814895/a3c1b729-e81a-4624-828d-31abc052ccc9)
 
 
 ## ✨ Features
-- gain
+
 - phase invert
-- pan
+- channel mode
+- stereo width, mid/side
 - mono
 - bass mono
-- stereo width, mid/side
+- gain
+- pan
+- dc offset
 
 ### TODO
 **Processing**
 - [ ] bass mono : filter phase
-
-**UI**
-- [ ] popup menu
 
 ## 📂 Download
 - [Windows (zip)](https://github.com/m1m0zzz/utility-clone/archive/refs/heads/release/windows.zip)
@@ -31,22 +31,20 @@ Currently, it is possible to build with both Projucer and CMake
 
 ### use Projucer
 - Edit `*.jucer` file
-  `/path/to/JUCE/modules` to the folder where your JUCE is downloaded
+  - `/path/to/JUCE/modules` to the folder where your JUCE is downloaded
 - Open Projucer
 
 ### use CMake
-TODO
 
 #### CMake + VSCode
 - Open `*.code-workspace`
 - Install extension
 
 ## 👷 CI
-TODO
 
-- GitHub Actions
+- GitHub Actions [(here...)](https://github.com/m1m0zzz/utility-clone/blob/main/.github/workflows/cmake-multi-platform.yml)
 - CMake
-- release by git tag
+- [ ] release by git tag
 
 ## License
 GPL v3.0
