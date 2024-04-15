@@ -3,10 +3,9 @@
 name: CMake on multiple platforms
 
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [main]
+    types: [closed]
 
 permissions:
   contents: write
