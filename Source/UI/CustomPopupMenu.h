@@ -8,7 +8,7 @@ public:
 
     juce::LookAndFeel* lookAndFeel;
     juce::UndoManager& undoManager;
-    std::atomic<float>* stereoMode;
+    juce::AudioProcessorValueTreeState& valueTreeState;
     std::function<void()> updateStereoLabel;
 
     const juce::URL documentURL = juce::URL("https://github.com/m1m0zzz/utility-clone");
@@ -20,9 +20,9 @@ public:
         SHOW_DOCUMENT
     };
 
-    CustomPopupMenu(juce::LookAndFeel* lookAndFeel, juce::UndoManager& undoManager,
-        std::atomic<float>* stereoMode, std::function<void()> updateStereoLabel) : 
-        lookAndFeel(lookAndFeel), undoManager(undoManager), stereoMode(stereoMode), updateStereoLabel(updateStereoLabel) {
+    CustomPopupMenu(juce::LookAndFeel* lookAndFeel, juce::AudioProcessorValueTreeState& valueTreeState,
+        juce::UndoManager& undoManager, std::function<void()> updateStereoLabel) : 
+        lookAndFeel(lookAndFeel), valueTreeState(valueTreeState), undoManager(undoManager), updateStereoLabel(updateStereoLabel) {
         setLookAndFeel(lookAndFeel);
     }
 
@@ -42,7 +42,7 @@ public:
             addSeparator();
             addItem(
                 static_cast<int>(ItemsID::TOGGLE_STEREO_MODE),
-                juce::String("Toggle ") + (*stereoMode ? "Width" : "Mid/Side") + " Mode"
+                juce::String("Toggle ") + (*valueTreeState.getRawParameterValue("stereoMode") ? "Width" : "Mid/Side") + " Mode"
             );
         }
         if (includes(ids, ItemsID::SHOW_DOCUMENT)) {
@@ -66,10 +66,12 @@ public:
                     undoManager.redo();
                     if (updateStereoLabel) updateStereoLabel();
                     break;
-                case static_cast<int>(ItemsID::TOGGLE_STEREO_MODE):
-                    *stereoMode = static_cast<float>(!*stereoMode);
+                case static_cast<int>(ItemsID::TOGGLE_STEREO_MODE): {
+                    const auto stereoMode = valueTreeState.getRawParameterValue("stereoMode");
+                    valueTreeState.getParameterAsValue("stereoMode").setValue(static_cast<float>(!*stereoMode));
                     if (updateStereoLabel) updateStereoLabel();
                     break;
+                }
                 case static_cast<int>(ItemsID::SHOW_DOCUMENT):
                     documentURL.launchInDefaultBrowser();
                     break;

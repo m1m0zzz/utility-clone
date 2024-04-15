@@ -19,11 +19,6 @@ UtilityCloneAudioProcessorEditor::UtilityCloneAudioProcessorEditor(
     //setResizeLimits(width, height, 400, 600);
     //getConstrainer()->setFixedAspectRatio(ratio);
 
-    customLookAndFeel.setColour(juce::PopupMenu::ColourIds::backgroundColourId, themeColours.at("white"));
-    customLookAndFeel.setColour(juce::PopupMenu::ColourIds::textColourId, themeColours.at("text"));
-    customLookAndFeel.setColour(juce::PopupMenu::ColourIds::highlightedBackgroundColourId, themeColours.at("lightblue"));
-    customLookAndFeel.setColour(juce::PopupMenu::ColourIds::highlightedTextColourId, themeColours.at("text"));
-
     // components
     gainSliderAttachment.reset(new SliderAttachment(valueTreeState, "gain", gainSlider));
     auto gainRange = valueTreeState.getParameterRange("gain");
@@ -38,13 +33,30 @@ UtilityCloneAudioProcessorEditor::UtilityCloneAudioProcessorEditor(
     invertPhaseRToggleButtonAttachment.reset(new ButtonAttachment(valueTreeState, "invertPhaseR", invertPhaseRToggleButton));
     addAndMakeVisible(invertPhaseRToggleButton);
 
+    channelModeComboBox.addItemList(channelModeList, 1);
+    channelModeComboBoxAttachment.reset(new ComboBoxAttachment(valueTreeState, "channelMode", channelModeComboBox));
+    channelModeComboBox.setColour(juce::ComboBox::ColourIds::backgroundColourId, themeColours.at("lightgrey"));
+    channelModeComboBox.setColour(juce::ComboBox::ColourIds::textColourId, themeColours.at("text"));
+    channelModeComboBox.setColour(juce::ComboBox::ColourIds::outlineColourId, themeColours.at("lightblack"));
+    channelModeComboBox.setColour(juce::ComboBox::ColourIds::arrowColourId, themeColours.at("text"));
+    channelModeComboBox.setLookAndFeel(&customLookAndFeel);
+    channelModeComboBox.onChange = [this]() {
+        monoToggleButton.setAndUpdateDisabled(isMonoByChannelMode());
+        bassMonoListeningButton.setAndUpdateDisabled(isMonoByChannelMode());
+        stereoWidthSlider.setAndUpdateDisabled(isMonoByChannelMode() || *isMono);
+        stereoMidSideSlider.setAndUpdateDisabled(isMonoByChannelMode() || *isMono);
+        bassMonoToggleButton.setAndUpdateDisabled(isMonoByChannelMode() || *isMono);
+        bassMonoFrequencySlider.setAndUpdateDisabled(isMonoByChannelMode() || *isMono || !*isBassMono);
+    };
+    addAndMakeVisible(channelModeComboBox);
+
     monoToggleButtonAttachment.reset(new ButtonAttachment(valueTreeState, "mono", monoToggleButton));
     monoToggleButton.onClick = [this]() {
         auto state = monoToggleButton.getToggleState();
-        stereoWidthSlider.setAndUpdateDisabled(state);
-        stereoMidSideSlider.setAndUpdateDisabled(state);
-        bassMonoToggleButton.setAndUpdateDisabled(state);
-        bassMonoFrequencySlider.setAndUpdateDisabled(state || !*isBassMono);
+        stereoWidthSlider.setAndUpdateDisabled(isMonoByChannelMode() || state);
+        stereoMidSideSlider.setAndUpdateDisabled(isMonoByChannelMode() || state);
+        bassMonoToggleButton.setAndUpdateDisabled(isMonoByChannelMode() || state);
+        bassMonoFrequencySlider.setAndUpdateDisabled(isMonoByChannelMode() || state || !*isBassMono);
     };
     addAndMakeVisible(monoToggleButton);
 
@@ -80,7 +92,7 @@ UtilityCloneAudioProcessorEditor::UtilityCloneAudioProcessorEditor(
     bassMonoToggleButtonAttachment.reset(new ButtonAttachment(valueTreeState, "isBassMono", bassMonoToggleButton));
     bassMonoToggleButton.onClick = [this]() {
         auto state = bassMonoToggleButton.getToggleState();
-        bassMonoFrequencySlider.setAndUpdateDisabled(*isMono || !state);
+        bassMonoFrequencySlider.setAndUpdateDisabled(*isMono || isMonoByChannelMode() || !state);
     };
     addAndMakeVisible(bassMonoToggleButton);
 
@@ -90,6 +102,11 @@ UtilityCloneAudioProcessorEditor::UtilityCloneAudioProcessorEditor(
 
     bassMonoListeningButtonAttachment.reset(new ButtonAttachment(valueTreeState, "isBassMonoListening", bassMonoListeningButton));
     addAndMakeVisible(bassMonoListeningButton);
+
+    dcToggleButtonAttachment.reset(new ButtonAttachment(valueTreeState, "isDc", dcToggleButton));
+    dcToggleButton.setColour(ToggleTextButton::ColourIds::buttonOnColourId, themeColours.at("blue"));
+    dcToggleButton.updateColourAll();
+    addAndMakeVisible(dcToggleButton);
 
     gainLabel.setText("Gain", juce::dontSendNotification);
     gainLabel.setColour(juce::Label::textColourId, themeColours.at("text"));
@@ -167,7 +184,7 @@ void UtilityCloneAudioProcessorEditor::resized()
     height = getHeight();
 
     const int padding = 5;
-    const int componentHeight = 26;
+    const int componentHeight = 22;
     const int knobHeight = 80;
     const auto buttonSize = 20; // stereoModeSwitchButton
 
@@ -189,33 +206,38 @@ void UtilityCloneAudioProcessorEditor::resized()
     rect.setHeight(componentHeight);
     invertPhaseLToggleButton.setBounds(rect);
 
-    rect.setX((columnL.getWidth() + 2) / 2);
+    rect.setX((columnL.getWidth() / 2) + 2);
     invertPhaseRToggleButton.setBounds(rect);
 
     rect = columnL.reduced(padding);
-    rect.setTop(80);
+    rect.setTop(65);
+    rect.setHeight(componentHeight);
+    channelModeComboBox.setBounds(rect);
+
+    rect = columnL.reduced(padding);
+    rect.setTop(95);
     rect.setWidth(columnL.getWidth() - padding - buttonSize);
     rect.setHeight(componentHeight);
     stereoModeLabel.setBounds(rect);
 
     rect = columnL.reduced(padding);
-    rect.setTop(80 + (componentHeight - buttonSize) / 2);
+    rect.setTop(95 + (componentHeight - buttonSize) / 2);
     rect.setX(rect.getX() + rect.getWidth() - buttonSize);
     rect.setWidth(buttonSize);
     rect.setHeight(buttonSize);
     stereoModeSwitchButton.setBounds(rect);
 
     rect = columnL.reduced(padding);
-    rect.setTop(110);
+    rect.setTop(125);
     rect.setHeight(knobHeight);
     stereoWidthSlider.setBounds(rect);
     stereoMidSideSlider.setBounds(rect);
 
-    rect.setTop(200);
+    rect.setTop(210);
     rect.setHeight(componentHeight);
     monoToggleButton.setBounds(rect);
 
-    rect.setTop(235);
+    rect.setTop(240);
     rect.setHeight(componentHeight);
     bassMonoToggleButton.setBounds(rect);
 
@@ -252,6 +274,12 @@ void UtilityCloneAudioProcessorEditor::resized()
     rect.setTop(height / 2 + 30);
     rect.setHeight(knobHeight);
     panSlider.setBounds(rect);
+
+    rect.setTop(270);
+    rect.setX(rect.getX() + rect.getWidth() - 35);
+    rect.setHeight(componentHeight);
+    rect.setWidth(30);
+    dcToggleButton.setBounds(rect);
 }
 
 void UtilityCloneAudioProcessorEditor::updateStereoLabel()
@@ -260,4 +288,9 @@ void UtilityCloneAudioProcessorEditor::updateStereoLabel()
     stereoWidthSlider.setVisible(boolean);
     stereoMidSideSlider.setVisible(!boolean);
     stereoModeLabel.setText(boolean ? "Width" : "Mid/Side", juce::sendNotification);
+}
+
+bool UtilityCloneAudioProcessorEditor::isMonoByChannelMode()
+{
+    return channelModeList[*channelMode] == "Right" || channelModeList[*channelMode] == "Left";
 }

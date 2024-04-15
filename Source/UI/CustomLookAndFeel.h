@@ -4,6 +4,14 @@
 #include "math.h"
 
 class CustomLookAndFeel : public juce::LookAndFeel_V4 {
+public:
+    CustomLookAndFeel() {
+        setColour(juce::PopupMenu::ColourIds::backgroundColourId, themeColours.at("white"));
+        setColour(juce::PopupMenu::ColourIds::textColourId, themeColours.at("text"));
+        setColour(juce::PopupMenu::ColourIds::highlightedBackgroundColourId, themeColours.at("lightblue"));
+        setColour(juce::PopupMenu::ColourIds::highlightedTextColourId, themeColours.at("text"));
+    }
+
     // knob
     void drawRotarySlider(juce::Graphics& g, int x, int y, int width, int height,
         float sliderPosProportional, float rotaryStartAngle,
@@ -71,6 +79,75 @@ class CustomLookAndFeel : public juce::LookAndFeel_V4 {
         return label;
     };
 
+    juce::Slider::SliderLayout getSliderLayout(juce::Slider& slider) override {
+        // ref: https://github.com/juce-framework/JUCE/blob/master/modules/juce_gui_basics/lookandfeel/juce_LookAndFeel_V2.cpp#L1651
+        // 1. compute the actually visible textBox size from the slider textBox size and some additional constraints
+
+        int minXSpace = 0;
+        int minYSpace = 0;
+
+        auto textBoxPos = slider.getTextBoxPosition();
+
+        if (textBoxPos == juce::Slider::TextBoxLeft || textBoxPos == juce::Slider::TextBoxRight)
+            minXSpace = 30;
+        else
+            minYSpace = 15;
+
+        auto localBounds = slider.getLocalBounds();
+
+        auto textBoxWidth = std::max(0, std::min(slider.getTextBoxWidth(), localBounds.getWidth() - minXSpace));
+        textBoxWidth = static_cast<int>(textBoxWidth * 0.85); // custamized this line
+        auto textBoxHeight = std::max(0, std::min(slider.getTextBoxHeight(), localBounds.getHeight() - minYSpace));
+
+        juce::Slider::SliderLayout layout;
+
+        // 2. set the textBox bounds
+
+        if (textBoxPos != juce::Slider::NoTextBox)
+        {
+            if (slider.isBar())
+            {
+                layout.textBoxBounds = localBounds;
+            }
+            else
+            {
+                layout.textBoxBounds.setWidth(textBoxWidth);
+                layout.textBoxBounds.setHeight(textBoxHeight);
+
+                if (textBoxPos == juce::Slider::TextBoxLeft)           layout.textBoxBounds.setX(0);
+                else if (textBoxPos == juce::Slider::TextBoxRight)     layout.textBoxBounds.setX(localBounds.getWidth() - textBoxWidth);
+                else /* above or below -> centre horizontally */ layout.textBoxBounds.setX((localBounds.getWidth() - textBoxWidth) / 2);
+
+                if (textBoxPos == juce::Slider::TextBoxAbove)          layout.textBoxBounds.setY(0);
+                else if (textBoxPos == juce::Slider::TextBoxBelow)     layout.textBoxBounds.setY(localBounds.getHeight() - textBoxHeight - 8); // custamized this line
+                else /* left or right -> centre vertically */    layout.textBoxBounds.setY((localBounds.getHeight() - textBoxHeight) / 2);
+            }
+        }
+
+        // 3. set the slider bounds
+
+        layout.sliderBounds = localBounds;
+
+        if (slider.isBar())
+        {
+            layout.sliderBounds.reduce(1, 1);   // bar border
+        }
+        else
+        {
+            if (textBoxPos == juce::Slider::TextBoxLeft)       layout.sliderBounds.removeFromLeft(textBoxWidth);
+            else if (textBoxPos == juce::Slider::TextBoxRight) layout.sliderBounds.removeFromRight(textBoxWidth);
+            else if (textBoxPos == juce::Slider::TextBoxAbove) layout.sliderBounds.removeFromTop(textBoxHeight);
+            else if (textBoxPos == juce::Slider::TextBoxBelow) layout.sliderBounds.removeFromBottom(textBoxHeight);
+
+            const int thumbIndent = getSliderThumbRadius(slider);
+
+            if (slider.isHorizontal())    layout.sliderBounds.reduce(thumbIndent, 0);
+            else if (slider.isVertical()) layout.sliderBounds.reduce(0, thumbIndent);
+        }
+
+        return layout;
+    }
+
     // square button
     void drawButtonBackground(juce::Graphics& g, juce::Button& button, const juce::Colour& backgroundColour,
         bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override
@@ -90,4 +167,25 @@ class CustomLookAndFeel : public juce::LookAndFeel_V4 {
         g.setColour(outline);
         g.drawRect(bounds);
     };
+
+    void drawComboBox(juce::Graphics& g, int width, int height, bool,
+        int, int, int, int, juce::ComboBox& box) override
+    {
+        juce::Rectangle<int> boxBounds(0, 0, width, height);
+
+        g.setColour(box.findColour(juce::ComboBox::backgroundColourId));
+        g.fillRect(boxBounds);
+
+        g.setColour(box.findColour(juce::ComboBox::outlineColourId));
+        g.drawRect(boxBounds, 1.0f);
+
+        juce::Rectangle<int> arrowZone(width - 20, 0, std::min(15, height), height);
+        juce::Path path;
+        path.startNewSubPath((float)arrowZone.getX() + 3.0f, (float)arrowZone.getCentreY() - 2.0f);
+        path.lineTo((float)arrowZone.getCentreX(), (float)arrowZone.getCentreY() + 3.0f);
+        path.lineTo((float)arrowZone.getRight() - 3.0f, (float)arrowZone.getCentreY() - 2.0f);
+
+        g.setColour(box.findColour(juce::ComboBox::arrowColourId).withAlpha((box.isEnabled() ? 0.9f : 0.2f)));
+        g.strokePath(path, juce::PathStrokeType(2.0f));
+    }
 };

@@ -38,6 +38,7 @@ UtilityCloneAudioProcessor::UtilityCloneAudioProcessor()
             ),
             std::make_unique<juce::AudioParameterBool>("invertPhaseL", "Invert Phase L", false),
             std::make_unique<juce::AudioParameterBool>("invertPhaseR", "Invert Phase R", false),
+            std::make_unique<juce::AudioParameterChoice>("channelMode", "Channel Mode", channelModeList, 1),
             std::make_unique<juce::AudioParameterBool>("mono", "Mono", false),
             std::make_unique<juce::AudioParameterFloat>(
                 "pan", "Pan", juce::NormalisableRange(-50.0f, 50.0f, 1.0f), 0.0f, "Pan", juce::AudioProcessorParameter::genericParameter,
@@ -64,11 +65,13 @@ UtilityCloneAudioProcessor::UtilityCloneAudioProcessor()
                 120.0f
             ),
             std::make_unique<juce::AudioParameterBool>("isBassMonoListening", "Bass Mono Listening", false),
+            std::make_unique<juce::AudioParameterBool>("isDc", "DC", false),
         })
 {
     gain                = parameters.getRawParameterValue("gain");
     isInvertPhaseL      = parameters.getRawParameterValue("invertPhaseL");
     isInvertPhaseR      = parameters.getRawParameterValue("invertPhaseR");
+    channelMode         = parameters.getRawParameterValue("channelMode");
     isMono              = parameters.getRawParameterValue("mono");
     pan                 = parameters.getRawParameterValue("pan");
     stereoMode          = parameters.getRawParameterValue("stereoMode");
@@ -77,6 +80,7 @@ UtilityCloneAudioProcessor::UtilityCloneAudioProcessor()
     isBassMono          = parameters.getRawParameterValue("isBassMono");
     bassMonoFrequency   = parameters.getRawParameterValue("bassMonoFrequency");
     isBassMonoListening = parameters.getRawParameterValue("isBassMonoListening");
+    isDc                = parameters.getRawParameterValue("isDc");
 }
 
 UtilityCloneAudioProcessor::~UtilityCloneAudioProcessor()
@@ -162,6 +166,9 @@ void UtilityCloneAudioProcessor::prepareToPlay (double sampleRate, int samplesPe
 
     pannerDSP.prepare(spec);
     pannerDSP.setRule(juce::dsp::PannerRule::sin3dB);
+
+    *dcFilter.state = *juce::dsp::IIR::Coefficients<float>::makeHighPass(sampleRate, 5.0f);
+    dcFilter.prepare(spec);
 }
 
 void UtilityCloneAudioProcessor::releaseResources()
@@ -210,11 +217,30 @@ void UtilityCloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     if (totalNumInputChannels == 2)
         buffer.applyGain(1, 0, numSamples, phaseR);
 
+    // channel mode
+    //DBG("channel mode: " << channelModeList[*channelMode]);
+    if (totalNumInputChannels == 2) {
+        if (channelModeList[*channelMode] == "Right") {
+            buffer.clear(0, 0, numSamples);
+            buffer.copyFrom(0, 0, buffer, 1, 0, buffer.getNumSamples());
+        }
+        else if (channelModeList[*channelMode] == "Left") {
+            buffer.clear(1, 0, numSamples);
+            buffer.copyFrom(1, 0, buffer, 0, 0, buffer.getNumSamples());
+        }
+        else if (channelModeList[*channelMode] == "Swap") {
+            juce::AudioBuffer<float> newBuffer;
+            newBuffer.makeCopyOf(buffer);
+            buffer.copyFrom(0, 0, newBuffer, 1, 0, newBuffer.getNumSamples());
+            buffer.copyFrom(1, 0, newBuffer, 0, 0, newBuffer.getNumSamples());
+        }
+    }
+
     // stereo
     //DBG("stereoMode: " << *stereoMode);
     width.setTargetValue(*stereoWidth);
     midSide.setTargetValue(*stereoMidSide);
-    if (totalNumInputChannels == 2 && !(*isMono))
+    if (totalNumInputChannels == 2 && !*isMono && !isMonoByChannelMode())
     {
         auto* leftChannel = buffer.getWritePointer(0);
         auto* rightChannel = buffer.getWritePointer(1);
@@ -224,7 +250,7 @@ void UtilityCloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
             auto mid = (leftChannel[i] + rightChannel[i]);
             auto side = (rightChannel[i] - leftChannel[i]);
 
-            if (*stereoMode == 0) { // Width (0 to 400)
+            if (stereoModeList[*stereoMode] == "Width") { // Width (0 to 400)
                 mid  *= 0.5f; // no change
                 side *= 0.5f * width.getNextValue() / 100;
             }
@@ -241,7 +267,7 @@ void UtilityCloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     }
 
     // mono
-    if (*isMono) {
+    if (*isMono && !isMonoByChannelMode()) {
         // cf. https://forum.juce.com/t/how-do-i-sum-stereo-to-mono/37579/8
         buffer.addFrom(0, 0, buffer, 1, 0, buffer.getNumSamples());
         buffer.copyFrom(1, 0, buffer, 0, 0, buffer.getNumSamples());
@@ -253,7 +279,7 @@ void UtilityCloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     //DBG("BM Freq   = " << *bassMonoFrequency);
     //DBG("BM L = " << *isBassMonoListening);
     lrFilter.setCutoffFrequency(*bassMonoFrequency);
-    if ((*isBassMono && !*isMono) || *isBassMonoListening) {
+    if (((*isBassMono && !*isMono) || *isBassMonoListening) && !isMonoByChannelMode()) {
         juce::AudioSampleBuffer lowOutput;
         juce::AudioSampleBuffer highOutput;
 
@@ -302,6 +328,10 @@ void UtilityCloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
 
     gainDSP.process(context);
     pannerDSP.process(context);
+
+    if (*isDc) {
+        dcFilter.process(context);
+    }
 }
 
 //==============================================================================
@@ -337,4 +367,9 @@ void UtilityCloneAudioProcessor::setStateInformation (const void* data, int size
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new UtilityCloneAudioProcessor();
+}
+
+bool UtilityCloneAudioProcessor::isMonoByChannelMode()
+{
+    return channelModeList[*channelMode] == "Right" || channelModeList[*channelMode] == "Left";
 }

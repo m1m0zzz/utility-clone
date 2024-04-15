@@ -9,36 +9,51 @@ public:
         buttonColourId,
         buttonOnColourId,
         outlineColourId,
+        imageColourId,
+        imageDisabledColourId,
+        buttonDisabledOnColourId,
     };
 
+    bool disabled; // show disabled color
     CustomPopupMenu& menu;
 
-    IconButton(juce::Image iconImage, CustomPopupMenu& menu) : iconImage(iconImage), menu(menu) {
+    IconButton(juce::Image iconImage, CustomPopupMenu& menu,
+        bool disabled = false,bool enableMaskImage = false) :
+        iconImage(iconImage), menu(menu), disabled(disabled), enableMaskImage(enableMaskImage) {
         setClickingTogglesState(true);
         setColour(buttonColourId, themeColours.at("lightgrey"));
         setColour(buttonOnColourId, themeColours.at("deepblue"));
-        setColour(outlineColourId, themeColours.at("text"));
+        setColour(outlineColourId, themeColours.at("lightblack"));
+        setColour(imageColourId, themeColours.at("text"));
+        setColour(buttonDisabledOnColourId, themeColours.at("white"));
+        setColour(imageDisabledColourId, themeColours.at("disabled"));
+        setAndUpdateDisabled(disabled);
     }
 
     void paintButton(juce::Graphics& g, bool shouldDrawButtonAsHighlighted, bool) override {
-        auto c = getToggleState() ? findColour(buttonOnColourId) : findColour(buttonColourId);
+        auto rect = juce::Rectangle<float>(0, 0, getWidth(), getHeight()).reduced(0.5f, 0.5f);
+        auto c = getToggleState() ? (
+            disabled ? findColour(buttonDisabledOnColourId) : findColour(buttonOnColourId)
+            ) : findColour(buttonColourId);
         g.setColour(c);
-        g.fillEllipse(0, 0, getWidth(), getHeight());
+        g.fillEllipse(rect);
 
         g.setColour(findColour(outlineColourId));
-        g.drawEllipse(0, 0, getWidth(), getHeight(), 1);
+        g.drawEllipse(rect, 1.0f);
 
         const auto padding = 4;
         const auto pad2 = padding * 2;
+        g.setColour(disabled ? findColour(imageDisabledColourId) : findColour(imageColourId));
         g.drawImage(
             iconImage,
             padding, padding, getWidth() - pad2, getHeight() - pad2,
-            0, 0, iconImage.getWidth(), iconImage.getHeight()
+            0, 0, iconImage.getWidth(), iconImage.getHeight(),
+            enableMaskImage
         );
 
         if (shouldDrawButtonAsHighlighted) {
             g.setColour(juce::Colour::fromFloatRGBA(0, 0, 0, 0.05));
-            g.fillEllipse(0, 0, getWidth(), getHeight());
+            g.fillEllipse(rect);
         }
     }
 
@@ -61,6 +76,25 @@ public:
         return iconImage;
     }
 
+    void updateDisabled() {
+        repaint();
+    }
+
+    void setAndUpdateDisabled(bool flag) {
+        disabled = flag;
+        updateDisabled();
+    }
+
+    bool getEnableMaskImage() {
+        return enableMaskImage;
+    }
+
+    void settEnableMaskImage(bool enableMaskImage) {
+        enableMaskImage = enableMaskImage;
+        repaint();
+    }
+
 private:
+    bool enableMaskImage = false;
     juce::Image iconImage;
 };
