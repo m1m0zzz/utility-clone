@@ -3,7 +3,7 @@
 VST plugin like a Ableton Utility.  
 Development with [JUCE](https://github.com/juce-framework/JUCE)
 
-![preview](https://github.com/m1m0zzz/utility-clone/assets/117814895/a3c1b729-e81a-4624-828d-31abc052ccc9)
+![preview](https://github.com/m1m0zzz/utility-clone/assets/117814895/c0f1913b-e393-4dc6-935b-42fdf28d1640)
 
 
 ## ✨ Features
