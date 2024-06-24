@@ -48,7 +48,7 @@
 				"lib",
 				"build",
 				"*.code-workspace",
-			]
+            ]
 	},
 	"launch": {
 			"configurations": [

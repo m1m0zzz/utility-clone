@@ -48,7 +48,7 @@ private:
     int width = 200;
     int height = 300;
     double ratio = width / height;
-    
+
     // watch parameter for ui
     std::atomic<float>* isMono      = valueTreeState.getRawParameterValue("mono");
     std::atomic<float>* stereoMode  = valueTreeState.getRawParameterValue("stereoMode");

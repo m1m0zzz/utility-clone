@@ -255,10 +255,14 @@ void UtilityCloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
                 side *= 0.5f * width.getNextValue() / 100;
             }
             else { // Mid/Side (-100 to 100)
-                float normalizedMS = (midSide.getNextValue() / 100 + 1.0f) * 0.5f; // 0 to 1
-                float divVolume = abs(midSide.getNextValue() / 100) + 1.0f; // 1 to 2
-                mid  *= (1.0 - normalizedMS) / divVolume;
-                side *=        normalizedMS  / divVolume;
+                float scale = 1.0f - abs(midSide.getNextValue() / 100); // 1 to 0
+                if (midSide.getNextValue() > 0) {
+                    mid  *= scale;
+                } else if (midSide.getNextValue() < 0) {
+                    side  *= scale;
+                }
+                mid  /= 2.0f;
+                side /= 2.0f;
             }
 
             leftChannel[i] = (mid - side);
@@ -316,7 +320,7 @@ void UtilityCloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
             }
         }
     }
-    
+
     juce::dsp::AudioBlock<float> audioBlock(buffer);
     juce::dsp::ProcessContextReplacing<float> context(audioBlock);
 
