@@ -63,8 +63,7 @@ class UtilityCloneAudioProcessor : public juce::AudioProcessor {
   juce::dsp::Gain<float> gainDSP;
   juce::dsp::Panner<float> pannerDSP;
   juce::dsp::LinkwitzRileyFilter<float> lrFilter;
-  juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>,
-                                 juce::dsp::IIR::Coefficients<float>>
+  juce::dsp::ProcessorDuplicator<juce::dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>>
       dcFilter;
 
   std::atomic<float>* gain = nullptr;

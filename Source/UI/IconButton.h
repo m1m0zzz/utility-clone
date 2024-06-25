@@ -16,12 +16,9 @@ class IconButton : public juce::TextButton {
   bool disabled;  // show disabled color
   CustomPopupMenu& menu;
 
-  IconButton(juce::Image iconImage, CustomPopupMenu& menu,
-             bool disabled = false, bool enableMaskImage = false)
-      : iconImage(iconImage),
-        menu(menu),
-        disabled(disabled),
-        enableMaskImage(enableMaskImage) {
+  IconButton(juce::Image iconImage, CustomPopupMenu& menu, bool disabled = false,
+             bool enableMaskImage = false)
+      : iconImage(iconImage), menu(menu), disabled(disabled), enableMaskImage(enableMaskImage) {
     setClickingTogglesState(true);
     setColour(buttonColourId, themeColours.at("lightgrey"));
     setColour(buttonOnColourId, themeColours.at("deepblue"));
@@ -32,13 +29,13 @@ class IconButton : public juce::TextButton {
     setAndUpdateDisabled(disabled);
   }
 
-  void paintButton(juce::Graphics& g, bool shouldDrawButtonAsHighlighted,
-                   bool) override {
-    auto rect = juce::Rectangle<float>(0.0f, 0.0f, static_cast<float>(getWidth()), static_cast<float>(getHeight()))
+  void paintButton(juce::Graphics& g, bool shouldDrawButtonAsHighlighted, bool) override {
+    auto rect = juce::Rectangle<float>(0.0f, 0.0f, static_cast<float>(getWidth()),
+                                       static_cast<float>(getHeight()))
                     .reduced(0.5f, 0.5f);
-    auto c = getToggleState() ? (disabled ? findColour(buttonDisabledOnColourId)
-                                          : findColour(buttonOnColourId))
-                              : findColour(buttonColourId);
+    auto c = getToggleState()
+                 ? (disabled ? findColour(buttonDisabledOnColourId) : findColour(buttonOnColourId))
+                 : findColour(buttonColourId);
     g.setColour(c);
     g.fillEllipse(rect);
 
@@ -47,11 +44,9 @@ class IconButton : public juce::TextButton {
 
     const auto padding = 4;
     const auto pad2 = padding * 2;
-    g.setColour(disabled ? findColour(imageDisabledColourId)
-                         : findColour(imageColourId));
-    g.drawImage(iconImage, padding, padding, getWidth() - pad2,
-                getHeight() - pad2, 0, 0, iconImage.getWidth(),
-                iconImage.getHeight(), enableMaskImage);
+    g.setColour(disabled ? findColour(imageDisabledColourId) : findColour(imageColourId));
+    g.drawImage(iconImage, padding, padding, getWidth() - pad2, getHeight() - pad2, 0, 0,
+                iconImage.getWidth(), iconImage.getHeight(), enableMaskImage);
 
     if (shouldDrawButtonAsHighlighted) {
       g.setColour(juce::Colour::fromFloatRGBA(0, 0, 0, 0.05f));

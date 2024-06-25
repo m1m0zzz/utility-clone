@@ -14,8 +14,8 @@ class ToggleTextButton : public juce::TextButton {
     textDisabledColourId,
   };
 
-  ToggleTextButton(juce::String text, juce::LookAndFeel* lookAndFeel,
-                   CustomPopupMenu& menu, bool disabled = false)
+  ToggleTextButton(juce::String text, juce::LookAndFeel* lookAndFeel, CustomPopupMenu& menu,
+                   bool disabled = false)
       : disabled(disabled), menu(menu) {
     setClickingTogglesState(true);
     setButtonText(text);
@@ -41,27 +41,17 @@ class ToggleTextButton : public juce::TextButton {
 
   void updateColourAll() {
     if (!disabled) {
-      setColour(TextButton::ColourIds::buttonOnColourId,
-                findColour(buttonOnColourId));
-      setColour(TextButton::ColourIds::buttonColourId,
-                findColour(buttonColourId));
-      setColour(TextButton::ColourIds::textColourOnId,
-                findColour(textColourId));
-      setColour(TextButton::ColourIds::textColourOffId,
-                findColour(textColourId));
-      setColour(juce::ComboBox::ColourIds::outlineColourId,
-                findColour(outlineColourId));
+      setColour(TextButton::ColourIds::buttonOnColourId, findColour(buttonOnColourId));
+      setColour(TextButton::ColourIds::buttonColourId, findColour(buttonColourId));
+      setColour(TextButton::ColourIds::textColourOnId, findColour(textColourId));
+      setColour(TextButton::ColourIds::textColourOffId, findColour(textColourId));
+      setColour(juce::ComboBox::ColourIds::outlineColourId, findColour(outlineColourId));
     } else {
-      setColour(TextButton::ColourIds::buttonOnColourId,
-                findColour(buttonDisabledOnColourId));
-      setColour(TextButton::ColourIds::buttonColourId,
-                findColour(buttonColourId));
-      setColour(TextButton::ColourIds::textColourOnId,
-                findColour(textDisabledColourId));
-      setColour(TextButton::ColourIds::textColourOffId,
-                findColour(textDisabledColourId));
-      setColour(juce::ComboBox::ColourIds::outlineColourId,
-                findColour(outlineColourId));
+      setColour(TextButton::ColourIds::buttonOnColourId, findColour(buttonDisabledOnColourId));
+      setColour(TextButton::ColourIds::buttonColourId, findColour(buttonColourId));
+      setColour(TextButton::ColourIds::textColourOnId, findColour(textDisabledColourId));
+      setColour(TextButton::ColourIds::textColourOffId, findColour(textDisabledColourId));
+      setColour(juce::ComboBox::ColourIds::outlineColourId, findColour(outlineColourId));
     }
   }
 

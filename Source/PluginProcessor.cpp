@@ -7,6 +7,7 @@
 */
 
 #include "PluginProcessor.h"
+
 #include "PluginEditor.h"
 
 template <typename T>
@@ -18,68 +19,57 @@ T calcSkew(T min, T max) {
 //==============================================================================
 UtilityCloneAudioProcessor::UtilityCloneAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
-    : AudioProcessor(
-          BusesProperties()
+    : AudioProcessor(BusesProperties()
 #if !JucePlugin_IsMidiEffect
 #if !JucePlugin_IsSynth
-              .withInput("Input", juce::AudioChannelSet::stereo(), true)
+                         .withInput("Input", juce::AudioChannelSet::stereo(), true)
 #endif
-              .withOutput("Output", juce::AudioChannelSet::stereo(), true)
+                         .withOutput("Output", juce::AudioChannelSet::stereo(), true)
 #endif
-              )
+                         )
 #endif
       ,
       parameters(
           *this, &undoManager, juce::Identifier("Utility-clone"),
           {
               std::make_unique<juce::AudioParameterFloat>(
-                  "gain", "Gain", juce::NormalisableRange(-100.0f, 35.0f), 0.0f,
-                  "Gain", juce::AudioProcessorParameter::genericParameter,
+                  "gain", "Gain", juce::NormalisableRange(-100.0f, 35.0f), 0.0f, "Gain",
+                  juce::AudioProcessorParameter::genericParameter,
                   [](float value, int) {
                     int digit = static_cast<int>(log10(abs(value)));
-                    return (value <= -100.0f)
-                               ? "-inf"
-                               : juce::String(value,
-                                              2 - (digit < 0 ? 0 : digit));
+                    return (value <= -100.0f) ? "-inf"
+                                              : juce::String(value, 2 - (digit < 0 ? 0 : digit));
                   }),
-              std::make_unique<juce::AudioParameterBool>(
-                  "invertPhaseL", "Invert Phase L", false),
-              std::make_unique<juce::AudioParameterBool>(
-                  "invertPhaseR", "Invert Phase R", false),
-              std::make_unique<juce::AudioParameterChoice>(
-                  "channelMode", "Channel Mode", channelModeList, 1),
+              std::make_unique<juce::AudioParameterBool>("invertPhaseL", "Invert Phase L", false),
+              std::make_unique<juce::AudioParameterBool>("invertPhaseR", "Invert Phase R", false),
+              std::make_unique<juce::AudioParameterChoice>("channelMode", "Channel Mode",
+                                                           channelModeList, 1),
               std::make_unique<juce::AudioParameterBool>("mono", "Mono", false),
               std::make_unique<juce::AudioParameterFloat>(
-                  "pan", "Pan", juce::NormalisableRange(-50.0f, 50.0f, 1.0f),
-                  0.0f, "Pan", juce::AudioProcessorParameter::genericParameter,
+                  "pan", "Pan", juce::NormalisableRange(-50.0f, 50.0f, 1.0f), 0.0f, "Pan",
+                  juce::AudioProcessorParameter::genericParameter,
                   [](float value, int) {
                     return (value == 0) ? "C"
-                                        : (juce::String(abs(value)) +
-                                           ((value < 0) ? "L" : "R"));
+                                        : (juce::String(abs(value)) + ((value < 0) ? "L" : "R"));
                   }),
-              std::make_unique<juce::AudioParameterChoice>(
-                  "stereoMode", "Stereo Mode", stereoModeList, 0),
+              std::make_unique<juce::AudioParameterChoice>("stereoMode", "Stereo Mode",
+                                                           stereoModeList, 0),
               std::make_unique<juce::AudioParameterFloat>(
-                  "stereoWidth", "Width",
-                  juce::NormalisableRange(0.0f, 400.0f, 1.0f), 100.0f),
+                  "stereoWidth", "Width", juce::NormalisableRange(0.0f, 400.0f, 1.0f), 100.0f),
               std::make_unique<juce::AudioParameterFloat>(
-                  "stereoMidSide", "Mid/Side",
-                  juce::NormalisableRange(-100.0f, 100.0f, 1.0f), 0.0f,
+                  "stereoMidSide", "Mid/Side", juce::NormalisableRange(-100.0f, 100.0f, 1.0f), 0.0f,
                   "Mid/Side", juce::AudioProcessorParameter::genericParameter,
                   [](float value, int) {
                     return (value == 0) ? "0"
-                                        : (juce::String(abs(value)) +
-                                           ((value < 0) ? "M" : "S"));
+                                        : (juce::String(abs(value)) + ((value < 0) ? "M" : "S"));
                   }),
-              std::make_unique<juce::AudioParameterBool>("isBassMono",
-                                                         "Bass Mono", false),
+              std::make_unique<juce::AudioParameterBool>("isBassMono", "Bass Mono", false),
               std::make_unique<juce::AudioParameterFloat>(
                   "bassMonoFrequency", "Bass Mono freq",
-                  juce::NormalisableRange(50.0f, 500.0f, 1.0f,
-                                          calcSkew(50.0f, 500.0f), false),
+                  juce::NormalisableRange(50.0f, 500.0f, 1.0f, calcSkew(50.0f, 500.0f), false),
                   120.0f),
-              std::make_unique<juce::AudioParameterBool>(
-                  "isBassMonoListening", "Bass Mono Listening", false),
+              std::make_unique<juce::AudioParameterBool>("isBassMonoListening",
+                                                         "Bass Mono Listening", false),
               std::make_unique<juce::AudioParameterBool>("isDc", "DC", false),
           }) {
   gain = parameters.getRawParameterValue("gain");
@@ -100,9 +90,7 @@ UtilityCloneAudioProcessor::UtilityCloneAudioProcessor()
 UtilityCloneAudioProcessor::~UtilityCloneAudioProcessor() {}
 
 //==============================================================================
-const juce::String UtilityCloneAudioProcessor::getName() const {
-  return JucePlugin_Name;
-}
+const juce::String UtilityCloneAudioProcessor::getName() const { return JucePlugin_Name; }
 
 bool UtilityCloneAudioProcessor::acceptsMidi() const {
 #if JucePlugin_WantsMidiInput
@@ -140,16 +128,12 @@ int UtilityCloneAudioProcessor::getCurrentProgram() { return 0; }
 
 void UtilityCloneAudioProcessor::setCurrentProgram(int index) {}
 
-const juce::String UtilityCloneAudioProcessor::getProgramName(int index) {
-  return {};
-}
+const juce::String UtilityCloneAudioProcessor::getProgramName(int index) { return {}; }
 
-void UtilityCloneAudioProcessor::changeProgramName(
-    int index, const juce::String& newName) {}
+void UtilityCloneAudioProcessor::changeProgramName(int index, const juce::String& newName) {}
 
 //==============================================================================
-void UtilityCloneAudioProcessor::prepareToPlay(double sampleRate,
-                                               int samplesPerBlock) {
+void UtilityCloneAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock) {
   spec.maximumBlockSize = samplesPerBlock;
   spec.numChannels = 2;
   spec.sampleRate = sampleRate;
@@ -160,14 +144,12 @@ void UtilityCloneAudioProcessor::prepareToPlay(double sampleRate,
   lrFilter.prepare(spec);
 
   gainDSP.prepare(spec);
-  gainDSP.setRampDurationSeconds(
-      0.005);  // should consider arguments or using SmoothValue
+  gainDSP.setRampDurationSeconds(0.005);  // should consider arguments or using SmoothValue
 
   pannerDSP.prepare(spec);
   pannerDSP.setRule(juce::dsp::PannerRule::sin3dB);
 
-  *dcFilter.state =
-      *juce::dsp::IIR::Coefficients<float>::makeHighPass(sampleRate, 5.0f);
+  *dcFilter.state = *juce::dsp::IIR::Coefficients<float>::makeHighPass(sampleRate, 5.0f);
   dcFilter.prepare(spec);
 }
 
@@ -177,8 +159,7 @@ void UtilityCloneAudioProcessor::releaseResources() {
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
-bool UtilityCloneAudioProcessor::isBusesLayoutSupported(
-    const BusesLayout& layouts) const {
+bool UtilityCloneAudioProcessor::isBusesLayoutSupported(const BusesLayout& layouts) const {
 #if JucePlugin_IsMidiEffect
   juce::ignoreUnused(layouts);
   return true;
@@ -193,8 +174,7 @@ bool UtilityCloneAudioProcessor::isBusesLayoutSupported(
 
     // This checks if the input layout matches the output layout
 #if !JucePlugin_IsSynth
-  if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
-    return false;
+  if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet()) return false;
 #endif
 
   return true;
@@ -246,7 +226,7 @@ void UtilityCloneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
 
       if (stereoModeList[(int)*stereoMode] == "Width") {  // Width (0 to 400)
         side *= width.getNextValue() / 100;
-      } else {  // Mid/Side (-100 to 100)
+      } else {                                                   // Mid/Side (-100 to 100)
         float scale = 1.0f - abs(midSide.getNextValue() / 100);  // 1 to 0
         if (midSide.getNextValue() > 0) {
           mid *= scale;
@@ -273,8 +253,7 @@ void UtilityCloneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
   // DBG("BM Freq   = " << *bassMonoFrequency);
   // DBG("BM L = " << *isBassMonoListening);
   lrFilter.setCutoffFrequency(*bassMonoFrequency);
-  if (((*isBassMono && !*isMono) || *isBassMonoListening) &&
-      !isMonoByChannelMode()) {
+  if (((*isBassMono && !*isMono) || *isBassMonoListening) && !isMonoByChannelMode()) {
     juce::AudioSampleBuffer lowOutput;
     juce::AudioSampleBuffer highOutput;
 
@@ -338,17 +317,14 @@ juce::AudioProcessorEditor* UtilityCloneAudioProcessor::createEditor() {
 }
 
 //==============================================================================
-void UtilityCloneAudioProcessor::getStateInformation(
-    juce::MemoryBlock& destData) {
+void UtilityCloneAudioProcessor::getStateInformation(juce::MemoryBlock& destData) {
   auto state = parameters.copyState();
   std::unique_ptr<juce::XmlElement> xml(state.createXml());
   copyXmlToBinary(*xml, destData);
 }
 
-void UtilityCloneAudioProcessor::setStateInformation(const void* data,
-                                                     int sizeInBytes) {
-  std::unique_ptr<juce::XmlElement> xmlState(
-      getXmlFromBinary(data, sizeInBytes));
+void UtilityCloneAudioProcessor::setStateInformation(const void* data, int sizeInBytes) {
+  std::unique_ptr<juce::XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
 
   if (xmlState.get() != nullptr)
     if (xmlState->hasTagName(parameters.state.getType()))

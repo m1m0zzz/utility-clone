@@ -8,10 +8,10 @@
 
 #pragma once
 
-// #include <JuceHeader.h>
 #include <juce_audio_processors/juce_audio_processors.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <BinaryData.h>
+
 #include "PluginProcessor.h"
 
 #include "UI/Constant.h"
@@ -30,8 +30,7 @@
 class UtilityCloneAudioProcessorEditor : public juce::AudioProcessorEditor {
  public:
   UtilityCloneAudioProcessorEditor(UtilityCloneAudioProcessor&,
-                                   juce::AudioProcessorValueTreeState& vts,
-                                   juce::UndoManager& um);
+                                   juce::AudioProcessorValueTreeState& vts, juce::UndoManager& um);
   ~UtilityCloneAudioProcessorEditor() override;
 
   //==============================================================================
@@ -51,46 +50,38 @@ class UtilityCloneAudioProcessorEditor : public juce::AudioProcessorEditor {
 
   int width = 200;
   int height = 300;
-//   double ratio = width / height;
+  //   double ratio = width / height;
 
   // watch parameter for ui
   std::atomic<float>* isMono = valueTreeState.getRawParameterValue("mono");
-  std::atomic<float>* stereoMode =
-      valueTreeState.getRawParameterValue("stereoMode");
-  std::atomic<float>* isBassMono =
-      valueTreeState.getRawParameterValue("isBassMono");
-  std::atomic<float>* channelMode =
-      valueTreeState.getRawParameterValue("channelMode");
+  std::atomic<float>* stereoMode = valueTreeState.getRawParameterValue("stereoMode");
+  std::atomic<float>* isBassMono = valueTreeState.getRawParameterValue("isBassMono");
+  std::atomic<float>* channelMode = valueTreeState.getRawParameterValue("channelMode");
 
   CustomPopupMenu menu{&customLookAndFeel, valueTreeState, undoManager,
                        [this]() { this->updateStereoLabel(); }};
 
   // parameter components
   typedef juce::AudioProcessorValueTreeState::SliderAttachment SliderAttachment;
-  typedef juce::AudioProcessorValueTreeState::ComboBoxAttachment
-      ComboBoxAttachment;
+  typedef juce::AudioProcessorValueTreeState::ComboBoxAttachment ComboBoxAttachment;
   typedef juce::AudioProcessorValueTreeState::ButtonAttachment ButtonAttachment;
 
   KnobSlider gainSlider{&customLookAndFeel, menu};
   TogglePhaseButton invertPhaseLToggleButton{"L", &customLookAndFeel, menu};
   TogglePhaseButton invertPhaseRToggleButton{"R", &customLookAndFeel, menu};
   juce::ComboBox channelModeComboBox;
-  ToggleTextButton monoToggleButton{"Mono", &customLookAndFeel, menu,
-                                    isMonoByChannelMode()};
+  ToggleTextButton monoToggleButton{"Mono", &customLookAndFeel, menu, isMonoByChannelMode()};
   KnobSlider panSlider{&customLookAndFeel, menu};
   IconButton stereoModeSwitchButton{
-      juce::ImageCache::getFromMemory(BinaryData::swap_16_16_png,
-                                      BinaryData::swap_16_16_pngSize),
+      juce::ImageCache::getFromMemory(BinaryData::swap_16_16_png, BinaryData::swap_16_16_pngSize),
       menu};
-  KnobSlider stereoWidthSlider{&customLookAndFeel, menu,
-                               *isMono != 0 || isMonoByChannelMode()};
-  KnobSlider stereoMidSideSlider{&customLookAndFeel, menu,
-                                 *isMono != 0 || isMonoByChannelMode()};
+  KnobSlider stereoWidthSlider{&customLookAndFeel, menu, *isMono != 0 || isMonoByChannelMode()};
+  KnobSlider stereoMidSideSlider{&customLookAndFeel, menu, *isMono != 0 || isMonoByChannelMode()};
   ToggleTextButton bassMonoToggleButton{"Bass Mono", &customLookAndFeel, menu,
                                         *isMono != 0 || isMonoByChannelMode()};
-  MiniTextSlider bassMonoFrequencySlider{
-      valueTreeState, "bassMonoFrequency", &customLookAndFeel, menu,
-      *isMono != 0 || isMonoByChannelMode() || *isBassMono == 0};
+  MiniTextSlider bassMonoFrequencySlider{valueTreeState, "bassMonoFrequency", &customLookAndFeel,
+                                         menu,
+                                         *isMono != 0 || isMonoByChannelMode() || *isBassMono == 0};
   IconButton bassMonoListeningButton{
       juce::ImageCache::getFromMemory(BinaryData::headphone_16_16_png,
                                       BinaryData::headphone_16_16_pngSize),

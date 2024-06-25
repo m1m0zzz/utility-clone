@@ -14,5 +14,4 @@ const std::unordered_map<std::string, juce::Colour> themeColours = {
 };
 
 const auto stereoModeList = juce::StringArray("Width", "Mid/Side");
-const auto channelModeList =
-  juce::StringArray("Left", "Stereo", "Right", "Swap");
+const auto channelModeList = juce::StringArray("Left", "Stereo", "Right", "Swap");

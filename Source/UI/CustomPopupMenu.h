@@ -10,15 +10,13 @@ class CustomPopupMenu : public juce::PopupMenu {
   juce::AudioProcessorValueTreeState& valueTreeState;
   std::function<void()> updateStereoLabel;
 
-  const juce::URL documentURL =
-      juce::URL("https://github.com/m1m0zzz/utility-clone");
+  const juce::URL documentURL = juce::URL("https://github.com/m1m0zzz/utility-clone");
 
   enum class ItemsID { UNDO = 1, REDO, TOGGLE_STEREO_MODE, SHOW_DOCUMENT };
 
   CustomPopupMenu(juce::LookAndFeel* lookAndFeel,
                   juce::AudioProcessorValueTreeState& valueTreeState,
-                  juce::UndoManager& undoManager,
-                  std::function<void()> updateStereoLabel)
+                  juce::UndoManager& undoManager, std::function<void()> updateStereoLabel)
       : lookAndFeel(lookAndFeel),
         valueTreeState(valueTreeState),
         undoManager(undoManager),
@@ -33,28 +31,23 @@ class CustomPopupMenu : public juce::PopupMenu {
                           }) {
     clear();
     if (includes(ids, ItemsID::UNDO))
-      addColouredItem(
-          static_cast<int>(ItemsID::UNDO), "Undo (Ctrl+z)",
-          lookAndFeel->findColour(juce::PopupMenu::ColourIds::textColourId),
-          undoManager.canUndo());
+      addColouredItem(static_cast<int>(ItemsID::UNDO), "Undo (Ctrl+z)",
+                      lookAndFeel->findColour(juce::PopupMenu::ColourIds::textColourId),
+                      undoManager.canUndo());
     if (includes(ids, ItemsID::REDO))
-      addColouredItem(
-          static_cast<int>(ItemsID::REDO), "Redo (Ctrl+y)",
-          lookAndFeel->findColour(juce::PopupMenu::ColourIds::textColourId),
-          undoManager.canRedo());
+      addColouredItem(static_cast<int>(ItemsID::REDO), "Redo (Ctrl+y)",
+                      lookAndFeel->findColour(juce::PopupMenu::ColourIds::textColourId),
+                      undoManager.canRedo());
     if (includes(ids, ItemsID::TOGGLE_STEREO_MODE)) {
       addSeparator();
       addItem(static_cast<int>(ItemsID::TOGGLE_STEREO_MODE),
               juce::String("Toggle ") +
-                  (*valueTreeState.getRawParameterValue("stereoMode")
-                       ? "Width"
-                       : "Mid/Side") +
+                  (*valueTreeState.getRawParameterValue("stereoMode") ? "Width" : "Mid/Side") +
                   " Mode");
     }
     if (includes(ids, ItemsID::SHOW_DOCUMENT)) {
       addSeparator();
-      addItem(static_cast<int>(ItemsID::SHOW_DOCUMENT),
-              "Show document (browser)");
+      addItem(static_cast<int>(ItemsID::SHOW_DOCUMENT), "Show document (browser)");
     }
   }
 
@@ -72,8 +65,7 @@ class CustomPopupMenu : public juce::PopupMenu {
           if (updateStereoLabel) updateStereoLabel();
           break;
         case static_cast<int>(ItemsID::TOGGLE_STEREO_MODE): {
-          const auto stereoMode =
-              valueTreeState.getRawParameterValue("stereoMode");
+          const auto stereoMode = valueTreeState.getRawParameterValue("stereoMode");
           valueTreeState.getParameterAsValue("stereoMode")
               .setValue(static_cast<float>(!*stereoMode));
           if (updateStereoLabel) updateStereoLabel();

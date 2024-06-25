@@ -7,49 +7,43 @@
 */
 
 #include "PluginEditor.h"
+
 #include "PluginProcessor.h"
 
 //==============================================================================
 UtilityCloneAudioProcessorEditor::UtilityCloneAudioProcessorEditor(
-    UtilityCloneAudioProcessor& p, juce::AudioProcessorValueTreeState& vts,
-    juce::UndoManager& um)
-    : AudioProcessorEditor(&p),
-      audioProcessor(p),
-      valueTreeState(vts),
-      undoManager(um) {
+    UtilityCloneAudioProcessor& p, juce::AudioProcessorValueTreeState& vts, juce::UndoManager& um)
+    : AudioProcessorEditor(&p), audioProcessor(p), valueTreeState(vts), undoManager(um) {
   // window
   // setResizable(true, true);
   // setResizeLimits(width, height, 400, 600);
   // getConstrainer()->setFixedAspectRatio(ratio);
 
   // components
-  gainSliderAttachment.reset(
-      new SliderAttachment(valueTreeState, "gain", gainSlider));
+  gainSliderAttachment.reset(new SliderAttachment(valueTreeState, "gain", gainSlider));
   auto gainRange = valueTreeState.getParameterRange("gain");
   gainSlider.setRange(gainRange.start, gainRange.end);
   gainSlider.setSkewFactorFromMidPoint(0);
   gainSlider.setTextValueSuffix(" dB");
   addAndMakeVisible(gainSlider);
 
-  invertPhaseLToggleButtonAttachment.reset(new ButtonAttachment(
-      valueTreeState, "invertPhaseL", invertPhaseLToggleButton));
+  invertPhaseLToggleButtonAttachment.reset(
+      new ButtonAttachment(valueTreeState, "invertPhaseL", invertPhaseLToggleButton));
   addAndMakeVisible(invertPhaseLToggleButton);
 
-  invertPhaseRToggleButtonAttachment.reset(new ButtonAttachment(
-      valueTreeState, "invertPhaseR", invertPhaseRToggleButton));
+  invertPhaseRToggleButtonAttachment.reset(
+      new ButtonAttachment(valueTreeState, "invertPhaseR", invertPhaseRToggleButton));
   addAndMakeVisible(invertPhaseRToggleButton);
 
   channelModeComboBox.addItemList(channelModeList, 1);
-  channelModeComboBoxAttachment.reset(new ComboBoxAttachment(
-      valueTreeState, "channelMode", channelModeComboBox));
+  channelModeComboBoxAttachment.reset(
+      new ComboBoxAttachment(valueTreeState, "channelMode", channelModeComboBox));
   channelModeComboBox.setColour(juce::ComboBox::ColourIds::backgroundColourId,
                                 themeColours.at("lightgrey"));
-  channelModeComboBox.setColour(juce::ComboBox::ColourIds::textColourId,
-                                themeColours.at("text"));
+  channelModeComboBox.setColour(juce::ComboBox::ColourIds::textColourId, themeColours.at("text"));
   channelModeComboBox.setColour(juce::ComboBox::ColourIds::outlineColourId,
                                 themeColours.at("lightblack"));
-  channelModeComboBox.setColour(juce::ComboBox::ColourIds::arrowColourId,
-                                themeColours.at("text"));
+  channelModeComboBox.setColour(juce::ComboBox::ColourIds::arrowColourId, themeColours.at("text"));
   channelModeComboBox.setLookAndFeel(&customLookAndFeel);
   channelModeComboBox.onChange = [this]() {
     monoToggleButton.setAndUpdateDisabled(isMonoByChannelMode());
@@ -57,25 +51,21 @@ UtilityCloneAudioProcessorEditor::UtilityCloneAudioProcessorEditor(
     stereoWidthSlider.setAndUpdateDisabled(isMonoByChannelMode() || *isMono);
     stereoMidSideSlider.setAndUpdateDisabled(isMonoByChannelMode() || *isMono);
     bassMonoToggleButton.setAndUpdateDisabled(isMonoByChannelMode() || *isMono);
-    bassMonoFrequencySlider.setAndUpdateDisabled(isMonoByChannelMode() ||
-                                                 *isMono || !*isBassMono);
+    bassMonoFrequencySlider.setAndUpdateDisabled(isMonoByChannelMode() || *isMono || !*isBassMono);
   };
   addAndMakeVisible(channelModeComboBox);
 
-  monoToggleButtonAttachment.reset(
-      new ButtonAttachment(valueTreeState, "mono", monoToggleButton));
+  monoToggleButtonAttachment.reset(new ButtonAttachment(valueTreeState, "mono", monoToggleButton));
   monoToggleButton.onClick = [this]() {
     auto state = monoToggleButton.getToggleState();
     stereoWidthSlider.setAndUpdateDisabled(isMonoByChannelMode() || state);
     stereoMidSideSlider.setAndUpdateDisabled(isMonoByChannelMode() || state);
     bassMonoToggleButton.setAndUpdateDisabled(isMonoByChannelMode() || state);
-    bassMonoFrequencySlider.setAndUpdateDisabled(isMonoByChannelMode() ||
-                                                 state || !*isBassMono);
+    bassMonoFrequencySlider.setAndUpdateDisabled(isMonoByChannelMode() || state || !*isBassMono);
   };
   addAndMakeVisible(monoToggleButton);
 
-  panSliderAttachment.reset(
-      new SliderAttachment(valueTreeState, "pan", panSlider));
+  panSliderAttachment.reset(new SliderAttachment(valueTreeState, "pan", panSlider));
   addAndMakeVisible(panSlider);
 
   stereoWidthSliderAttachment.reset(
@@ -87,8 +77,8 @@ UtilityCloneAudioProcessorEditor::UtilityCloneAudioProcessorEditor(
   stereoWidthSlider.setName("stereoModeSlider");
   addAndMakeVisible(stereoWidthSlider);
 
-  stereoMidSideSliderAttachment.reset(new SliderAttachment(
-      valueTreeState, "stereoMidSide", stereoMidSideSlider));
+  stereoMidSideSliderAttachment.reset(
+      new SliderAttachment(valueTreeState, "stereoMidSide", stereoMidSideSlider));
   stereoMidSideSlider.setName("stereoModeSlider");
   addAndMakeVisible(stereoMidSideSlider);
   stereoMidSideSlider.setVisible(false);
@@ -98,8 +88,8 @@ UtilityCloneAudioProcessorEditor::UtilityCloneAudioProcessorEditor(
   stereoModeLabel.setJustificationType(juce::Justification::centred);
   addAndMakeVisible(stereoModeLabel);
 
-  stereoModeSwitchButtonAttachment.reset(new ButtonAttachment(
-      valueTreeState, "stereoMode", stereoModeSwitchButton));
+  stereoModeSwitchButtonAttachment.reset(
+      new ButtonAttachment(valueTreeState, "stereoMode", stereoModeSwitchButton));
   stereoModeSwitchButton.onClick = [this]() { updateStereoLabel(); };
   stereoModeSwitchButton.setColour(IconButton::ColourIds::buttonOnColourId,
                                    themeColours.at("lightgrey"));
@@ -110,24 +100,21 @@ UtilityCloneAudioProcessorEditor::UtilityCloneAudioProcessorEditor(
       new ButtonAttachment(valueTreeState, "isBassMono", bassMonoToggleButton));
   bassMonoToggleButton.onClick = [this]() {
     auto state = bassMonoToggleButton.getToggleState();
-    bassMonoFrequencySlider.setAndUpdateDisabled(
-        *isMono || isMonoByChannelMode() || !state);
+    bassMonoFrequencySlider.setAndUpdateDisabled(*isMono || isMonoByChannelMode() || !state);
   };
   addAndMakeVisible(bassMonoToggleButton);
 
-  bassMonoFrequencySliderAttachment.reset(new SliderAttachment(
-      valueTreeState, "bassMonoFrequency", bassMonoFrequencySlider));
+  bassMonoFrequencySliderAttachment.reset(
+      new SliderAttachment(valueTreeState, "bassMonoFrequency", bassMonoFrequencySlider));
   bassMonoFrequencySlider.setTextValueSuffix(" Hz");
   addAndMakeVisible(bassMonoFrequencySlider);
 
-  bassMonoListeningButtonAttachment.reset(new ButtonAttachment(
-      valueTreeState, "isBassMonoListening", bassMonoListeningButton));
+  bassMonoListeningButtonAttachment.reset(
+      new ButtonAttachment(valueTreeState, "isBassMonoListening", bassMonoListeningButton));
   addAndMakeVisible(bassMonoListeningButton);
 
-  dcToggleButtonAttachment.reset(
-      new ButtonAttachment(valueTreeState, "isDc", dcToggleButton));
-  dcToggleButton.setColour(ToggleTextButton::ColourIds::buttonOnColourId,
-                           themeColours.at("blue"));
+  dcToggleButtonAttachment.reset(new ButtonAttachment(valueTreeState, "isDc", dcToggleButton));
+  dcToggleButton.setColour(ToggleTextButton::ColourIds::buttonOnColourId, themeColours.at("blue"));
   dcToggleButton.updateColourAll();
   addAndMakeVisible(dcToggleButton);
 
@@ -175,8 +162,7 @@ bool UtilityCloneAudioProcessorEditor::keyPressed(const juce::KeyPress& key) {
   return true;
 }
 
-void UtilityCloneAudioProcessorEditor::mouseDown(
-    const juce::MouseEvent& mouseEvent) {
+void UtilityCloneAudioProcessorEditor::mouseDown(const juce::MouseEvent& mouseEvent) {
   auto modifiers = juce::ModifierKeys::getCurrentModifiers();
   if (!modifiers.isRightButtonDown()) return;
 
@@ -303,8 +289,7 @@ void UtilityCloneAudioProcessorEditor::updateStereoLabel() {
   auto boolean = !(static_cast<bool>(*stereoMode));
   stereoWidthSlider.setVisible(boolean);
   stereoMidSideSlider.setVisible(!boolean);
-  stereoModeLabel.setText(boolean ? "Width" : "Mid/Side",
-                          juce::sendNotification);
+  stereoModeLabel.setText(boolean ? "Width" : "Mid/Side", juce::sendNotification);
 }
 
 bool UtilityCloneAudioProcessorEditor::isMonoByChannelMode() {
