@@ -51,7 +51,7 @@ class UtilityCloneAudioProcessorEditor : public juce::AudioProcessorEditor {
 
   int width = 200;
   int height = 300;
-  double ratio = width / height;
+//   double ratio = width / height;
 
   // watch parameter for ui
   std::atomic<float>* isMono = valueTreeState.getRawParameterValue("mono");

@@ -308,6 +308,6 @@ void UtilityCloneAudioProcessorEditor::updateStereoLabel() {
 }
 
 bool UtilityCloneAudioProcessorEditor::isMonoByChannelMode() {
-  return channelModeList[*channelMode] == "Right" ||
-         channelModeList[*channelMode] == "Left";
+  return channelModeList[(int)*channelMode] == "Right" ||
+         channelModeList[(int)*channelMode] == "Left";
 }

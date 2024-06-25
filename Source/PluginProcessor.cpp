@@ -216,15 +216,15 @@ void UtilityCloneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
   if (totalNumInputChannels == 2) buffer.applyGain(1, 0, numSamples, phaseR);
 
   // channel mode
-  // DBG("channel mode: " << channelModeList[*channelMode]);
+  // DBG("channel mode: " << channelModeList[(int)*channelMode]);
   if (totalNumInputChannels == 2) {
-    if (channelModeList[*channelMode] == "Right") {
+    if (channelModeList[(int)*channelMode] == "Right") {
       buffer.clear(0, 0, numSamples);
       buffer.copyFrom(0, 0, buffer, 1, 0, buffer.getNumSamples());
-    } else if (channelModeList[*channelMode] == "Left") {
+    } else if (channelModeList[(int)*channelMode] == "Left") {
       buffer.clear(1, 0, numSamples);
       buffer.copyFrom(1, 0, buffer, 0, 0, buffer.getNumSamples());
-    } else if (channelModeList[*channelMode] == "Swap") {
+    } else if (channelModeList[(int)*channelMode] == "Swap") {
       juce::AudioBuffer<float> newBuffer;
       newBuffer.makeCopyOf(buffer);
       buffer.copyFrom(0, 0, newBuffer, 1, 0, newBuffer.getNumSamples());
@@ -244,7 +244,7 @@ void UtilityCloneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer,
       auto mid = (rightChannel[i] + leftChannel[i]);
       auto side = (rightChannel[i] - leftChannel[i]);
 
-      if (stereoModeList[*stereoMode] == "Width") {  // Width (0 to 400)
+      if (stereoModeList[(int)*stereoMode] == "Width") {  // Width (0 to 400)
         side *= width.getNextValue() / 100;
       } else {  // Mid/Side (-100 to 100)
         float scale = 1.0f - abs(midSide.getNextValue() / 100);  // 1 to 0
@@ -362,6 +362,6 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter() {
 }
 
 bool UtilityCloneAudioProcessor::isMonoByChannelMode() {
-  return channelModeList[*channelMode] == "Right" ||
-         channelModeList[*channelMode] == "Left";
+  return channelModeList[(int)*channelMode] == "Right" ||
+         channelModeList[(int)*channelMode] == "Left";
 }
