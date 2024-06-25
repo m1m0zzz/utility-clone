@@ -247,26 +247,22 @@ void UtilityCloneAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
 
         for (int i = 0; i < buffer.getNumSamples(); ++i)
         {
-            auto mid = (leftChannel[i] + rightChannel[i]);
+            auto mid  = (rightChannel[i] + leftChannel[i]);
             auto side = (rightChannel[i] - leftChannel[i]);
 
             if (stereoModeList[*stereoMode] == "Width") { // Width (0 to 400)
-                mid  *= 0.5f; // no change
-                side *= 0.5f * width.getNextValue() / 100;
-            }
-            else { // Mid/Side (-100 to 100)
+                side *= width.getNextValue() / 100;
+            } else { // Mid/Side (-100 to 100)
                 float scale = 1.0f - abs(midSide.getNextValue() / 100); // 1 to 0
                 if (midSide.getNextValue() > 0) {
                     mid  *= scale;
                 } else if (midSide.getNextValue() < 0) {
                     side  *= scale;
                 }
-                mid  /= 2.0f;
-                side /= 2.0f;
             }
 
-            leftChannel[i] = (mid - side);
-            rightChannel[i] = (mid + side);
+            leftChannel[i]  = (mid - side) / 2.0f;
+            rightChannel[i] = (mid + side) / 2.0f;
         }
     }
 
