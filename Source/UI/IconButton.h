@@ -34,7 +34,7 @@ class IconButton : public juce::TextButton {
 
   void paintButton(juce::Graphics& g, bool shouldDrawButtonAsHighlighted,
                    bool) override {
-    auto rect = juce::Rectangle<float>(0, 0, getWidth(), getHeight())
+    auto rect = juce::Rectangle<float>(0.0f, 0.0f, static_cast<float>(getWidth()), static_cast<float>(getHeight()))
                     .reduced(0.5f, 0.5f);
     auto c = getToggleState() ? (disabled ? findColour(buttonDisabledOnColourId)
                                           : findColour(buttonOnColourId))
@@ -54,7 +54,7 @@ class IconButton : public juce::TextButton {
                 iconImage.getHeight(), enableMaskImage);
 
     if (shouldDrawButtonAsHighlighted) {
-      g.setColour(juce::Colour::fromFloatRGBA(0, 0, 0, 0.05));
+      g.setColour(juce::Colour::fromFloatRGBA(0, 0, 0, 0.05f));
       g.fillEllipse(rect);
     }
   }

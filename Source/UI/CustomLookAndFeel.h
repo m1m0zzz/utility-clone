@@ -45,7 +45,8 @@ class CustomLookAndFeel : public juce::LookAndFeel_V4 {
 
     juce::Path valueArc;
     valueArc.addCentredArc(bounds.getCentreX(), bounds.getCentreY(), arcRadius,
-                           arcRadius, 0.0f, 2 * M_PI, toAngle, true);
+                           arcRadius, 0.0f, 2.0f * static_cast<float>(M_PI),
+                           toAngle, true);
     g.setColour(fill);
     g.strokePath(valueArc,
                  juce::PathStrokeType(lineW, juce::PathStrokeType::curved,
@@ -203,7 +204,7 @@ class CustomLookAndFeel : public juce::LookAndFeel_V4 {
     g.setColour(isOn ? bgOn : bg);
     g.fillRect(bounds);
     if (shouldDrawButtonAsHighlighted) {
-      g.setColour(juce::Colour::fromFloatRGBA(0, 0, 0, 0.05));
+      g.setColour(juce::Colour::fromFloatRGBA(0, 0, 0, 0.05f));
       g.fillRect(bounds);
     }
     g.setColour(outline);
@@ -218,7 +219,7 @@ class CustomLookAndFeel : public juce::LookAndFeel_V4 {
     g.fillRect(boxBounds);
 
     g.setColour(box.findColour(juce::ComboBox::outlineColourId));
-    g.drawRect(boxBounds, 1.0f);
+    g.drawRect(boxBounds, 1);
 
     juce::Rectangle<int> arrowZone(width - 20, 0, std::min(15, height), height);
     juce::Path path;

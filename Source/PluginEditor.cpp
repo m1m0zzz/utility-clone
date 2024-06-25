@@ -6,8 +6,8 @@
   ==============================================================================
 */
 
-#include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "PluginProcessor.h"
 
 //==============================================================================
 UtilityCloneAudioProcessorEditor::UtilityCloneAudioProcessorEditor(
