@@ -3,23 +3,23 @@
 name: CMake on multiple platforms
 
 on:
-  pull_request:
-    branches: [main]
-    types: [closed]
+  push:
+    branches: [ "main", "develop" ]
 
 permissions:
   contents: write
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
-
     strategy:
       # Set fail-fast to false to ensure that feedback is delivered for all matrix combinations. Consider changing this to true when your workflow is stable.
       fail-fast: false
 
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
+        # windows: cl
+        # mac: clang
+        # ubuntu: clang, gcc
         os: [windows-latest, macos-latest, ubuntu-latest]
         build_type: [Release]
         c_compiler: [cl, clang, gcc]
@@ -52,12 +52,17 @@ jobs:
             c_compiler: gcc
           - os: ubuntu-latest
             c_compiler: cl
-
+    runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v3
       with:
         # include JUCE folder
         submodules: true
+
+    - uses: maxim-lobanov/setup-xcode@v1
+      if: matrix.os == 'macos-latest'
+      with:
+        xcode-version: latest-stable
 
     - name: Set reusable strings
       # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
@@ -115,7 +120,7 @@ jobs:
     # TODO: submodulesが含まれるの lib ディレクトリがコピーされている？
     # このアクションを使わずに ブランチを作成しpushする
     - name: Deploy to branch
-      if: matrix.c_compiler != 'gcc'
+      if: github.ref == 'refs/heads/main' && matrix.c_compiler != 'gcc'
       uses: s0/git-publish-subdir-action@v2.6.0
       env:
         REPO: self

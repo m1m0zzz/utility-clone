@@ -37,18 +37,19 @@
 					"Unix Makefiles"
 			],
 			"cSpell.words": [
-				"jmin",
-				"juce",
-				"jucer",
-				"Linkwitz",
-				"Projucer"
-			],
+                "jmin",
+                "juce",
+                "jucer",
+                "Linkwitz",
+                "Normalisable",
+                "Projucer"
+            ],
 			"cSpell.ignorePaths": [
 				".git",
 				"lib",
 				"build",
 				"*.code-workspace",
-			]
+            ]
 	},
 	"launch": {
 			"configurations": [
