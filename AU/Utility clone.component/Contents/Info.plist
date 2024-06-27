@@ -20,9 +20,9 @@
     <key>CFBundleSignature</key>
     <string>????</string>
     <key>CFBundleShortVersionString</key>
-    <string>0.0.1</string>
+    <string>1.1.1</string>
     <key>CFBundleVersion</key>
-    <string>0.0.1</string>
+    <string>1.1.1</string>
     <key>NSHumanReadableCopyright</key>
     <string>mimoz</string>
     <key>NSHighResolutionCapable</key>
@@ -43,7 +43,7 @@
         <key>subtype</key>
         <string>XXXX</string>
         <key>version</key>
-        <integer>1</integer>
+        <integer>65793</integer>
         <key>resourceUsage</key>
         <dict>
           <key>network.client</key>
