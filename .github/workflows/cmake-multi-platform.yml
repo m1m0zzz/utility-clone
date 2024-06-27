@@ -59,6 +59,11 @@ jobs:
         # include JUCE folder
         submodules: true
 
+    - uses: maxim-lobanov/setup-xcode@v1
+      if: matrix.os == 'macos-latest'
+      with:
+        xcode-version: latest-stable
+
     - name: Set reusable strings
       # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
       id: strings
