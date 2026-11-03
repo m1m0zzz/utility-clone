@@ -47,7 +47,9 @@ Currently, it is possible to build with both Projucer and CMake
 - [ ] release by git tag
 
 ## License
-GPL v3.0
+AGPL v3.0
+
+JUCE 9 is used under the [AGPLv3](https://www.gnu.org/licenses/agpl-3.0.en.html).
 
 ## Acknowledgment
 
