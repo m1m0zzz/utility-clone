@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.22)
 
-PROJECT(UTILTY_CLONE LANGUAGES CXX VERSION 1.1.1)
+PROJECT(UTILTY_CLONE LANGUAGES C CXX VERSION 1.1.1)
 
 # for clang-tidy(this enable to find system header files).
 if(CMAKE_EXPORT_COMPILE_COMMANDS)
