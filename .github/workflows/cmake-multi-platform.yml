@@ -5,11 +5,12 @@ name: CMake on multiple platforms
 on:
   push:
     branches: [ "main", "develop" ]
-  # PR ではビルドとテストだけを行う。Deploy to branch は github.ref が main のときだけ動く
+    # v1.2.0 のようなタグを push すると、ビルドした成果物を GitHub Release に載せる
+    tags: [ "v*" ]
   pull_request:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
@@ -124,24 +125,48 @@ jobs:
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest --build-config ${{ matrix.build_type }}
 
-    - name: Clean Release Folder (Windows)
-      if: matrix.os == 'windows-latest'
+    - name: Package
+      # 配布するのは各プラグイン形式のフォルダだけ。静的ライブラリや import library は含めない
+      if: startsWith(github.ref, 'refs/tags/v') && matrix.release_branch != ''
       shell: bash
+      working-directory: ${{ steps.strings.outputs.release-dir }}
       run: |
-        rm '${{ steps.strings.outputs.release-dir }}/Utility clone_SharedCode.lib'
+        rm -f "Utility clone_SharedCode.lib" "libUtility clone_SharedCode.a" "VST3/Utility clone.exp" "VST3/Utility clone.lib"
+        dirs=$(ls -d Standalone VST3 AU 2>/dev/null)
+        cmake -E tar cf "$GITHUB_WORKSPACE/UtilityClone-$GITHUB_REF_NAME-${{ matrix.release_branch }}.zip" --format=zip $dirs
 
-    - name: Clean Release Folder (Mac/Linux)
-      if: matrix.os == 'macos-latest' || (matrix.os == 'ubuntu-latest' && matrix.c_compiler != 'gcc')
+    - name: Upload package
+      if: startsWith(github.ref, 'refs/tags/v') && matrix.release_branch != ''
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      with:
+        name: release-${{ matrix.release_branch }}
+        path: UtilityClone-*.zip
+        if-no-files-found: error
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+    - name: Check tag matches project version
       run: |
-        rm '${{ steps.strings.outputs.release-dir }}/libUtility clone_SharedCode.a'
+        version=$(sed -nE 's/^PROJECT\(.*VERSION ([0-9.]+)\).*/\1/p' CMakeLists.txt)
+        if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+          echo "::error::タグ $GITHUB_REF_NAME と CMakeLists.txt の VERSION（$version）が一致しません"
+          exit 1
+        fi
 
-    # TODO: submodulesが含まれるの lib ディレクトリがコピーされている？
-    # このアクションを使わずに ブランチを作成しpushする
-    - name: Deploy to branch
-      if: github.ref == 'refs/heads/main' && matrix.c_compiler != 'gcc'
-      uses: s0/git-publish-subdir-action@v2.6.0
+    - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+      with:
+        pattern: release-*
+        merge-multiple: true
+        path: dist
+
+    - name: Create release
       env:
-        REPO: self
-        BRANCH: release/${{ matrix.release_branch }}
-        FOLDER: ${{ steps.strings.outputs.release-dir }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ github.token }}
+      run: gh release create "$GITHUB_REF_NAME" dist/*.zip --repo "$GITHUB_REPOSITORY" --title "$GITHUB_REF_NAME" --generate-notes
