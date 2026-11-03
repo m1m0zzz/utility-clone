@@ -22,9 +22,7 @@ Development with [JUCE](https://github.com/juce-framework/JUCE)
 - [ ] bass mono : filter phase
 
 ## 📂 Download
-- [Windows (zip)](https://github.com/m1m0zzz/utility-clone/archive/refs/heads/release/windows.zip)
-- [Mac (zip)](https://github.com/m1m0zzz/utility-clone/archive/refs/heads/release/macos.zip)
-- [Linux (zip)](https://github.com/m1m0zzz/utility-clone/archive/refs/heads/release/linux.zip)
+Download the zip for your OS (Windows / Mac / Linux) from [Releases](https://github.com/m1m0zzz/utility-clone/releases/latest).
 
 ## 🛠️ Build
 Currently, it is possible to build with both Projucer and CMake
@@ -44,10 +42,15 @@ Currently, it is possible to build with both Projucer and CMake
 
 - GitHub Actions [(here...)](https://github.com/m1m0zzz/utility-clone/blob/main/.github/workflows/cmake-multi-platform.yml)
 - CMake
-- [ ] release by git tag
+- Release by git tag
+  1. Update `VERSION` in `CMakeLists.txt`
+  2. Push a tag such as `v1.2.0` (it must match `VERSION`)
+  3. The binaries for each OS are uploaded to GitHub Releases
 
 ## License
-GPL v3.0
+AGPL v3.0
+
+JUCE 9 is used under the [AGPLv3](https://www.gnu.org/licenses/agpl-3.0.en.html).
 
 ## Acknowledgment
 
