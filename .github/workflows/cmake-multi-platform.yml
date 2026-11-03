@@ -5,6 +5,8 @@ name: CMake on multiple platforms
 on:
   push:
     branches: [ "main", "develop" ]
+  # PR ではビルドとテストだけを行う。Deploy to branch は github.ref が main のときだけ動く
+  pull_request:
 
 permissions:
   contents: write
