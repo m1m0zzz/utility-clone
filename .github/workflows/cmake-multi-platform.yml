@@ -74,6 +74,21 @@ jobs:
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
         echo "release-dir=${{ github.workspace }}/build/Source/UtilityClone_artefacts/Release" >> "$GITHUB_OUTPUT"
 
+    - name: Set macOS deployment target
+      # 指定しないとランナーの macOS が deployment target になり、新しい SDK で廃止された API がエラーになる。
+      # CMake はこの環境変数から CMAKE_OSX_DEPLOYMENT_TARGET を決め、JUCE の juceaide のビルドにも引き継がれる
+      if: matrix.os == 'macos-latest'
+      run: echo "MACOSX_DEPLOYMENT_TARGET=11.0" >> "$GITHUB_ENV"
+
+    - name: Use LLVM archiver for clang LTO
+      # clang の LTO はビットコードを出すため、GNU ar で作った静的ライブラリからはシンボルを解決できない
+      if: matrix.os == 'ubuntu-latest' && matrix.c_compiler == 'clang'
+      run: |
+        major=$(clang -dumpversion | cut -d. -f1)
+        ar=$(command -v llvm-ar || command -v "llvm-ar-$major")
+        ranlib=$(command -v llvm-ranlib || command -v "llvm-ranlib-$major")
+        echo "EXTRA_CMAKE_ARGS=-DCMAKE_AR=$ar -DCMAKE_RANLIB=$ranlib" >> "$GITHUB_ENV"
+
     - name: Install Dependencies for Ubuntu
       # https://github.com/juce-framework/JUCE/blob/master/docs/Linux%20Dependencies.md
       if: matrix.os == 'ubuntu-latest'
@@ -96,6 +111,7 @@ jobs:
         -DCMAKE_CXX_COMPILER=${{ matrix.cpp_compiler }}
         -DCMAKE_C_COMPILER=${{ matrix.c_compiler }}
         -DCMAKE_BUILD_TYPE=${{ matrix.build_type }}
+        ${{ env.EXTRA_CMAKE_ARGS }}
         -S ${{ github.workspace }}
 
     - name: Build
