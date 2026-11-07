@@ -62,7 +62,7 @@ jobs:
         # include JUCE folder
         submodules: true
 
-    - uses: maxim-lobanov/setup-xcode@v1
+    - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1
       if: matrix.os == 'macos-latest'
       with:
         xcode-version: latest-stable
