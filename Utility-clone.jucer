@@ -3,7 +3,8 @@
 <JUCERPROJECT id="HgJPNV" name="Utility clone" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" companyName="mimoz"
               pluginVST3Category="Tools" companyEmail="contact.m1m0zzz@gmail.com"
-              companyWebsite="m1m0zzz.github.io" companyCopyright="mimoz" displaySplashScreen="1">
+              companyWebsite="m1m0zzz.github.io" companyCopyright="mimoz" displaySplashScreen="1"
+              pluginManufacturerCode="Mimo" pluginCode="Utcl">
   <MAINGROUP id="PrPPaK" name="Utility clone">
     <GROUP id="{8C952588-4780-CCC3-C1BB-84BD50A7E215}" name="Assets">
       <FILE id="gF1hzS" name="headphone_64_64.png" compile="0" resource="1"
