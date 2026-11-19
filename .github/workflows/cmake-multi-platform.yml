@@ -132,8 +132,16 @@ jobs:
       working-directory: ${{ steps.strings.outputs.release-dir }}
       run: |
         rm -f "Utility clone_SharedCode.lib" "libUtility clone_SharedCode.a" "VST3/Utility clone.exp" "VST3/Utility clone.lib"
-        dirs=$(ls -d Standalone VST3 AU 2>/dev/null)
-        cmake -E tar cf "$GITHUB_WORKSPACE/UtilityClone-$GITHUB_REF_NAME-${{ matrix.release_branch }}.zip" --format=zip $dirs
+        # AU は macOS でしか作られない。ls で探すと無いフォルダで exit 2 になり、bash -e でステップが止まる
+        dirs=()
+        for d in Standalone VST3 AU; do
+          if [ -d "$d" ]; then dirs+=("$d"); fi
+        done
+        if [ ${#dirs[@]} -eq 0 ]; then
+          echo "::error::配布するフォルダがありません"
+          exit 1
+        fi
+        cmake -E tar cf "$GITHUB_WORKSPACE/UtilityClone-$GITHUB_REF_NAME-${{ matrix.release_branch }}.zip" --format=zip "${dirs[@]}"
 
     - name: Upload package
       if: startsWith(github.ref, 'refs/tags/v') && matrix.release_branch != ''
