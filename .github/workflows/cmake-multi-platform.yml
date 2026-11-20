@@ -4,7 +4,7 @@ name: CMake on multiple platforms
 
 on:
   push:
-    branches: [ "main", "develop" ]
+    branches: [ "main" ]
     # v1.2.0 のようなタグを push すると、ビルドした成果物を GitHub Release に載せる
     tags: [ "v*" ]
   pull_request:
